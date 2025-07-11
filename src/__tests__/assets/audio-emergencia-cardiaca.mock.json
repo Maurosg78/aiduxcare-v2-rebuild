@@ -1,0 +1,34 @@
+{
+  "audioMock": {
+    "filename": "audio-emergencia-cardiaca.mp3",
+    "duration": 12,
+    "format": "mp3",
+    "transcription": "Buenas, siento un dolor agudo en el pecho que se me va al brazo izquierdo y además me cuesta respirar. Empezó hace como 20 minutos y no se me quita. También siento como que me aprieta el pecho y tengo sudoración fría.",
+    "speaker": "PACIENTE",
+    "quality": "high",
+    "confidence": 0.95,
+    "expectedWarnings": [
+      "Dolor torácico",
+      "Síntomas cardiacos",
+      "Emergencia médica"
+    ],
+    "expectedSeverity": "CRITICAL",
+    "clinicalContext": {
+      "redFlags": [
+        "dolor pecho",
+        "dolor brazo izquierdo",
+        "dificultad respirar",
+        "sudoración fría"
+      ],
+      "specialty": "cardiology",
+      "emergencyLevel": "CRITICAL",
+      "timeWindow": "20 minutos",
+      "symptoms": [
+        "dolor torácico agudo",
+        "irradiación a brazo izquierdo",
+        "disnea",
+        "diaforesis"
+      ]
+    }
+  }
+} 

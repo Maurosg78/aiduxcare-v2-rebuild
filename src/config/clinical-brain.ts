@@ -1,0 +1,1 @@
+export const clinicalBrainUrl = 'https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain'; 

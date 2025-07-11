@@ -1,0 +1,16 @@
+{
+  "healthCheck": false,
+  "cors": false,
+  "latency": 0,
+  "successRate": 25,
+  "errors": [
+    "Health check error: fetch is not a function",
+    "CORS error: fetch is not a function",
+    "Frontend error: fetch is not a function",
+    "Latency test 1 failed: fetch is not a function",
+    "Latency test 2 failed: fetch is not a function",
+    "Latency test 3 failed: fetch is not a function",
+    "Latency test 4 failed: fetch is not a function",
+    "Latency test 5 failed: fetch is not a function"
+  ]
+}

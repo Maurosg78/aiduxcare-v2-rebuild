@@ -1,0 +1,211 @@
+{
+  "rules": {
+    "physiotherapy": [
+      "Evaluar signos neurológicos antes de cualquier manipulación",
+      "Contraindicar ejercicios en presencia de inflamación aguda severa",
+      "Monitorear respuesta al dolor durante tratamiento (escala 0-10)",
+      "Verificar estabilidad articular antes de movilización",
+      "Evaluar ROM activo y pasivo en articulaciones afectadas",
+      "Considerar factores biomecánicos en la evaluación",
+      "Documentar limitaciones funcionales específicas",
+      "Evaluar fuerza muscular mediante escalas validadas",
+      "Considerar factores psicosociales en dolor crónico",
+      "Educar al paciente sobre anatomía y patología",
+      "Establecer objetivos funcionales medibles",
+      "Reevaluar progreso cada 2-3 sesiones",
+      "Descartar banderas rojas antes de iniciar tratamiento manual",
+      "Evaluar dolor nocturno que no cede con cambios de postura",
+      "Verificar función de esfínteres en dolor lumbar severo",
+      "Evaluar patrón de dolor: mecánico vs inflamatorio vs neuropático"
+    ]
+  },
+  "terminology": {
+    "physiotherapy": [
+      { "term": "ROM", "definition": "Rango de movimiento articular" },
+      { "term": "ADL", "definition": "Actividades de la vida diaria" },
+      { "term": "PROM", "definition": "Rango de movimiento pasivo" },
+      { "term": "AROM", "definition": "Rango de movimiento activo" },
+      { "term": "MMT", "definition": "Manual Muscle Testing - Prueba manual de fuerza muscular" },
+      { "term": "TENS", "definition": "Estimulación eléctrica transcutánea" },
+      { "term": "PNF", "definition": "Facilitación neuromuscular propioceptiva" },
+      { "term": "McKenzie", "definition": "Método de diagnóstico y tratamiento mecánico" },
+      { "term": "Maitland", "definition": "Concepto de movilización articular" },
+      { "term": "Mulligan", "definition": "Técnica de movilización con movimiento" },
+      { "term": "NDT", "definition": "Neurodesarrollo - Técnica Bobath" },
+      { "term": "Cyriax", "definition": "Medicina ortopédica - Masaje transverso profundo" },
+      { "term": "Puntos gatillo miofasciales", "definition": "Nódulos palpables en bandas tensas musculares que refieren dolor" },
+      { "term": "Control motor", "definition": "Capacidad del sistema nervioso para coordinar movimientos" },
+      { "term": "Propiocepción", "definition": "Percepción de la posición y movimiento del cuerpo en el espacio" },
+      { "term": "Test de Lasègue", "definition": "Prueba neurológica para evaluar irritación del nervio ciático" },
+      { "term": "Signo de la arteria vertebral", "definition": "Síntomas neurológicos durante rotación/extensión cervical" },
+      { "term": "Sensibilidad en silla de montar", "definition": "Pérdida de sensación en región perineal y genital" },
+      { "term": "Dolor mecánico", "definition": "Dolor que empeora con actividad y mejora con reposo" },
+      { "term": "Dolor inflamatorio", "definition": "Dolor matutino con rigidez, mejora con actividad" },
+      { "term": "Dolor neuropático", "definition": "Dolor quemante, punzante o eléctrico por lesión nerviosa" }
+    ]
+  },
+  "protocols": {
+    "assessment": [
+      "Inspección visual de postura y alineación",
+      "Palpación de estructuras anatómicas relevantes",
+      "Evaluación de ROM activo y pasivo",
+      "Pruebas de fuerza muscular manual",
+      "Tests ortopédicos específicos",
+      "Evaluación neurológica básica",
+      "Análisis funcional de movimientos",
+      "Medición de perímetros si aplica",
+      "Screening de banderas rojas obligatorio",
+      "Evaluación del patrón de dolor (24h)",
+      "Test de provocación de síntomas"
+    ],
+    "treatment": [
+      "Establecer objetivos SMART",
+      "Progresión gradual de ejercicios",
+      "Monitoreo continuo del dolor",
+      "Educación del paciente",
+      "Técnicas de terapia manual apropiadas",
+      "Prescripción de ejercicio domiciliario",
+      "Reevaluación periódica",
+      "Derivación si no hay mejora en 2-3 semanas"
+    ]
+  },
+  "contraindications": {
+    "absolute": [
+      "Fractura no consolidada",
+      "Infección activa en área de tratamiento",
+      "Tumor maligno en área de tratamiento",
+      "Trombosis venosa profunda",
+      "Inestabilidad articular severa",
+      "Síndrome de cauda equina",
+      "Mielopatía cervical progresiva",
+      "Manipulación de alta velocidad en sospecha de fractura",
+      "Ejercicio intenso durante crisis inflamatoria aguda",
+      "Termoterapia sobre zona con alteración de la sensibilidad",
+      "Manipulación cervical con síntomas de arteria vertebral",
+      "Terapia manual en presencia de osteoporosis severa",
+      "Movilización articular con signos de inestabilidad ligamentaria"
+    ],
+    "relative": [
+      "Osteoporosis severa",
+      "Embarazo (ciertas técnicas)",
+      "Hipertensión no controlada",
+      "Enfermedad cardiovascular severa",
+      "Diabetes descompensada",
+      "Medicación anticoagulante",
+      "Edad avanzada con fragilidad",
+      "Dolor nocturno persistente sin causa mecánica clara",
+      "Antecedente de cáncer reciente",
+      "Uso prolongado de corticosteroides",
+      "Pérdida de peso no intencional"
+    ]
+  },
+  "redFlags": {
+    "physiotherapy": [
+      "Dolor nocturno que no cede con cambios de postura",
+      "Pérdida de sensibilidad en silla de montar",
+      "Signo de la arteria vertebral positivo",
+      "Disfunción de esfínteres inexplicable",
+      "Pérdida de control de esfínteres",
+      "Debilidad progresiva en extremidades",
+      "Entumecimiento en silla de montar",
+      "Fiebre con dolor de espalda",
+      "Pérdida de peso inexplicada",
+      "Antecedente de cáncer con nuevo dolor",
+      "Uso de corticosteroides prolongado",
+      "Edad mayor a 50 años con primer episodio",
+      "Trauma significativo reciente",
+      "Signos neurológicos progresivos",
+      "Alteración del estado mental",
+      "Dolor torácico con ejercicio",
+      "Mareos o vértigo con movimientos cervicales",
+      "Síntomas de arteria vertebral",
+      "Dolor inflamatorio matutino con rigidez >1 hora",
+      "Dolor que empeora progresivamente durante semanas",
+      "Antecedente de uveítis o psoriasis con dolor espinal",
+      "Claudicación neurógena bilateral",
+      "Déficit motor segmentario progresivo",
+      "Hipereflexia o signo de Babinski positivo",
+      "Síndrome constitucional (fiebre, pérdida peso, sudoración nocturna)"
+    ]
+  },
+  "assessmentTools": {
+    "functional": [
+      "Escala Visual Analógica (EVA) para dolor",
+      "Índice de Discapacidad de Oswestry",
+      "Índice de Discapacidad Cervical",
+      "Cuestionario DASH (brazo, hombro, mano)",
+      "Escala de Tinetti (equilibrio y marcha)",
+      "Test de Berg (equilibrio)",
+      "Cuestionario de Roland Morris",
+      "Escala de Barthel (independencia funcional)",
+      "Cuestionario de Banderas Rojas (Red Flags Screening)",
+      "Índice de Dolor Nocturno",
+      "Escala de Patrón de Dolor (Mecánico/Inflamatorio/Neuropático)"
+    ],
+    "physical": [
+      "Goniometría para ROM",
+      "Dinamometría para fuerza",
+      "Prueba de marcha de 6 minutos",
+      "Test de Romberg",
+      "Prueba de escalón",
+      "Medición de perímetros",
+      "Evaluación postural",
+      "Test de Lasègue (ciático)",
+      "Test de arteria vertebral",
+      "Evaluación de sensibilidad dermatomal",
+      "Test de provocación sacroilíaca"
+    ]
+  },
+  "treatmentApproaches": {
+    "manual": [
+      "Movilización articular",
+      "Manipulación vertebral (solo si descartadas banderas rojas)",
+      "Masaje terapéutico",
+      "Liberación miofascial",
+      "Técnicas de energía muscular",
+      "Movilización neural"
+    ],
+    "exercise": [
+      "Ejercicios de fortalecimiento",
+      "Ejercicios de flexibilidad",
+      "Entrenamiento propioceptivo",
+      "Ejercicios de estabilización",
+      "Reeducación postural",
+      "Entrenamiento funcional",
+      "Ejercicios de control motor",
+      "Programa de ejercicios domiciliarios"
+    ],
+    "modalities": [
+      "Electroterapia",
+      "Ultrasonido terapéutico",
+      "Termoterapia (solo si no hay alteración sensorial)",
+      "Crioterapia",
+      "Hidroterapia",
+      "Láser terapéutico"
+    ]
+  },
+  "referralCriteria": {
+    "urgent": [
+      "Síndrome de cauda equina",
+      "Mielopatía cervical progresiva",
+      "Signos de arteria vertebral",
+      "Déficit neurológico progresivo",
+      "Sospecha de fractura",
+      "Infección espinal"
+    ],
+    "rheumatology": [
+      "Dolor inflamatorio con rigidez matutina >1h",
+      "Antecedente de uveítis o psoriasis",
+      "Dolor axial nocturno en <40 años",
+      "Respuesta a AINEs en espondilitis",
+      "Artritis periférica asociada"
+    ],
+    "oncology": [
+      "Antecedente de cáncer con nuevo dolor",
+      "Pérdida de peso inexplicada",
+      "Dolor nocturno severo sin alivio postural",
+      "Edad >50 años con primer episodio",
+      "Síndrome constitucional"
+    ]
+  }
+} 

@@ -1,0 +1,23 @@
+{
+  "name": "clinical-brain",
+  "version": "1.0.0",
+  "description": "AiDuxCare Clinical Brain - Sistema de IA especializado en fisioterapia",
+  "main": "index.js",
+  "engines": {
+    "node": "18"
+  },
+  "dependencies": {
+    "@google-cloud/aiplatform": "^3.0.0",
+    "@google-cloud/functions-framework": "^3.3.0",
+    "@google-cloud/storage": "^7.0.0",
+    "cors": "^2.8.5",
+    "winston": "^3.8.2"
+  },
+  "scripts": {
+    "start": "functions-framework --target=clinicalBrain",
+    "deploy": "gcloud functions deploy clinical-brain"
+  },
+  "keywords": ["medical", "ai", "physiotherapy", "vertex-ai", "cloud-functions"],
+  "author": "AiDuxCare Team",
+  "license": "MIT"
+}

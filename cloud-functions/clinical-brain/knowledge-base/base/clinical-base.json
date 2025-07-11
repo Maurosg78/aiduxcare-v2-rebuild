@@ -1,0 +1,68 @@
+{
+  "rules": {
+    "general": [
+      "Siempre evaluar signos vitales en consulta inicial",
+      "Documentar alergias medicamentosas conocidas",
+      "Investigar antecedentes familiares relevantes",
+      "Considerar interacciones medicamentosas",
+      "Evaluar adherencia a tratamientos previos",
+      "Mantener confidencialidad médica",
+      "Obtener consentimiento informado para procedimientos",
+      "Referir cuando exceda el alcance de práctica"
+    ]
+  },
+  "terminology": {
+    "general": [
+      { "term": "SOAP", "definition": "Subjective, Objective, Assessment, Plan - Estructura de documentación clínica" },
+      { "term": "Anamnesis", "definition": "Historia clínica detallada del paciente" },
+      { "term": "Semiología", "definition": "Estudio de los signos y síntomas de las enfermedades" },
+      { "term": "Diagnóstico diferencial", "definition": "Proceso de distinguir entre condiciones con síntomas similares" },
+      { "term": "Pronóstico", "definition": "Predicción del curso probable de una enfermedad" },
+      { "term": "Comorbilidad", "definition": "Presencia de una o más condiciones médicas adicionales" }
+    ]
+  },
+  "protocols": {
+    "safety": [
+      "Verificar identidad del paciente",
+      "Confirmar alergias antes de prescribir",
+      "Evaluar riesgo-beneficio de intervenciones",
+      "Documentar consentimiento informado",
+      "Seguir protocolos de higiene y bioseguridad"
+    ],
+    "documentation": [
+      "Registrar fecha, hora y duración de la consulta",
+      "Documentar motivo de consulta",
+      "Registrar hallazgos objetivos",
+      "Incluir plan de tratamiento",
+      "Programar seguimiento apropiado"
+    ]
+  },
+  "contraindications": {
+    "absolute": [
+      "Alergia conocida al tratamiento propuesto",
+      "Condición médica que contraindique la intervención",
+      "Falta de consentimiento informado",
+      "Estado mental alterado que impida cooperación"
+    ],
+    "relative": [
+      "Embarazo (según intervención)",
+      "Edad avanzada con fragilidad",
+      "Múltiples comorbilidades",
+      "Medicación anticoagulante (según procedimiento)"
+    ]
+  },
+  "redFlags": {
+    "universal": [
+      "Alteración súbita del nivel de conciencia",
+      "Signos de shock (hipotensión, taquicardia, piel fría)",
+      "Dificultad respiratoria severa",
+      "Dolor torácico con características cardíacas",
+      "Cefalea súbita e intensa",
+      "Fiebre alta con rigidez nucal",
+      "Sangrado activo no controlado",
+      "Convulsiones",
+      "Ideación suicida u homicida",
+      "Signos de maltrato o negligencia"
+    ]
+  }
+} 

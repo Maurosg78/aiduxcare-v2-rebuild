@@ -1,0 +1,31 @@
+[debug] [2025-07-07T05:29:23.115Z] ----------------------------------------------------------------------
+[debug] [2025-07-07T05:29:23.117Z] Command:       /opt/homebrew/Cellar/node@20/20.19.3/bin/node /opt/homebrew/bin/firebase init firestore
+[debug] [2025-07-07T05:29:23.118Z] CLI Version:   14.9.0
+[debug] [2025-07-07T05:29:23.118Z] Platform:      darwin
+[debug] [2025-07-07T05:29:23.118Z] Node Version:  v20.19.3
+[debug] [2025-07-07T05:29:23.118Z] Time:          Mon Jul 07 2025 07:29:23 GMT+0200 (Central European Summer Time)
+[debug] [2025-07-07T05:29:23.118Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-07-07T05:29:23.119Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-07-07T05:29:23.135Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-07T05:29:23.136Z] > authorizing via signed-in user (maurosg.2023@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/mauriciosobarzo/Desktop/AIDUXCARE-V.2
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-07-07T05:29:23.448Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-07-07T05:29:23.448Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
