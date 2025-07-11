@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Archivos de build
+dist/
+
+# Archivos de entorno - NUNCA deben estar en el repositorio
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Credenciales
+google-cloud-credentials.json
+
+# Archivos de sistema operativo
+.DS_Store
+
+# Archivos de Vercel
+.vercel/
