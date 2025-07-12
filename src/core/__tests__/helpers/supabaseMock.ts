@@ -1,4 +1,4 @@
-import { PostgrestQueryBuilder } from '@supabase/postgrest-js';
+import { PostgrestQueryBuilder } from "@supabase/postgrest-js";
 
 export const createSupabaseMock = (error?: Error) => {
   const mockBuilder = {

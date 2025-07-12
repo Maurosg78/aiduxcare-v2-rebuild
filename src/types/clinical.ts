@@ -1,12 +1,12 @@
 export interface Warning {
-  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  severity: "HIGH" | "MEDIUM" | "LOW";
   title: string;
   description: string;
   recommendation?: string;
 }
 
 export interface Highlight {
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  priority: "HIGH" | "MEDIUM" | "LOW";
   title: string;
   description: string;
 }

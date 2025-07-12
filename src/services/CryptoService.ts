@@ -3,7 +3,7 @@
  * Proporciona cifrado AES-GCM usando Web Crypto API para datos médicos
  */
 
-import { Buffer } from 'buffer';
+import { Buffer } from "buffer";
 
 interface EncryptedData {
   iv: string;
@@ -27,7 +27,7 @@ export class CryptoService {
   private static instance: CryptoService;
   private key: CryptoKey | null = null;
   private config: CryptoConfig = {
-    algorithm: 'AES-GCM',
+    algorithm: "AES-GCM",
     keyLength: 256,
     saltLength: 16
   };
@@ -41,7 +41,7 @@ export class CryptoService {
     return CryptoService.instance;
   }
 
-  private static readonly ALGORITHM = 'AES-GCM';
+  private static readonly ALGORITHM = "AES-GCM";
   private static readonly KEY_LENGTH = 256;
   private static readonly IV_LENGTH = 12;
   private static readonly TAG_LENGTH = 128;
@@ -53,23 +53,23 @@ export class CryptoService {
         length: this.KEY_LENGTH
       },
       true,
-      ['encrypt', 'decrypt']
+      ["encrypt", "decrypt"]
     );
     return key;
   }
 
   private static async importKey(rawKey: ArrayBuffer): Promise<CryptoKey> {
     return window.crypto.subtle.importKey(
-      'raw',
+      "raw",
       rawKey,
       this.ALGORITHM,
       true,
-      ['encrypt', 'decrypt']
+      ["encrypt", "decrypt"]
     );
   }
 
   private static async exportKey(key: CryptoKey): Promise<ArrayBuffer> {
-    return window.crypto.subtle.exportKey('raw', key);
+    return window.crypto.subtle.exportKey("raw", key);
   }
 
   private static generateIV(): Uint8Array {
@@ -92,22 +92,22 @@ export class CryptoService {
       );
 
       return {
-        iv: Buffer.from(iv).toString('base64'),
-        encryptedData: Buffer.from(encryptedContent).toString('base64')
+        iv: Buffer.from(iv).toString("base64"),
+        encryptedData: Buffer.from(encryptedContent).toString("base64")
       };
     } catch (error) {
       return {
-        iv: '',
-        encryptedData: '',
-        error: error instanceof Error ? error.message : 'Error de encriptación'
+        iv: "",
+        encryptedData: "",
+        error: error instanceof Error ? error.message : "Error de encriptación"
       };
     }
   }
 
   private static async decryptData(encryptedData: EncryptedData, key: CryptoKey): Promise<DecryptionResult> {
     try {
-      const iv = Buffer.from(encryptedData.iv, 'base64');
-      const content = Buffer.from(encryptedData.encryptedData, 'base64');
+      const iv = Buffer.from(encryptedData.iv, "base64");
+      const content = Buffer.from(encryptedData.encryptedData, "base64");
 
       const decryptedContent = await window.crypto.subtle.decrypt(
         {
@@ -126,7 +126,7 @@ export class CryptoService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Error de desencriptación'
+        error: error instanceof Error ? error.message : "Error de desencriptación"
       };
     }
   }
@@ -149,8 +149,8 @@ export class CryptoService {
     );
 
     return {
-      iv: Buffer.from(iv).toString('base64'),
-      encryptedData: Buffer.from(encryptedBuffer).toString('base64')
+      iv: Buffer.from(iv).toString("base64"),
+      encryptedData: Buffer.from(encryptedBuffer).toString("base64")
     };
   }
 
@@ -160,8 +160,8 @@ export class CryptoService {
         await this.generateKey();
       }
 
-      const iv = Buffer.from(encryptedData.iv, 'base64');
-      const data = Buffer.from(encryptedData.encryptedData, 'base64');
+      const iv = Buffer.from(encryptedData.iv, "base64");
+      const data = Buffer.from(encryptedData.encryptedData, "base64");
 
       const decryptedBuffer = await crypto.subtle.decrypt(
         {
@@ -181,7 +181,7 @@ export class CryptoService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Error desconocido al descifrar'
+        error: error instanceof Error ? error.message : "Error desconocido al descifrar"
       };
     }
   }
@@ -193,7 +193,7 @@ export class CryptoService {
         length: this.config.keyLength
       },
       true,
-      ['encrypt', 'decrypt']
+      ["encrypt", "decrypt"]
     );
   }
 
@@ -203,20 +203,20 @@ export class CryptoService {
   private static async deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {
     // Importar la contraseña como material de clave
     const keyMaterial = await crypto.subtle.importKey(
-      'raw',
+      "raw",
       new TextEncoder().encode(passphrase),
-      'PBKDF2',
+      "PBKDF2",
       false,
-      ['deriveBits', 'deriveKey']
+      ["deriveBits", "deriveKey"]
     );
 
     // Derivar la clave usando PBKDF2
     return crypto.subtle.deriveKey(
       {
-        name: 'PBKDF2',
+        name: "PBKDF2",
         salt: salt,
         iterations: 100000, // 100k iteraciones para seguridad
-        hash: 'SHA-256'
+        hash: "SHA-256"
       },
       keyMaterial,
       {
@@ -224,7 +224,7 @@ export class CryptoService {
         length: this.KEY_LENGTH
       },
       false,
-      ['encrypt', 'decrypt']
+      ["encrypt", "decrypt"]
     );
   }
 
@@ -233,7 +233,7 @@ export class CryptoService {
    */
   private static arrayBufferToBase64(buffer: ArrayBuffer): string {
     const bytes = new Uint8Array(buffer);
-    let binary = '';
+    let binary = "";
     for (let i = 0; i < bytes.byteLength; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
@@ -273,7 +273,7 @@ export class CryptoService {
    */
   static async encryptMedicalData(data: MedicalData): Promise<EncryptedData> {
     const jsonData = JSON.stringify(data);
-    const medicalKey = 'AIDUXCARE_MEDICAL_ENCRYPTION_KEY_2025';
+    const medicalKey = "AIDUXCARE_MEDICAL_ENCRYPTION_KEY_2025";
     return this.encrypt(jsonData, medicalKey);
   }
 
@@ -281,7 +281,7 @@ export class CryptoService {
    * Descifra datos médicos con la clave predeterminada
    */
   static async decryptMedicalData(encryptedData: EncryptedData): Promise<MedicalData> {
-    const medicalKey = 'AIDUXCARE_MEDICAL_ENCRYPTION_KEY_2025';
+    const medicalKey = "AIDUXCARE_MEDICAL_ENCRYPTION_KEY_2025";
     const decryptedJson = await this.decrypt(encryptedData, medicalKey);
     return JSON.parse(decryptedJson);
   }

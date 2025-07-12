@@ -1,9 +1,9 @@
-import { AgentContext, AgentSuggestion, SuggestionType } from '@/types/agent';
+import { AgentContext, AgentSuggestion, SuggestionType } from "@/types/agent";
 
 /**
  * Tipo que define los proveedores de modelos de lenguaje soportados
  */
-export type LLMProvider = 'openai' | 'anthropic' | 'cohere';
+export type LLMProvider = "openai" | "anthropic" | "cohere";
 
 export interface LLMResponse {
   suggestions: AgentSuggestion[];
@@ -24,25 +24,25 @@ export interface LLMResponse {
  */
 export async function sendToLLM(
   context: AgentContext,
-  provider: LLMProvider = 'openai'
+  provider: LLMProvider = "openai"
 ): Promise<LLMResponse> {
   // Validar proveedor soportado
-  if (provider !== 'openai' && provider !== 'anthropic' && provider !== 'cohere') {
-    return Promise.reject(new Error('Unsupported LLM provider'));
+  if (provider !== "openai" && provider !== "anthropic" && provider !== "cohere") {
+    return Promise.reject(new Error("Unsupported LLM provider"));
   }
   // Implementación simulada para desarrollo
   return {
     suggestions: [
       {
-        id: '1',
-        type: 'recommendation' as SuggestionType,
-        field: 'diagnosis',
-        content: 'Considerar diagnóstico de hipertensión arterial',
-        sourceBlockId: context.blocks[0]?.id || 'default',
+        id: "1",
+        type: "recommendation" as SuggestionType,
+        field: "diagnosis",
+        content: "Considerar diagnóstico de hipertensión arterial",
+        sourceBlockId: context.blocks[0]?.id || "default",
         createdAt: new Date(),
         updatedAt: new Date()
       }
     ],
-    explanation: 'Basado en los signos vitales y síntomas reportados'
+    explanation: "Basado en los signos vitales y síntomas reportados"
   };
 } 

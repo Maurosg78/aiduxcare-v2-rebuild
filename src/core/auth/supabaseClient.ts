@@ -6,14 +6,14 @@
  * pero delega toda la lógica al singleton en src/lib/supabaseClient.ts
  */
 
-import { supabase, getSupabaseClient, isSupabaseInitialized } from '@/lib/supabaseClient';
+import { supabase, getSupabaseClient, isSupabaseInitialized } from "@/lib/supabaseClient";
 
 // Log de compatibilidad
-console.log('⚙️ Usando cliente Supabase centralizado (vía singleton)...');
+console.log("⚙️ Usando cliente Supabase centralizado (vía singleton)...");
 
 // Verificar que el singleton esté inicializado
 if (!isSupabaseInitialized()) {
-  console.warn('⚠️ Cliente Supabase no inicializado correctamente');
+  console.warn("⚠️ Cliente Supabase no inicializado correctamente");
 }
 
 // Re-exportar el cliente único para compatibilidad total

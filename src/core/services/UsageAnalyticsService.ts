@@ -10,7 +10,7 @@ export const trackMetric = (
   metadata?: MetricData
 ): void => {
   // Implementación del tracking de métricas
-  console.log('Tracking metric:', {
+  console.log("Tracking metric:", {
     metricName,
     userId,
     visitId,

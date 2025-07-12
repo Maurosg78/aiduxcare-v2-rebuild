@@ -1,4 +1,4 @@
-import { Session } from '@supabase/supabase-js';
+import { Session } from "@supabase/supabase-js";
 
 /**
  * Clase para simular la autenticación de Supabase en los tests

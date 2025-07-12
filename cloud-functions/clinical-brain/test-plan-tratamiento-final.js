@@ -5,7 +5,7 @@
  * Evaluación completa del sistema para generar planes basados en evidencia
  */
 
-const ClinicalInsightService = require('./src/services/ClinicalInsightService');
+const ClinicalInsightService = require("./src/services/ClinicalInsightService");
 
 // Configurar logging detallado
 const log = (message, data = {}) => {
@@ -39,42 +39,42 @@ async function evaluarPlanTratamiento() {
   const startTime = Date.now();
   
   try {
-    log('🏥 INICIANDO EVALUACIÓN DE PLAN DE TRATAMIENTO');
-    log('📋 CASO CLÍNICO: Lumbalgia mecánica sin banderas rojas');
+    log("🏥 INICIANDO EVALUACIÓN DE PLAN DE TRATAMIENTO");
+    log("📋 CASO CLÍNICO: Lumbalgia mecánica sin banderas rojas");
     
     // Inicializar servicio
     const clinicalInsightService = new ClinicalInsightService();
     
     // Procesar transcripción
-    log('🔄 PROCESANDO TRANSCRIPCIÓN...');
+    log("🔄 PROCESANDO TRANSCRIPCIÓN...");
     const resultado = await clinicalInsightService.processTranscription(
       casoLumbalgia,
-      'physiotherapy',
-      'initial'
+      "physiotherapy",
+      "initial"
     );
     
     const tiempoTotal = (Date.now() - startTime) / 1000;
     
-    log('✅ PROCESAMIENTO COMPLETADO', {
+    log("✅ PROCESAMIENTO COMPLETADO", {
       tiempoTotal: `${tiempoTotal}s`,
       tieneResultado: !!resultado
     });
     
     // Analizar resultado
-    console.log('\n📊 ANÁLISIS DEL RESULTADO:');
-    console.log('=========================================');
+    console.log("\n📊 ANÁLISIS DEL RESULTADO:");
+    console.log("=========================================");
     
     // 1. Verificar estructura general
-    console.log('\n🔍 ESTRUCTURA GENERAL:');
+    console.log("\n🔍 ESTRUCTURA GENERAL:");
     console.log(`  - Tipo: ${typeof resultado}`);
-    console.log(`  - Claves principales: ${Object.keys(resultado || {}).slice(0, 10).join(', ')}`);
+    console.log(`  - Claves principales: ${Object.keys(resultado || {}).slice(0, 10).join(", ")}`);
     console.log(`  - Tiene SOAP: ${!!resultado.soap_analysis}`);
     console.log(`  - Tiene warnings: ${!!resultado.warnings}`);
     console.log(`  - Tiene suggestions: ${!!resultado.suggestions}`);
     
     // 2. Analizar SOAP si existe
     if (resultado.soap_analysis) {
-      console.log('\n�� ANÁLISIS SOAP:');
+      console.log("\n�� ANÁLISIS SOAP:");
       const soap = resultado.soap_analysis;
       
       if (soap.assessment) {
@@ -89,7 +89,7 @@ async function evaluarPlanTratamiento() {
     }
     
     // 3. Buscar objetivos funcionales en todo el resultado
-    console.log('\n🎯 BÚSQUEDA DE OBJETIVOS FUNCIONALES:');
+    console.log("\n🎯 BÚSQUEDA DE OBJETIVOS FUNCIONALES:");
     const textoCompleto = JSON.stringify(resultado, null, 2);
     
     // Buscar patrones de objetivos
@@ -115,7 +115,7 @@ async function evaluarPlanTratamiento() {
     });
     
     // 4. Buscar técnicas de tratamiento
-    console.log('\n🔧 BÚSQUEDA DE TÉCNICAS DE TRATAMIENTO:');
+    console.log("\n🔧 BÚSQUEDA DE TÉCNICAS DE TRATAMIENTO:");
     const tecnicasPatterns = [
       /ejercicio/gi,
       /fortalecimiento/gi,
@@ -133,14 +133,14 @@ async function evaluarPlanTratamiento() {
       const matches = textoCompleto.match(pattern) || [];
       if (matches.length > 0) {
         tecnicasEncontradas++;
-        console.log(`  - ${pattern.source.replace(/\s*/g, ' ')}: ${matches.length} menciones`);
+        console.log(`  - ${pattern.source.replace(/\s*/g, " ")}: ${matches.length} menciones`);
       }
     });
     
     console.log(`  - TOTAL TÉCNICAS DETECTADAS: ${tecnicasEncontradas}/9`);
     
     // 5. Evaluación de calidad
-    console.log('\n📊 EVALUACIÓN DE CALIDAD:');
+    console.log("\n📊 EVALUACIÓN DE CALIDAD:");
     let puntaje = 0;
     
     // Criterios de evaluación
@@ -148,32 +148,32 @@ async function evaluarPlanTratamiento() {
     if (resultado.warnings && resultado.warnings.length >= 0) puntaje += 15;
     if (resultado.suggestions && resultado.suggestions.length > 0) puntaje += 15;
     if (tecnicasEncontradas >= 3) puntaje += 20;
-    if (textoCompleto.includes('trabajo') || textoCompleto.includes('laboral')) puntaje += 10;
-    if (textoCompleto.includes('semana') || textoCompleto.includes('mes')) puntaje += 10;
-    if (textoCompleto.includes('ejercicio') && textoCompleto.includes('educación')) puntaje += 10;
+    if (textoCompleto.includes("trabajo") || textoCompleto.includes("laboral")) puntaje += 10;
+    if (textoCompleto.includes("semana") || textoCompleto.includes("mes")) puntaje += 10;
+    if (textoCompleto.includes("ejercicio") && textoCompleto.includes("educación")) puntaje += 10;
     
     console.log(`  - PUNTAJE TOTAL: ${puntaje}/100`);
     
     let nivel;
-    if (puntaje >= 80) nivel = 'EXCELENTE';
-    else if (puntaje >= 65) nivel = 'BUENO';
-    else if (puntaje >= 50) nivel = 'ACEPTABLE';
-    else nivel = 'INSUFICIENTE';
+    if (puntaje >= 80) nivel = "EXCELENTE";
+    else if (puntaje >= 65) nivel = "BUENO";
+    else if (puntaje >= 50) nivel = "ACEPTABLE";
+    else nivel = "INSUFICIENTE";
     
     console.log(`  - NIVEL: ${nivel}`);
     
     // 6. Resumen final
-    console.log('\n🎉 RESUMEN FINAL:');
-    console.log('=====================================');
+    console.log("\n🎉 RESUMEN FINAL:");
+    console.log("=====================================");
     console.log(`✅ Sistema ${nivel} para generar planes de tratamiento`);
     console.log(`⏱️  Tiempo de procesamiento: ${tiempoTotal.toFixed(1)}s`);
     console.log(`🎯 Técnicas de tratamiento: ${tecnicasEncontradas}/9 detectadas`);
     console.log(`📊 Puntaje de calidad: ${puntaje}/100`);
     
     if (puntaje >= 65) {
-      console.log('\n🟢 RECOMENDACIÓN: Sistema LISTO para uso clínico en planes de tratamiento');
+      console.log("\n🟢 RECOMENDACIÓN: Sistema LISTO para uso clínico en planes de tratamiento");
     } else {
-      console.log('\n🟡 RECOMENDACIÓN: Sistema requiere ajustes para uso clínico');
+      console.log("\n🟡 RECOMENDACIÓN: Sistema requiere ajustes para uso clínico");
     }
     
     return {
@@ -185,7 +185,7 @@ async function evaluarPlanTratamiento() {
     };
     
   } catch (error) {
-    log('❌ ERROR EN EVALUACIÓN', {
+    log("❌ ERROR EN EVALUACIÓN", {
       error: error.message,
       stack: error.stack
     });
@@ -193,14 +193,14 @@ async function evaluarPlanTratamiento() {
     return {
       error: error.message,
       puntaje: 0,
-      nivel: 'ERROR'
+      nivel: "ERROR"
     };
   }
 }
 
 // Ejecutar evaluación
 evaluarPlanTratamiento().then(resultado => {
-  console.log('\n🏁 EVALUACIÓN COMPLETADA:', resultado);
+  console.log("\n🏁 EVALUACIÓN COMPLETADA:", resultado);
 }).catch(error => {
-  console.error('💥 EVALUACIÓN FALLÓ:', error.message);
+  console.error("💥 EVALUACIÓN FALLÓ:", error.message);
 }); 

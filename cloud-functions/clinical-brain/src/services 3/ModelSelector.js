@@ -1,7 +1,7 @@
-const winston = require('winston');
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -23,32 +23,32 @@ class ModelSelector {
     
     // Configuración de modelos disponibles
     this.models = {
-      'gemini-2.5-pro': {
+      "gemini-2.5-pro": {
         costPerMillionTokens: 1.25,
         accuracy: 0.95,
         emergencyDetection: 1.0,
-        useCase: 'Casos críticos con banderas rojas'
+        useCase: "Casos críticos con banderas rojas"
       },
-      'gemini-2.5-flash': {
+      "gemini-2.5-flash": {
         costPerMillionTokens: 0.15,
         accuracy: 0.87,
         emergencyDetection: 1.0,
-        useCase: 'Casos estándar y optimización de costos'
+        useCase: "Casos estándar y optimización de costos"
       }
     };
 
     // Criterios para escalado a modelo premium
     this.CRITICAL_ESCALATION_CRITERIA = [
-      'dolor nocturno severo',
-      'pérdida de peso inexplicada',
-      'fiebre persistente',
-      'déficit neurológico',
-      'dolor torácico',
-      'dificultad respiratoria severa',
-      'pérdida de control de esfínteres',
-      'cambios visuales súbitos',
-      'cefalea tipo trueno',
-      'sangrado inexplicado'
+      "dolor nocturno severo",
+      "pérdida de peso inexplicada",
+      "fiebre persistente",
+      "déficit neurológico",
+      "dolor torácico",
+      "dificultad respiratoria severa",
+      "pérdida de control de esfínteres",
+      "cambios visuales súbitos",
+      "cefalea tipo trueno",
+      "sangrado inexplicado"
     ];
   }
 
@@ -61,9 +61,9 @@ class ModelSelector {
   async selectModel(transcription) {
     const triageStartTime = Date.now();
     
-    logger.info('🧠 INICIANDO MODELSELECTION INTELIGENTE', {
+    logger.info("🧠 INICIANDO MODELSELECTION INTELIGENTE", {
       transcriptionLength: transcription.length,
-      step: 'triaje_inicial'
+      step: "triaje_inicial"
     });
 
     try {
@@ -75,7 +75,7 @@ class ModelSelector {
       // PASO 2: Decisión inteligente basada en triaje
       const decision = this._makeModelDecision(triageResult);
       
-      logger.info('✅ DECISIÓN DE MODELO COMPLETADA', {
+      logger.info("✅ DECISIÓN DE MODELO COMPLETADA", {
         selectedModel: decision.selectedModel,
         redFlagsDetected: triageResult.redFlags.length,
         triageTime: triageTime,
@@ -90,24 +90,24 @@ class ModelSelector {
         costOptimization: decision.costOptimization,
         processingTime: triageTime,
         metadata: {
-          triageModel: 'gemini-2.5-flash',
+          triageModel: "gemini-2.5-flash",
           analysisModel: decision.selectedModel,
           timestamp: new Date().toISOString()
         }
       };
 
     } catch (error) {
-      logger.error('❌ ERROR EN SELECCIÓN DE MODELO', {
+      logger.error("❌ ERROR EN SELECCIÓN DE MODELO", {
         error: error.message,
-        fallback: 'gemini-2.5-flash'
+        fallback: "gemini-2.5-flash"
       });
 
       // Fallback seguro a Flash
       return {
-        selectedModel: 'gemini-2.5-flash',
+        selectedModel: "gemini-2.5-flash",
         triageResult: { redFlags: [], confidence: 0.5 },
-        reasoning: 'Error en triaje - fallback a modelo estándar por seguridad',
-        costOptimization: this._calculateSavings('gemini-2.5-flash'),
+        reasoning: "Error en triaje - fallback a modelo estándar por seguridad",
+        costOptimization: this._calculateSavings("gemini-2.5-flash"),
         error: error.message
       };
     }
@@ -123,7 +123,7 @@ TRANSCRIPCIÓN A ANALIZAR:
 ${transcription}
 
 BANDERAS ROJAS CRÍTICAS A DETECTAR:
-${this.CRITICAL_ESCALATION_CRITERIA.map(flag => `- ${flag}`).join('\n')}
+${this.CRITICAL_ESCALATION_CRITERIA.map(flag => `- ${flag}`).join("\n")}
 
 INSTRUCCIONES:
 1. Analiza la transcripción en busca de las banderas rojas críticas listadas
@@ -145,15 +145,15 @@ EJEMPLOS:
 
 RESPUESTA JSON:`;
 
-    logger.info('🔍 EJECUTANDO TRIAJE CON IA', {
-      model: 'gemini-2.5-flash',
+    logger.info("🔍 EJECUTANDO TRIAJE CON IA", {
+      model: "gemini-2.5-flash",
       transcriptionLength: transcription.length
     });
 
     const response = await this.vertexClient.processWithModel(
       transcription,
       triagePrompt,
-      'gemini-2.5-flash',
+      "gemini-2.5-flash",
       {
         maxTokens: 500,
         temperature: 0.1  // Muy baja para máxima consistencia
@@ -172,18 +172,18 @@ RESPUESTA JSON:`;
     let selectedModel, reasoning, costOptimization;
 
     // Lógica de decisión: Flash vs Pro
-    if (redFlags.length >= 1 || riskLevel === 'HIGH') {
-      selectedModel = 'gemini-2.5-pro';
-      reasoning = `¡Banderas rojas detectadas! Escalando a modelo Pro para máxima seguridad. Banderas: ${redFlags.join(', ')}`;
-      costOptimization = 'Inversión en seguridad clínica - Análisis premium requerido';
-    } else if (riskLevel === 'MEDIUM' && confidence < 0.8) {
-      selectedModel = 'gemini-2.5-pro';
-      reasoning = 'Riesgo medio con baja confianza - Escalado preventivo a modelo Pro';
-      costOptimization = 'Escalado preventivo por incertidumbre';
+    if (redFlags.length >= 1 || riskLevel === "HIGH") {
+      selectedModel = "gemini-2.5-pro";
+      reasoning = `¡Banderas rojas detectadas! Escalando a modelo Pro para máxima seguridad. Banderas: ${redFlags.join(", ")}`;
+      costOptimization = "Inversión en seguridad clínica - Análisis premium requerido";
+    } else if (riskLevel === "MEDIUM" && confidence < 0.8) {
+      selectedModel = "gemini-2.5-pro";
+      reasoning = "Riesgo medio con baja confianza - Escalado preventivo a modelo Pro";
+      costOptimization = "Escalado preventivo por incertidumbre";
     } else {
-      selectedModel = 'gemini-2.5-flash';
-      reasoning = 'Triaje no detecta riesgos. Seleccionando modelo Flash para análisis completo.';
-      costOptimization = this._calculateSavings('gemini-2.5-flash');
+      selectedModel = "gemini-2.5-flash";
+      reasoning = "Triaje no detecta riesgos. Seleccionando modelo Flash para análisis completo.";
+      costOptimization = this._calculateSavings("gemini-2.5-flash");
     }
 
     return {
@@ -198,47 +198,47 @@ RESPUESTA JSON:`;
    */
   _parseTriageResponse(response) {
     try {
-      logger.info('🔍 DEBUGGING TRIAJE PARSER', {
+      logger.info("🔍 DEBUGGING TRIAJE PARSER", {
         responseType: typeof response,
-        isString: typeof response === 'string',
-        isObject: typeof response === 'object',
-        responsePreview: typeof response === 'string' ? response.substring(0, 200) : JSON.stringify(response).substring(0, 200)
+        isString: typeof response === "string",
+        isObject: typeof response === "object",
+        responsePreview: typeof response === "string" ? response.substring(0, 200) : JSON.stringify(response).substring(0, 200)
       });
       
       let parsed;
       
       // CASO 1: Es string - necesita parsing JSON
-      if (typeof response === 'string') {
-        const cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      if (typeof response === "string") {
+        const cleanResponse = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
         parsed = JSON.parse(cleanResponse);
         
-        logger.info('✅ TRIAJE PARSEADO DESDE STRING', {
+        logger.info("✅ TRIAJE PARSEADO DESDE STRING", {
           redFlags: parsed.redFlags?.length || 0,
           riskLevel: parsed.riskLevel,
           confidence: parsed.confidence
         });
       }
-             // CASO 2: Es objeto con propiedad text (VertexAI response)
-       else if (typeof response === 'object' && response !== null && response.text) {
-         const cleanResponse = response.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-         parsed = JSON.parse(cleanResponse);
+      // CASO 2: Es objeto con propiedad text (VertexAI response)
+      else if (typeof response === "object" && response !== null && response.text) {
+        const cleanResponse = response.text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+        parsed = JSON.parse(cleanResponse);
          
-         logger.info('✅ TRIAJE PARSEADO DESDE OBJETO.TEXT', {
-           redFlags: parsed.redFlags?.length || 0,
-           riskLevel: parsed.riskLevel,
-           confidence: parsed.confidence
-         });
-       }
-       // CASO 3: Es objeto sin text - usar directamente
-       else if (typeof response === 'object' && response !== null) {
-         parsed = response;
+        logger.info("✅ TRIAJE PARSEADO DESDE OBJETO.TEXT", {
+          redFlags: parsed.redFlags?.length || 0,
+          riskLevel: parsed.riskLevel,
+          confidence: parsed.confidence
+        });
+      }
+      // CASO 3: Es objeto sin text - usar directamente
+      else if (typeof response === "object" && response !== null) {
+        parsed = response;
          
-         logger.info('✅ TRIAJE USANDO OBJETO DIRECTO', {
-           redFlags: parsed.redFlags?.length || 0,
-           riskLevel: parsed.riskLevel,
-           confidence: parsed.confidence
-         });
-       }
+        logger.info("✅ TRIAJE USANDO OBJETO DIRECTO", {
+          redFlags: parsed.redFlags?.length || 0,
+          riskLevel: parsed.riskLevel,
+          confidence: parsed.confidence
+        });
+      }
       // CASO 3: Tipo inválido
       else {
         throw new Error(`Tipo de respuesta inválido: ${typeof response}`);
@@ -247,32 +247,32 @@ RESPUESTA JSON:`;
       // VALIDACIÓN CRÍTICA DE SEGURIDAD
       const result = {
         redFlags: Array.isArray(parsed.redFlags) ? parsed.redFlags : [],
-        riskLevel: ['LOW', 'MEDIUM', 'HIGH'].includes(parsed.riskLevel) ? parsed.riskLevel : 'LOW',
-        confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.7,
-        reasoning: typeof parsed.reasoning === 'string' ? parsed.reasoning : 'Análisis completado'
+        riskLevel: ["LOW", "MEDIUM", "HIGH"].includes(parsed.riskLevel) ? parsed.riskLevel : "LOW",
+        confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0.7,
+        reasoning: typeof parsed.reasoning === "string" ? parsed.reasoning : "Análisis completado"
       };
       
-      logger.info('🛡️ TRIAJE VALIDADO PARA SEGURIDAD', {
+      logger.info("🛡️ TRIAJE VALIDADO PARA SEGURIDAD", {
         redFlagsCount: result.redFlags.length,
         redFlagsList: result.redFlags,
         riskLevel: result.riskLevel,
         confidence: result.confidence,
-        escalationRequired: result.redFlags.length >= 1 || result.riskLevel === 'HIGH'
+        escalationRequired: result.redFlags.length >= 1 || result.riskLevel === "HIGH"
       });
       
       return result;
       
     } catch (error) {
-      logger.error('❌ ERROR CRÍTICO EN TRIAJE PARSER', {
+      logger.error("❌ ERROR CRÍTICO EN TRIAJE PARSER", {
         error: error.message,
         responseType: typeof response,
-        responsePreview: typeof response === 'string' ? response.substring(0, 200) : JSON.stringify(response).substring(0, 200)
+        responsePreview: typeof response === "string" ? response.substring(0, 200) : JSON.stringify(response).substring(0, 200)
       });
       
       // Fallback ultra-seguro
       return {
         redFlags: [],
-        riskLevel: 'LOW',
+        riskLevel: "LOW",
         confidence: 0.5,
         reasoning: `Error en parsing - fallback seguro. Error: ${error.message}`
       };
@@ -283,18 +283,18 @@ RESPUESTA JSON:`;
    * Cálculo de ahorros vs modelo premium
    */
   _calculateSavings(selectedModel) {
-    if (selectedModel === 'gemini-2.5-flash') {
+    if (selectedModel === "gemini-2.5-flash") {
       return {
-        savingsVsPro: '88% ahorro vs Pro',
-        costRatio: '8.3x más económico',
-        message: 'Optimización de costos manteniendo calidad clínica'
+        savingsVsPro: "88% ahorro vs Pro",
+        costRatio: "8.3x más económico",
+        message: "Optimización de costos manteniendo calidad clínica"
       };
     }
     
     return {
-      savingsVsPro: 'Modelo premium seleccionado',
-      costRatio: 'Máxima calidad para casos críticos',
-      message: 'Inversión justificada en seguridad clínica'
+      savingsVsPro: "Modelo premium seleccionado",
+      costRatio: "Máxima calidad para casos críticos",
+      message: "Inversión justificada en seguridad clínica"
     };
   }
 
@@ -317,9 +317,9 @@ RESPUESTA JSON:`;
     
     return {
       selectedModel: modelName,
-      triageResult: { redFlags: [], riskLevel: 'FORCED' },
-      reasoning: 'Modelo forzado por configuración de testing',
-      costOptimization: 'N/A - Modo testing',
+      triageResult: { redFlags: [], riskLevel: "FORCED" },
+      reasoning: "Modelo forzado por configuración de testing",
+      costOptimization: "N/A - Modo testing",
       forced: true
     };
   }
@@ -329,12 +329,12 @@ RESPUESTA JSON:`;
    */
   getOptimizationStats() {
     return {
-      triageModel: 'gemini-2.5-flash',
-      standardModel: 'gemini-2.5-flash',
-      premiumModel: 'gemini-2.5-pro',
-      escalationCriteria: this.CRITICAL_ESCALATION_CRITERIA.length + ' banderas rojas monitoreadas',
-      avgCostSavings: '88% en casos estándar',
-      clinicalSafety: '100% - triaje con IA real'
+      triageModel: "gemini-2.5-flash",
+      standardModel: "gemini-2.5-flash",
+      premiumModel: "gemini-2.5-pro",
+      escalationCriteria: this.CRITICAL_ESCALATION_CRITERIA.length + " banderas rojas monitoreadas",
+      avgCostSavings: "88% en casos estándar",
+      clinicalSafety: "100% - triaje con IA real"
     };
   }
 }

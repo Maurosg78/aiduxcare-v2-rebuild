@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
-import supabase from '../../../core/auth/supabaseClient';
+import React, { useEffect, useState } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
+import supabase from "../../../core/auth/supabaseClient";
 
 interface IntegratedSuggestion {
   id: string;
@@ -9,7 +9,7 @@ interface IntegratedSuggestion {
   field: string;
   accepted_by: string;
   accepted_at: string;
-  type: 'recommendation' | 'warning' | 'info';
+  type: "recommendation" | "warning" | "info";
 }
 
 interface IntegratedSuggestionViewerProps {
@@ -29,12 +29,12 @@ const IntegratedSuggestionViewer: React.FC<IntegratedSuggestionViewerProps> = ({
 
         // Consultar sugerencias integradas desde la tabla de logs
         const { data, error: fetchError } = await supabase
-          .from('suggestion_logs')
-          .select('*')
-          .eq('visit_id', visitId)
-          .eq('status', 'integrated')
-          .order('field_name', { ascending: true })
-          .order('accepted_at', { ascending: false });
+          .from("suggestion_logs")
+          .select("*")
+          .eq("visit_id", visitId)
+          .eq("status", "integrated")
+          .order("field_name", { ascending: true })
+          .order("accepted_at", { ascending: false });
 
         if (fetchError) {
           throw new Error(`Error al cargar sugerencias: ${fetchError.message}`);
@@ -52,13 +52,13 @@ const IntegratedSuggestionViewer: React.FC<IntegratedSuggestionViewerProps> = ({
           field: log.field_name,
           accepted_by: log.accepted_by,
           accepted_at: log.accepted_at,
-          type: log.suggestion_type as 'recommendation' | 'warning' | 'info'
+          type: log.suggestion_type as "recommendation" | "warning" | "info"
         }));
 
         setSuggestions(formattedSuggestions);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido');
-        console.error('Error al cargar sugerencias integradas:', err);
+        setError(err instanceof Error ? err.message : "Error desconocido");
+        console.error("Error al cargar sugerencias integradas:", err);
       } finally {
         setIsLoading(false);
       }
@@ -68,26 +68,26 @@ const IntegratedSuggestionViewer: React.FC<IntegratedSuggestionViewerProps> = ({
   }, [visitId]);
 
   // Función para obtener el color del badge según el tipo de sugerencia
-  const getTypeColorClass = (type: 'recommendation' | 'warning' | 'info'): string => {
+  const getTypeColorClass = (type: "recommendation" | "warning" | "info"): string => {
     switch (type) {
-      case 'recommendation':
-        return 'bg-blue-100 text-blue-800';
-      case 'warning':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'info':
-        return 'bg-green-100 text-green-800';
+    case "recommendation":
+      return "bg-blue-100 text-blue-800";
+    case "warning":
+      return "bg-yellow-100 text-yellow-800";
+    case "info":
+      return "bg-green-100 text-green-800";
     }
   };
 
   // Función para obtener el ícono según el tipo de sugerencia
-  const getTypeIcon = (type: 'recommendation' | 'warning' | 'info'): string => {
+  const getTypeIcon = (type: "recommendation" | "warning" | "info"): string => {
     switch (type) {
-      case 'recommendation':
-        return '💡';
-      case 'warning':
-        return '⚠️';
-      case 'info':
-        return 'ℹ️';
+    case "recommendation":
+      return "💡";
+    case "warning":
+      return "⚠️";
+    case "info":
+      return "ℹ️";
     }
   };
 
@@ -163,6 +163,6 @@ const IntegratedSuggestionViewer: React.FC<IntegratedSuggestionViewerProps> = ({
   );
 };
 
-IntegratedSuggestionViewer.displayName = 'IntegratedSuggestionViewer';
+IntegratedSuggestionViewer.displayName = "IntegratedSuggestionViewer";
 
 export default IntegratedSuggestionViewer; 

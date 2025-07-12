@@ -1,9 +1,9 @@
-const { VertexAI } = require('@google-cloud/vertexai');
-const ModelSelector = require('./ModelSelector');
-const winston = require('winston');
+const { VertexAI } = require("@google-cloud/vertexai");
+const ModelSelector = require("./ModelSelector");
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -13,9 +13,9 @@ const logger = winston.createLogger({
 
 class VertexAIClient {
   constructor() {
-    this.projectId = process.env.GOOGLE_CLOUD_PROJECT_ID || 'aiduxcare-stt-20250706';
-    this.location = process.env.VERTEX_AI_LOCATION || 'us-east1';
-    this.defaultModel = process.env.VERTEX_AI_MODEL || 'gemini-2.5-flash'; // Modelo balanceado por defecto
+    this.projectId = process.env.GOOGLE_CLOUD_PROJECT_ID || "aiduxcare-stt-20250706";
+    this.location = process.env.VERTEX_AI_LOCATION || "us-east1";
+    this.defaultModel = process.env.VERTEX_AI_MODEL || "gemini-2.5-flash"; // Modelo balanceado por defecto
     
     // Inicializar ModelSelector para optimización inteligente
     this.modelSelector = new ModelSelector();
@@ -26,7 +26,7 @@ class VertexAIClient {
       location: this.location
     });
     
-    logger.info('🚀 VERTEXAI CLIENT INICIALIZADO CON OPTIMIZACIÓN DE COSTOS', {
+    logger.info("🚀 VERTEXAI CLIENT INICIALIZADO CON OPTIMIZACIÓN DE COSTOS", {
       proyecto: this.projectId,
       region: this.location,
       modeloPorDefecto: this.defaultModel
@@ -41,7 +41,7 @@ class VertexAIClient {
    * @returns {Promise<Object>} Respuesta procesada con información de optimización
    */
   async processTranscription(transcription, prompt, options = {}) {
-    logger.info('🧠 INICIANDO PROCESAMIENTO CON OPTIMIZACIÓN DE COSTOS');
+    logger.info("🧠 INICIANDO PROCESAMIENTO CON OPTIMIZACIÓN DE COSTOS");
     
     try {
       // Seleccionar modelo óptimo basado en evidencia empírica
@@ -55,10 +55,10 @@ class VertexAIClient {
         modelSelection = this.modelSelector.selectOptimalModel(transcription, options);
       }
       
-      logger.info('✅ MODELO SELECCIONADO:', {
+      logger.info("✅ MODELO SELECCIONADO:", {
         modelo: modelSelection.selectedModel,
         razonamiento: modelSelection.reasoning,
-        ahorro: modelSelection.costAnalysis?.savingsVsPro || 'N/A'
+        ahorro: modelSelection.costAnalysis?.savingsVsPro || "N/A"
       });
 
       // Procesar con el modelo seleccionado
@@ -75,14 +75,14 @@ class VertexAIClient {
         redFlagsDetected: modelSelection.redFlagsDetected,
         reasoning: modelSelection.reasoning,
         costAnalysis: modelSelection.costAnalysis,
-        empiricalBasis: modelSelection.empiricalBasis || 'Basado en evaluación empírica',
+        empiricalBasis: modelSelection.empiricalBasis || "Basado en evaluación empírica",
         timestamp: modelSelection.timestamp
       };
 
       return result;
 
     } catch (error) {
-      logger.error('❌ ERROR EN PROCESAMIENTO:', error);
+      logger.error("❌ ERROR EN PROCESAMIENTO:", error);
       throw error;
     }
   }
@@ -110,7 +110,7 @@ class VertexAIClient {
       // Procesar con el modelo
       const startTime = Date.now();
       
-      logger.info('🔄 ENVIANDO PROMPT AL MODELO:', {
+      logger.info("🔄 ENVIANDO PROMPT AL MODELO:", {
         modelo: modelName,
         longitudTranscripcion: transcription.length,
         longitudPrompt: prompt.length
@@ -123,7 +123,7 @@ class VertexAIClient {
       const response = result.response;
       const text = response.candidates[0].content.parts[0].text;
 
-      logger.info('✅ RESPUESTA RECIBIDA:', {
+      logger.info("✅ RESPUESTA RECIBIDA:", {
         modelo: modelName,
         tiempoProcesamiento: `${processingTime}s`,
         longitudRespuesta: text.length
@@ -143,14 +143,14 @@ class VertexAIClient {
       };
 
     } catch (error) {
-      logger.error('❌ ERROR PROCESANDO CON MODELO:', {
+      logger.error("❌ ERROR PROCESANDO CON MODELO:", {
         modelo: modelName,
         error: error.message
       });
 
       // Analizar si se debe reintentar con modelo diferente
       if (this.shouldRetryWithDifferentModel(error)) {
-        logger.info('🔄 REINTENTANDO CON MODELO ALTERNATIVO...');
+        logger.info("🔄 REINTENTANDO CON MODELO ALTERNATIVO...");
         
         const fallbackModel = this.getFallbackModel(modelName);
         if (fallbackModel !== modelName) {
@@ -169,7 +169,7 @@ class VertexAIClient {
    */
   getModelConfiguration(modelName) {
     const configurations = {
-      'gemini-2.5-pro': {
+      "gemini-2.5-pro": {
         generationConfig: {
           temperature: 0.1,
           topK: 40,
@@ -178,13 +178,13 @@ class VertexAIClient {
           candidateCount: 1
         },
         safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
         ]
       },
-      'gemini-2.5-flash': {
+      "gemini-2.5-flash": {
         generationConfig: {
           temperature: 0.2,
           topK: 32,
@@ -193,13 +193,13 @@ class VertexAIClient {
           candidateCount: 1
         },
         safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
         ]
       },
-      'gemini-2.0-flash': {
+      "gemini-2.0-flash": {
         generationConfig: {
           temperature: 0.3,
           topK: 24,
@@ -208,15 +208,15 @@ class VertexAIClient {
           candidateCount: 1
         },
         safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
         ]
       }
     };
 
-    return configurations[modelName] || configurations['gemini-2.5-flash'];
+    return configurations[modelName] || configurations["gemini-2.5-flash"];
   }
 
   /**
@@ -226,10 +226,10 @@ class VertexAIClient {
    */
   shouldRetryWithDifferentModel(error) {
     const retryableErrors = [
-      'RESOURCE_EXHAUSTED',
-      'QUOTA_EXCEEDED',
-      'MODEL_NOT_AVAILABLE',
-      'INVALID_ARGUMENT'
+      "RESOURCE_EXHAUSTED",
+      "QUOTA_EXCEEDED",
+      "MODEL_NOT_AVAILABLE",
+      "INVALID_ARGUMENT"
     ];
 
     return retryableErrors.some(errorType => 
@@ -244,12 +244,12 @@ class VertexAIClient {
    */
   getFallbackModel(currentModel) {
     const fallbackChain = {
-      'gemini-2.5-pro': 'gemini-2.5-flash',
-      'gemini-2.5-flash': 'gemini-2.0-flash',
-      'gemini-2.0-flash': 'gemini-2.5-flash'
+      "gemini-2.5-pro": "gemini-2.5-flash",
+      "gemini-2.5-flash": "gemini-2.0-flash",
+      "gemini-2.0-flash": "gemini-2.5-flash"
     };
 
-    return fallbackChain[currentModel] || 'gemini-2.5-flash';
+    return fallbackChain[currentModel] || "gemini-2.5-flash";
   }
 
   /**
@@ -274,9 +274,9 @@ class VertexAIClient {
   getOptimizationStats() {
     return {
       modelsAvailable: Object.keys(this.modelSelector.getAvailableModels()),
-      costOptimization: 'Habilitado',
-      selectionStrategy: 'Basado en complejidad automática',
-      maxSavings: 'Hasta 22.5x vs modelo premium'
+      costOptimization: "Habilitado",
+      selectionStrategy: "Basado en complejidad automática",
+      maxSavings: "Hasta 22.5x vs modelo premium"
     };
   }
 }

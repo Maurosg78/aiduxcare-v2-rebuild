@@ -1,31 +1,31 @@
-import { defineConfig, ConfigEnv } from 'vite';
-import react from '@vitejs/plugin-react';
-import basicSsl from '@vitejs/plugin-basic-ssl';
+import { defineConfig, ConfigEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }: ConfigEnv) => ({
+export default defineConfig(({ mode }) => ({
   plugins: [
-    [react()],
-    [basicSsl()]
+    react(),
+    basicSsl()
   ],
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     rollupOptions: {
       input: {
-        main: 'index.html'
+        main: "index.html"
       }
     },
     copyPublicDir: true
   },
   server: {
     https: {
-      key: './localhost-key.pem',
-      cert: './localhost.pem'
+      key: "./localhost-key.pem",
+      cert: "./localhost.pem"
     },
-    host: 'localhost',
+    host: "localhost",
     port: 5174
   },
   define: {
-    'process.env.NODE_ENV': JSON.stringify(mode)
+    "process.env.NODE_ENV": JSON.stringify(mode)
   }
 }));

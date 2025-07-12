@@ -10,8 +10,8 @@
 
 interface PhysiotherapyQuestion {
   id: string;
-  priority: 'high' | 'medium' | 'low';
-  category: 'pain_characteristics' | 'functional_impact' | 'red_flags' | 'psychosocial' | 'ergonomic';
+  priority: "high" | "medium" | "low";
+  category: "pain_characteristics" | "functional_impact" | "red_flags" | "psychosocial" | "ergonomic";
   question: string;
   rationale: string;
   expected_insights: string;
@@ -20,8 +20,8 @@ interface PhysiotherapyQuestion {
 interface DiagnosticTest {
   id: string;
   name: string;
-  category: 'neurological' | 'orthopedic' | 'functional' | 'postural' | 'provocative';
-  priority: 'high' | 'medium' | 'low';
+  category: "neurological" | "orthopedic" | "functional" | "postural" | "provocative";
+  priority: "high" | "medium" | "low";
   procedure: string;
   positive_finding: string;
   clinical_relevance: string;
@@ -30,8 +30,8 @@ interface DiagnosticTest {
 
 interface ActionItem {
   id: string;
-  type: 'red_flag' | 'contraindication' | 'education' | 'treatment' | 'follow_up';
-  priority: 'immediate' | 'high' | 'medium' | 'low';
+  type: "red_flag" | "contraindication" | "education" | "treatment" | "follow_up";
+  priority: "immediate" | "high" | "medium" | "low";
   action: string;
   rationale: string;
   timeline: string;
@@ -53,7 +53,7 @@ export class PhysiotherapyWorkflowService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = 'https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/physiotherapyWorkflow';
+    this.baseUrl = "https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/physiotherapyWorkflow";
   }
 
   /**
@@ -66,13 +66,13 @@ export class PhysiotherapyWorkflowService {
     try {
       const response = await this.callWorkflowEndpoint({
         transcription,
-        step: 'questions',
+        step: "questions",
         clinicalFacts: clinicalFacts || {}
       });
 
       return response.result.questions || [];
     } catch (error) {
-      console.error('❌ Error generando preguntas puntos ciegos:', error);
+      console.error("❌ Error generando preguntas puntos ciegos:", error);
       return [];
     }
   }
@@ -88,14 +88,14 @@ export class PhysiotherapyWorkflowService {
     try {
       const response = await this.callWorkflowEndpoint({
         transcription,
-        step: 'tests',
+        step: "tests",
         clinicalFacts: clinicalFacts || {},
         suspectedDiagnosis
       });
 
       return response.result.diagnostic_tests || [];
     } catch (error) {
-      console.error('❌ Error generando pruebas diagnósticas:', error);
+      console.error("❌ Error generando pruebas diagnósticas:", error);
       return [];
     }
   }
@@ -112,7 +112,7 @@ export class PhysiotherapyWorkflowService {
     try {
       const response = await this.callWorkflowEndpoint({
         transcription,
-        step: 'checklist',
+        step: "checklist",
         clinicalFacts: clinicalFacts || {},
         warnings: warnings || [],
         suggestions: suggestions || []
@@ -120,7 +120,7 @@ export class PhysiotherapyWorkflowService {
 
       return response.result.action_checklist || [];
     } catch (error) {
-      console.error('❌ Error generando checklist acciones:', error);
+      console.error("❌ Error generando checklist acciones:", error);
       return [];
     }
   }
@@ -130,9 +130,9 @@ export class PhysiotherapyWorkflowService {
    */
   private async callWorkflowEndpoint(payload: unknown): Promise<PhysiotherapyWorkflowResponse> {
     const response = await fetch(this.baseUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload)
     });
@@ -149,7 +149,7 @@ export class PhysiotherapyWorkflowService {
    */
   async processCompleteWorkflow(transcription: string, clinicalFacts?: unknown) {
     try {
-      console.log('🚀 Iniciando flujo completo de fisioterapia');
+      console.log("🚀 Iniciando flujo completo de fisioterapia");
 
       // Paso 1: Generar preguntas de puntos ciegos
       const questions = await this.generateBlindSpotQuestions(transcription, clinicalFacts);
@@ -171,10 +171,10 @@ export class PhysiotherapyWorkflowService {
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      console.error('❌ Error en flujo completo:', error);
+      console.error("❌ Error en flujo completo:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Error desconocido',
+        error: error instanceof Error ? error.message : "Error desconocido",
         questions: [],
         tests: [],
         checklist: []

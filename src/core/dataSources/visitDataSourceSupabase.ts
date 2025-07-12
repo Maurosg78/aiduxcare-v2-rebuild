@@ -1,6 +1,6 @@
-import supabase from '@/core/auth/supabaseClient';
-import { Visit, VisitSchema } from '../domain/visitType';
-import { SupabaseClient } from '@supabase/supabase-js';
+import supabase from "@/core/auth/supabaseClient";
+import { Visit, VisitSchema } from "../domain/visitType";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export class VisitDataSourceSupabase {
   private supabase: SupabaseClient;
@@ -14,10 +14,10 @@ export class VisitDataSourceSupabase {
    */
   async getVisitsByProfessionalId(professionalId: string): Promise<Visit[]> {
     const { data, error } = await this.supabase
-      .from('visits')
-      .select('*')
-      .eq('professional_id', professionalId)
-      .order('date', { ascending: false });
+      .from("visits")
+      .select("*")
+      .eq("professional_id", professionalId)
+      .order("date", { ascending: false });
 
     if (error) throw new Error(`Error fetching visits: ${error.message}`);
     
@@ -39,13 +39,13 @@ export class VisitDataSourceSupabase {
    */
   async getVisitById(visitId: string): Promise<Visit | null> {
     const { data, error } = await this.supabase
-      .from('visits')
-      .select('*')
-      .eq('id', visitId)
+      .from("visits")
+      .select("*")
+      .eq("id", visitId)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') return null; // No se encontró la visita
+      if (error.code === "PGRST116") return null; // No se encontró la visita
       throw new Error(`Error fetching visit: ${error.message}`);
     }
     
@@ -63,9 +63,9 @@ export class VisitDataSourceSupabase {
   /**
    * Crea una nueva visita
    */
-  async createVisit(visitData: Omit<Visit, 'id' | 'created_at' | 'updated_at'>): Promise<Visit> {
+  async createVisit(visitData: Omit<Visit, "id" | "created_at" | "updated_at">): Promise<Visit> {
     const { data, error } = await this.supabase
-      .from('visits')
+      .from("visits")
       .insert([visitData])
       .select()
       .single();
@@ -79,9 +79,9 @@ export class VisitDataSourceSupabase {
    */
   async updateVisit(visitId: string, visitData: Partial<Visit>): Promise<Visit> {
     const { data, error } = await this.supabase
-      .from('visits')
+      .from("visits")
       .update(visitData)
-      .eq('id', visitId)
+      .eq("id", visitId)
       .select()
       .single();
 
@@ -94,10 +94,10 @@ export class VisitDataSourceSupabase {
    */
   async getVisitsByPatientId(patientId: string): Promise<Visit[]> {
     const { data, error } = await this.supabase
-      .from('visits')
-      .select('*')
-      .eq('patient_id', patientId)
-      .order('date', { ascending: false });
+      .from("visits")
+      .select("*")
+      .eq("patient_id", patientId)
+      .order("date", { ascending: false });
 
     if (error) throw new Error(`Error fetching visits for patient: ${error.message}`);
     
@@ -116,9 +116,9 @@ export class VisitDataSourceSupabase {
 
   async deleteVisit(visitId: string): Promise<boolean> {
     const { error } = await this.supabase
-      .from('visits')
+      .from("visits")
       .delete()
-      .eq('id', visitId);
+      .eq("id", visitId);
 
     if (error) throw new Error(`Error deleting visit: ${error.message}`);
     return true;
@@ -126,9 +126,9 @@ export class VisitDataSourceSupabase {
 
   async getAllVisits(): Promise<Visit[]> {
     const { data, error } = await this.supabase
-      .from('visits')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("visits")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) throw new Error(`Error fetching visits: ${error.message}`);
     return data as Visit[];

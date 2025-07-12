@@ -1,4 +1,4 @@
-import GoogleCloudAudioService from './GoogleCloudAudioService';
+import GoogleCloudAudioService from "./GoogleCloudAudioService";
 
 /**
  * Servicio de audio médico con Google Cloud Speech-to-Text
@@ -11,7 +11,7 @@ export default class HybridAudioService {
     // Usar Google Cloud Speech-to-Text como servicio principal
     this.googleCloudService = new GoogleCloudAudioService();
     
-    console.log('🎙️ HybridAudioService inicializado con Google Cloud');
+    console.log("🎙️ HybridAudioService inicializado con Google Cloud");
   }
 
   // Información clara del servicio
@@ -19,19 +19,19 @@ export default class HybridAudioService {
     const isSupported = this.googleCloudService.isServiceSupported();
     
     if (isSupported) {
-      return `🎙️ Google Cloud Speech-to-Text (Transcripción profesional médica)`;
+      return "🎙️ Google Cloud Speech-to-Text (Transcripción profesional médica)";
     } else {
-      return `❌ Google Cloud Speech-to-Text no disponible en este navegador`;
+      return "❌ Google Cloud Speech-to-Text no disponible en este navegador";
     }
   }
 
   // Iniciar grabación
   async startRecording(callback: (text: string, isFinal: boolean) => void): Promise<void> {
     try {
-      console.log('🎙️ Iniciando grabación con Google Cloud...');
+      console.log("🎙️ Iniciando grabación con Google Cloud...");
       await this.googleCloudService.startRecording(callback);
     } catch (error) {
-      console.error('❌ Error al iniciar grabación:', error);
+      console.error("❌ Error al iniciar grabación:", error);
       throw error;
     }
   }
@@ -39,10 +39,10 @@ export default class HybridAudioService {
   // Detener grabación
   stopRecording(): void {
     try {
-      console.log('🛑 Deteniendo grabación...');
+      console.log("🛑 Deteniendo grabación...");
       this.googleCloudService.stopRecording();
     } catch (error) {
-      console.error('❌ Error al detener grabación:', error);
+      console.error("❌ Error al detener grabación:", error);
     }
   }
 
@@ -58,7 +58,7 @@ export default class HybridAudioService {
 
   // Obtener nombre del servicio
   getServiceDisplayName(): string {
-    return '🎙️ Google Cloud Speech-to-Text';
+    return "🎙️ Google Cloud Speech-to-Text";
   }
 
   // Limpiar recursos

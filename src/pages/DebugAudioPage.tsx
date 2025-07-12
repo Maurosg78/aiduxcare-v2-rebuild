@@ -3,16 +3,16 @@
  * Para diagnosticar el bug de chunks repetidos
  */
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export function DebugAudioPage() {
   const [isRecording, setIsRecording] = useState(false);
-  const [transcription, setTranscription] = useState('');
+  const [transcription, setTranscription] = useState("");
 
   const handleRecording = () => {
     setIsRecording(!isRecording);
     if (!isRecording) {
-      setTranscription(''); // Limpiar transcripción al iniciar
+      setTranscription(""); // Limpiar transcripción al iniciar
     }
   };
 
@@ -20,7 +20,7 @@ export function DebugAudioPage() {
     <div className="debug-page">
       <h1>Debug Audio</h1>
       <button onClick={handleRecording}>
-        {isRecording ? 'Detener' : 'Grabar'}
+        {isRecording ? "Detener" : "Grabar"}
       </button>
       <div className="transcription">
         <h2>Transcripción:</h2>

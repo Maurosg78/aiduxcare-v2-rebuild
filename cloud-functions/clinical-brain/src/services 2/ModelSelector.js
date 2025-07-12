@@ -1,7 +1,7 @@
-const winston = require('winston');
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -18,41 +18,41 @@ class ModelSelector {
   constructor() {
     // Configuración de modelos basada en resultados empíricos
     this.models = {
-      'gemini-2.5-flash': {
+      "gemini-2.5-flash": {
         inputCost: 0.15,
         outputCost: 0.60,
-        clinicalSafety: '100%',
+        clinicalSafety: "100%",
         avgTime: 28,
-        description: 'Modelo estándar - Demostrada 100% seguridad clínica'
+        description: "Modelo estándar - Demostrada 100% seguridad clínica"
       },
-      'gemini-2.5-pro': {
+      "gemini-2.5-pro": {
         inputCost: 1.25,
         outputCost: 10.00,
-        clinicalSafety: '60%',
+        clinicalSafety: "60%",
         avgTime: 33.5,
-        description: 'Modelo premium - Solo para casos críticos múltiples'
+        description: "Modelo premium - Solo para casos críticos múltiples"
       }
     };
 
     // Términos que indican banderas rojas críticas
     this.criticalRedFlags = [
       // Cardiovasculares
-      'dolor pecho', 'dolor torácico', 'disnea', 'sudoración', 'palpitaciones',
-      'síncope', 'mareo severo', 'dolor irradiado brazo',
+      "dolor pecho", "dolor torácico", "disnea", "sudoración", "palpitaciones",
+      "síncope", "mareo severo", "dolor irradiado brazo",
       
       // Neurológicas
-      'pérdida de fuerza', 'déficit neurológico', 'disfunción vesical',
-      'incontinencia', 'alteración conciencia', 'confusión', 'convulsiones',
+      "pérdida de fuerza", "déficit neurológico", "disfunción vesical",
+      "incontinencia", "alteración conciencia", "confusión", "convulsiones",
       
       // Oncológicas
-      'pérdida de peso', 'dolor nocturno', 'fiebre vespertina', 'adenopatías',
-      'sangrado inexplicado', 'palidez', 'fatiga extrema',
+      "pérdida de peso", "dolor nocturno", "fiebre vespertina", "adenopatías",
+      "sangrado inexplicado", "palidez", "fatiga extrema",
       
       // Vasculares
-      'edema unilateral', 'dolor pantorrilla', 'trombosis', 'embolia',
+      "edema unilateral", "dolor pantorrilla", "trombosis", "embolia",
       
       // Infecciosas/Sistémicas
-      'fiebre alta', 'rigidez nucal', 'petequias', 'sepsis'
+      "fiebre alta", "rigidez nucal", "petequias", "sepsis"
     ];
   }
 
@@ -63,7 +63,7 @@ class ModelSelector {
    * @returns {Object} Modelo seleccionado con justificación
    */
   selectOptimalModel(transcription, options = {}) {
-    logger.info('🧠 SELECCIÓN BASADA EN EVIDENCIA EMPÍRICA');
+    logger.info("🧠 SELECCIÓN BASADA EN EVIDENCIA EMPÍRICA");
     
     try {
       // Detectar banderas rojas críticas
@@ -81,11 +81,11 @@ class ModelSelector {
         reasoning: selectedModel.reasoning,
         costAnalysis: costAnalysis,
         modelConfig: this.models[selectedModel.name],
-        empiricalBasis: 'Basado en evaluación de 5 casos clínicos reales',
+        empiricalBasis: "Basado en evaluación de 5 casos clínicos reales",
         timestamp: new Date().toISOString()
       };
 
-      logger.info('✅ MODELO SELECCIONADO (EVIDENCIA EMPÍRICA):', {
+      logger.info("✅ MODELO SELECCIONADO (EVIDENCIA EMPÍRICA):", {
         modelo: selectedModel.name,
         banderasRojas: redFlagsCount,
         justificacion: selectedModel.reasoning
@@ -94,15 +94,15 @@ class ModelSelector {
       return result;
 
     } catch (error) {
-      logger.error('❌ ERROR EN SELECCIÓN DE MODELO:', error);
+      logger.error("❌ ERROR EN SELECCIÓN DE MODELO:", error);
       
       // Fallback seguro a modelo estándar
       return {
-        selectedModel: 'gemini-2.5-flash',
+        selectedModel: "gemini-2.5-flash",
         redFlagsDetected: 0,
-        reasoning: 'Modelo estándar por error en análisis (100% seguridad demostrada)',
-        costAnalysis: { savingsVsPro: '15x más económico' },
-        modelConfig: this.models['gemini-2.5-flash'],
+        reasoning: "Modelo estándar por error en análisis (100% seguridad demostrada)",
+        costAnalysis: { savingsVsPro: "15x más económico" },
+        modelConfig: this.models["gemini-2.5-flash"],
         error: error.message
       };
     }
@@ -136,13 +136,13 @@ class ModelSelector {
     if (redFlagsCount >= 2) {
       // Múltiples banderas rojas - usar modelo premium
       return {
-        name: 'gemini-2.5-pro',
+        name: "gemini-2.5-pro",
         reasoning: `${redFlagsCount} banderas rojas críticas detectadas - requiere análisis premium para máxima seguridad`
       };
     } else {
       // Caso estándar - usar modelo balanceado (demostrada 100% seguridad)
       return {
-        name: 'gemini-2.5-flash',
+        name: "gemini-2.5-flash",
         reasoning: `${redFlagsCount} bandera(s) roja(s) - modelo estándar con 100% seguridad clínica demostrada`
       };
     }
@@ -159,8 +159,8 @@ class ModelSelector {
     const estimatedInputTokens = transcription.length / 4;
     const estimatedOutputTokens = 1500; // Estimación típica para respuesta SOAP
 
-    const flashModel = this.models['gemini-2.5-flash'];
-    const proModel = this.models['gemini-2.5-pro'];
+    const flashModel = this.models["gemini-2.5-flash"];
+    const proModel = this.models["gemini-2.5-pro"];
     const selectedModelConfig = this.models[selectedModel.name];
 
     // Calcular costos
@@ -180,11 +180,11 @@ class ModelSelector {
       flashCost: `$${flashCost.toFixed(6)}`,
       proCost: `$${proCost.toFixed(6)}`,
       selectedCost: `$${selectedCost.toFixed(6)}`,
-      savingsVsPro: selectedModel.name === 'gemini-2.5-pro' ? 'Modelo premium' : 
-                   `$${savingsVsPro.toFixed(6)} (${((savingsVsPro / proCost) * 100).toFixed(1)}% ahorro)`,
-      empiricalJustification: selectedModel.name === 'gemini-2.5-flash' ? 
-                             '100% seguridad clínica demostrada empíricamente' :
-                             'Modelo premium para casos críticos múltiples'
+      savingsVsPro: selectedModel.name === "gemini-2.5-pro" ? "Modelo premium" : 
+        `$${savingsVsPro.toFixed(6)} (${((savingsVsPro / proCost) * 100).toFixed(1)}% ahorro)`,
+      empiricalJustification: selectedModel.name === "gemini-2.5-flash" ? 
+        "100% seguridad clínica demostrada empíricamente" :
+        "Modelo premium para casos críticos múltiples"
     };
   }
 
@@ -210,8 +210,8 @@ class ModelSelector {
     
     return {
       selectedModel: modelName,
-      redFlagsDetected: 'N/A',
-      reasoning: 'Modelo forzado por configuración',
+      redFlagsDetected: "N/A",
+      reasoning: "Modelo forzado por configuración",
       modelConfig: this.models[modelName],
       forced: true
     };
@@ -223,11 +223,11 @@ class ModelSelector {
    */
   getOptimizationStats() {
     return {
-      standardModel: 'gemini-2.5-flash',
-      clinicalSafety: '100% (demostrado empíricamente)',
-      criteriaForPremium: '2+ banderas rojas críticas',
-      avgCostSavings: '15x vs modelo premium',
-      empiricalBasis: '5 casos clínicos evaluados',
+      standardModel: "gemini-2.5-flash",
+      clinicalSafety: "100% (demostrado empíricamente)",
+      criteriaForPremium: "2+ banderas rojas críticas",
+      avgCostSavings: "15x vs modelo premium",
+      empiricalBasis: "5 casos clínicos evaluados",
       redFlagsCriteria: `${this.criticalRedFlags.length} términos críticos monitoreados`
     };
   }

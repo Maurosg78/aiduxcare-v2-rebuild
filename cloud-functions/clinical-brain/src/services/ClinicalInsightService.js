@@ -1,7 +1,7 @@
-const winston = require('winston');
-const VertexAIClient = require('./VertexAIClient');
-const KnowledgeBase = require('./KnowledgeBase');
-const ModelSelector = require('./ModelSelector');
+const winston = require("winston");
+const VertexAIClient = require("./VertexAIClient");
+const KnowledgeBase = require("./KnowledgeBase");
+const ModelSelector = require("./ModelSelector");
 
 /**
  * ClinicalInsightService - Arquitectura de Cascada V2
@@ -22,7 +22,7 @@ class ClinicalInsightService {
     
     // Configurar logger
     this.logger = winston.createLogger({
-      level: 'info',
+      level: "info",
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
@@ -32,7 +32,7 @@ class ClinicalInsightService {
       ]
     });
     
-    this.logger.info('🏗️ ClinicalInsightService inicializado con arquitectura de cascada');
+    this.logger.info("🏗️ ClinicalInsightService inicializado con arquitectura de cascada");
   }
 
   /**
@@ -47,9 +47,9 @@ class ClinicalInsightService {
   async triageRedFlags(transcription) {
     const startTime = Date.now();
     
-    this.logger.info('🚩 ESTACIÓN 1: Iniciando triaje de banderas rojas', {
+    this.logger.info("🚩 ESTACIÓN 1: Iniciando triaje de banderas rojas", {
       transcriptionLength: transcription.length,
-      model: 'gemini-2.5-flash'
+      model: "gemini-2.5-flash"
     });
 
     try {
@@ -63,7 +63,7 @@ class ClinicalInsightService {
       const result = await this.vertexClient.processWithModel(
         transcription,
         triagePrompt,
-        'gemini-2.5-flash', // Modelo rápido y barato
+        "gemini-2.5-flash", // Modelo rápido y barato
         {
           maxTokens: 500, // Respuesta corta
           temperature: 0.1 // Precisión alta, creatividad baja
@@ -75,18 +75,18 @@ class ClinicalInsightService {
       
       const processingTime = (Date.now() - startTime) / 1000;
       
-      this.logger.info('✅ ESTACIÓN 1: Triaje completado', {
+      this.logger.info("✅ ESTACIÓN 1: Triaje completado", {
         redFlagsDetected: redFlags.length,
         redFlags: redFlags,
         processingTime: processingTime,
         model: result.modelUsed,
-        cost: result.costOptimization?.estimatedCost || 'N/A'
+        cost: result.costOptimization?.estimatedCost || "N/A"
       });
 
       return redFlags;
       
     } catch (error) {
-      this.logger.error('❌ ESTACIÓN 1: Error en triaje de banderas rojas', {
+      this.logger.error("❌ ESTACIÓN 1: Error en triaje de banderas rojas", {
         error: error.message,
         stack: error.stack,
         processingTime: (Date.now() - startTime) / 1000
@@ -109,9 +109,9 @@ class ClinicalInsightService {
   async extractClinicalFacts(transcription) {
     const startTime = Date.now();
     
-    this.logger.info('📋 ESTACIÓN 2: Iniciando extracción de hechos clínicos', {
+    this.logger.info("📋 ESTACIÓN 2: Iniciando extracción de hechos clínicos", {
       transcriptionLength: transcription.length,
-      model: 'gemini-2.5-flash'
+      model: "gemini-2.5-flash"
     });
 
     try {
@@ -122,7 +122,7 @@ class ClinicalInsightService {
       const result = await this.vertexClient.processWithModel(
         transcription,
         extractionPrompt,
-        'gemini-2.5-flash', // Modelo rápido y barato
+        "gemini-2.5-flash", // Modelo rápido y barato
         {
           maxTokens: 1000, // Respuesta estructurada mediana
           temperature: 0.2 // Precisión alta con algo de flexibilidad
@@ -134,20 +134,20 @@ class ClinicalInsightService {
       
       const processingTime = (Date.now() - startTime) / 1000;
       
-      this.logger.info('✅ ESTACIÓN 2: Extracción completada', {
+      this.logger.info("✅ ESTACIÓN 2: Extracción completada", {
         factsExtracted: Object.keys(clinicalFacts).length,
         hasSymptoms: !!clinicalFacts.symptoms,
         hasMedications: !!clinicalFacts.medications,
         hasHistory: !!clinicalFacts.history,
         processingTime: processingTime,
         model: result.modelUsed,
-        cost: result.costOptimization?.estimatedCost || 'N/A'
+        cost: result.costOptimization?.estimatedCost || "N/A"
       });
 
       return clinicalFacts;
       
     } catch (error) {
-      this.logger.error('❌ ESTACIÓN 2: Error en extracción de hechos', {
+      this.logger.error("❌ ESTACIÓN 2: Error en extracción de hechos", {
         error: error.message,
         stack: error.stack,
         processingTime: (Date.now() - startTime) / 1000
@@ -172,11 +172,11 @@ class ClinicalInsightService {
   async generateFinalAnalysis(transcription, redFlags, clinicalFacts) {
     const startTime = Date.now();
     
-    this.logger.info('🎯 ESTACIÓN 3: Iniciando análisis final y SOAP', {
+    this.logger.info("🎯 ESTACIÓN 3: Iniciando análisis final y SOAP", {
       transcriptionLength: transcription.length,
       redFlagsCount: redFlags.length,
       clinicalFactsKeys: Object.keys(clinicalFacts).length,
-      model: 'gemini-2.5-pro'
+      model: "gemini-2.5-pro"
     });
 
     try {
@@ -191,7 +191,7 @@ class ClinicalInsightService {
       const result = await this.vertexClient.processWithModel(
         transcription,
         finalPrompt,
-        'gemini-2.5-pro', // Modelo potente y preciso
+        "gemini-2.5-pro", // Modelo potente y preciso
         {
           maxTokens: 3000, // Respuesta completa y detallada
           temperature: 0.3 // Balance entre precisión y calidad narrativa
@@ -203,19 +203,19 @@ class ClinicalInsightService {
       
       const processingTime = (Date.now() - startTime) / 1000;
       
-      this.logger.info('✅ ESTACIÓN 3: Análisis final completado', {
+      this.logger.info("✅ ESTACIÓN 3: Análisis final completado", {
         hasWarnings: !!finalAnalysis.warnings,
         hasSuggestions: !!finalAnalysis.suggestions,
         hasSOAP: !!finalAnalysis.soap_analysis,
         processingTime: processingTime,
         model: result.modelUsed,
-        cost: result.costOptimization?.estimatedCost || 'N/A'
+        cost: result.costOptimization?.estimatedCost || "N/A"
       });
 
       return finalAnalysis;
       
     } catch (error) {
-      this.logger.error('❌ ESTACIÓN 3: Error en análisis final', {
+      this.logger.error("❌ ESTACIÓN 3: Error en análisis final", {
         error: error.message,
         stack: error.stack,
         processingTime: (Date.now() - startTime) / 1000
@@ -237,10 +237,10 @@ class ClinicalInsightService {
   async processTranscription(transcription, options = {}) {
     const cascadeStartTime = Date.now();
     
-    this.logger.info('🚀 INICIANDO CASCADA DE ANÁLISIS CLÍNICO', {
+    this.logger.info("🚀 INICIANDO CASCADA DE ANÁLISIS CLÍNICO", {
       transcriptionLength: transcription.length,
-      specialty: options.specialty || 'fisioterapia',
-      sessionType: options.sessionType || 'initial',
+      specialty: options.specialty || "fisioterapia",
+      sessionType: options.sessionType || "initial",
       cascadeId: this._generateCascadeId()
     });
 
@@ -264,7 +264,7 @@ class ClinicalInsightService {
       const cascadeResult = {
         ...finalAnalysis,
         cascade_metadata: {
-          pipeline_version: '2.0-cascade',
+          pipeline_version: "2.0-cascade",
           total_processing_time: totalCascadeTime,
           stations_completed: 3,
           station_results: {
@@ -278,27 +278,27 @@ class ClinicalInsightService {
             },
             station3_final_analysis: {
               sections_generated: [
-                finalAnalysis.warnings ? 'warnings' : null,
-                finalAnalysis.suggestions ? 'suggestions' : null,
-                finalAnalysis.soap_analysis ? 'soap_analysis' : null
+                finalAnalysis.warnings ? "warnings" : null,
+                finalAnalysis.suggestions ? "suggestions" : null,
+                finalAnalysis.soap_analysis ? "soap_analysis" : null
               ].filter(Boolean)
             }
           },
           cost_optimization: {
-            models_used: ['gemini-2.5-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'],
-            strategy: 'cascade-optimization',
-            estimated_savings: '60-70% vs single Pro call'
+            models_used: ["gemini-2.5-flash", "gemini-2.5-flash", "gemini-2.5-pro"],
+            strategy: "cascade-optimization",
+            estimated_savings: "60-70% vs single Pro call"
           },
           timestamp: new Date().toISOString()
         }
       };
 
-      this.logger.info('🎉 CASCADA DE ANÁLISIS COMPLETADA EXITOSAMENTE', {
+      this.logger.info("🎉 CASCADA DE ANÁLISIS COMPLETADA EXITOSAMENTE", {
         totalTime: totalCascadeTime,
         redFlagsDetected: redFlags.length,
         clinicalFactsExtracted: Object.keys(clinicalFacts).length,
         finalAnalysisSections: Object.keys(finalAnalysis).length,
-        estimatedSavings: '60-70%'
+        estimatedSavings: "60-70%"
       });
 
       return cascadeResult;
@@ -306,7 +306,7 @@ class ClinicalInsightService {
     } catch (error) {
       const totalTime = (Date.now() - cascadeStartTime) / 1000;
       
-      this.logger.error('💥 ERROR EN CASCADA DE ANÁLISIS', {
+      this.logger.error("💥 ERROR EN CASCADA DE ANÁLISIS", {
         error: error.message,
         stack: error.stack,
         totalTime: totalTime,
@@ -327,17 +327,17 @@ class ClinicalInsightService {
   async processTranscriptionWithIntelligentModel(transcription, options = {}) {
     const startTime = Date.now();
     
-    this.logger.info('🚀 INICIANDO ANÁLISIS CON MODELSELECTOR INTELIGENTE', {
+    this.logger.info("🚀 INICIANDO ANÁLISIS CON MODELSELECTOR INTELIGENTE", {
       transcriptionLength: transcription.length,
-      specialty: options.specialty || 'fisioterapia',
-      sessionType: options.sessionType || 'initial'
+      specialty: options.specialty || "fisioterapia",
+      sessionType: options.sessionType || "initial"
     });
 
     try {
       // PASO 1: ModelSelector decide qué modelo usar (con triaje IA)
       const modelDecision = await this.modelSelector.selectModel(transcription);
       
-      this.logger.info('🧠 DECISIÓN DE MODELO COMPLETADA', {
+      this.logger.info("🧠 DECISIÓN DE MODELO COMPLETADA", {
         selectedModel: modelDecision.selectedModel,
         reasoning: modelDecision.reasoning,
         redFlagsDetected: modelDecision.triageResult.redFlags.length,
@@ -358,7 +358,7 @@ class ClinicalInsightService {
       const intelligentResult = {
         ...analysisResult,
         intelligent_model_metadata: {
-          workflow_version: '3.0-intelligent-selector',
+          workflow_version: "3.0-intelligent-selector",
           total_processing_time: totalTime,
           model_decision: {
             selected_model: modelDecision.selectedModel,
@@ -375,7 +375,7 @@ class ClinicalInsightService {
         }
       };
 
-      this.logger.info('🎉 ANÁLISIS INTELIGENTE COMPLETADO EXITOSAMENTE', {
+      this.logger.info("🎉 ANÁLISIS INTELIGENTE COMPLETADO EXITOSAMENTE", {
         totalTime: totalTime,
         modelUsed: modelDecision.selectedModel,
         redFlagsDetected: modelDecision.triageResult.redFlags.length,
@@ -387,7 +387,7 @@ class ClinicalInsightService {
     } catch (error) {
       const totalTime = (Date.now() - startTime) / 1000;
       
-      this.logger.error('💥 ERROR EN ANÁLISIS INTELIGENTE', {
+      this.logger.error("💥 ERROR EN ANÁLISIS INTELIGENTE", {
         error: error.message,
         stack: error.stack,
         totalTime: totalTime,
@@ -404,7 +404,7 @@ class ClinicalInsightService {
   async _performCompleteAnalysis(transcription, selectedModel, triageResult, options) {
     const analysisStartTime = Date.now();
     
-    this.logger.info('🔬 INICIANDO ANÁLISIS COMPLETO', {
+    this.logger.info("🔬 INICIANDO ANÁLISIS COMPLETO", {
       model: selectedModel,
       transcriptionLength: transcription.length,
       redFlagsFromTriage: triageResult.redFlags.length
@@ -418,11 +418,11 @@ class ClinicalInsightService {
     );
 
     // Configurar parámetros según modelo seleccionado
-    const modelConfig = selectedModel === 'gemini-2.5-pro' 
+    const modelConfig = selectedModel === "gemini-2.5-pro" 
       ? { maxTokens: 3000, temperature: 0.2 }  // Máxima calidad para casos críticos
       : { maxTokens: 2000, temperature: 0.3 }; // Eficiente para casos estándar
 
-    this.logger.info('📤 ENVIANDO ANÁLISIS COMPLETO AL MODELO', {
+    this.logger.info("📤 ENVIANDO ANÁLISIS COMPLETO AL MODELO", {
       model: selectedModel,
       promptLength: completePrompt.length,
       config: modelConfig
@@ -437,7 +437,7 @@ class ClinicalInsightService {
 
     const analysisTime = (Date.now() - analysisStartTime) / 1000;
 
-    this.logger.info('✅ ANÁLISIS COMPLETO FINALIZADO', {
+    this.logger.info("✅ ANÁLISIS COMPLETO FINALIZADO", {
       model: selectedModel,
       processingTime: analysisTime,
       responseLength: response.length
@@ -450,8 +450,8 @@ class ClinicalInsightService {
    * Prompt completo contextualizado para análisis inteligente
    */
   _buildIntelligentAnalysisPrompt(transcription, triageResult, options) {
-    const specialty = options.specialty || 'fisioterapia';
-    const sessionType = options.sessionType || 'initial';
+    const specialty = options.specialty || "fisioterapia";
+    const sessionType = options.sessionType || "initial";
     
     return `Actúa como un ${specialty} clínico experto realizando análisis completo de caso clínico.
 
@@ -461,7 +461,7 @@ TRANSCRIPCIÓN ORIGINAL:
 ${transcription}
 
 RESULTADO DEL TRIAJE PREVIO:
-- Banderas Rojas Detectadas: ${triageResult.redFlags.length > 0 ? triageResult.redFlags.join(', ') : 'Ninguna'}
+- Banderas Rojas Detectadas: ${triageResult.redFlags.length > 0 ? triageResult.redFlags.join(", ") : "Ninguna"}
 - Nivel de Riesgo: ${triageResult.riskLevel}
 - Confianza del Triaje: ${triageResult.confidence}
 - Razonamiento: ${triageResult.reasoning}
@@ -469,7 +469,7 @@ RESULTADO DEL TRIAJE PREVIO:
 PARÁMETROS DE SESIÓN:
 - Especialidad: ${specialty}
 - Tipo de Sesión: ${sessionType}
-- Contexto: ${triageResult.redFlags.length > 0 ? 'ANÁLISIS CRÍTICO - Banderas rojas presentes' : 'ANÁLISIS ESTÁNDAR - Optimización de costos'}
+- Contexto: ${triageResult.redFlags.length > 0 ? "ANÁLISIS CRÍTICO - Banderas rojas presentes" : "ANÁLISIS ESTÁNDAR - Optimización de costos"}
 
 INSTRUCCIONES PARA ANÁLISIS COMPLETO:
 
@@ -480,12 +480,12 @@ Basándote en toda la información disponible, genera un análisis clínico comp
 3. **SOAP_ANALYSIS**: Nota SOAP profesional completa con todas las secciones
 
 ${triageResult.redFlags.length > 0 ? 
-`⚠️ MODO CRÍTICO ACTIVADO: Se han detectado banderas rojas en el triaje previo. Proporciona análisis exhaustivo con máxima atención a:
-- Validación de banderas rojas detectadas: ${triageResult.redFlags.join(', ')}
+    `⚠️ MODO CRÍTICO ACTIVADO: Se han detectado banderas rojas en el triaje previo. Proporciona análisis exhaustivo con máxima atención a:
+- Validación de banderas rojas detectadas: ${triageResult.redFlags.join(", ")}
 - Recomendaciones de seguimiento inmediato
 - Protocolos de derivación si es necesario
 - Evaluación de riesgo detallada` :
-`✅ MODO ESTÁNDAR: Triaje no detectó banderas rojas críticas. Proporciona análisis completo eficiente enfocado en:
+    `✅ MODO ESTÁNDAR: Triaje no detectó banderas rojas críticas. Proporciona análisis completo eficiente enfocado en:
 - Manejo clínico estándar
 - Optimización del plan de tratamiento
 - Educación del paciente
@@ -557,13 +557,13 @@ RESPUESTA JSON:`;
       let cleanResponse = response;
       
       // Si aún tiene markdown, limpiarlo
-      if (typeof response === 'string' && response.includes('```')) {
-        cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      if (typeof response === "string" && response.includes("```")) {
+        cleanResponse = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       }
       
       const parsed = JSON.parse(cleanResponse);
       
-      this.logger.info('✅ PARSING ANÁLISIS COMPLETO EXITOSO', {
+      this.logger.info("✅ PARSING ANÁLISIS COMPLETO EXITOSO", {
         warningsCount: parsed.warnings?.length || 0,
         suggestionsCount: parsed.suggestions?.length || 0,
         soapSections: Object.keys(parsed.soap_analysis || {}).length
@@ -572,9 +572,9 @@ RESPUESTA JSON:`;
       return parsed;
       
     } catch (error) {
-      this.logger.error('❌ ERROR PARSING ANÁLISIS COMPLETO', {
+      this.logger.error("❌ ERROR PARSING ANÁLISIS COMPLETO", {
         error: error.message,
-        response: typeof response === 'string' ? response.substring(0, 300) : 'No es string'
+        response: typeof response === "string" ? response.substring(0, 300) : "No es string"
       });
       
       // Fallback básico
@@ -626,7 +626,7 @@ TRANSCRIPCIÓN:
 ${transcription}
 
 BANDERAS ROJAS CRÍTICAS A BUSCAR:
-${criticalRedFlags.map(flag => `- ${flag}`).join('\n')}
+${criticalRedFlags.map(flag => `- ${flag}`).join("\n")}
 
 INSTRUCCIONES:
 1. Lee la transcripción en busca de las banderas rojas críticas listadas
@@ -719,7 +719,7 @@ TRANSCRIPCIÓN ORIGINAL:
 ${transcription}
 
 BANDERAS ROJAS DETECTADAS:
-${redFlags.length > 0 ? redFlags.map(flag => `- ${flag}`).join('\n') : 'Ninguna bandera roja crítica detectada'}
+${redFlags.length > 0 ? redFlags.map(flag => `- ${flag}`).join("\n") : "Ninguna bandera roja crítica detectada"}
 
 HECHOS CLÍNICOS ESTRUCTURADOS:
 ${JSON.stringify(clinicalFacts, null, 2)}
@@ -810,18 +810,18 @@ RESPUESTA JSON:`;
    */
   _parseRedFlagsResponse(response) {
     try {
-      if (!response || response.trim().toLowerCase() === 'ninguna') {
+      if (!response || response.trim().toLowerCase() === "ninguna") {
         return [];
       }
       
       return response
-        .split('\n')
+        .split("\n")
         .map(line => line.trim())
-        .filter(line => line.length > 0 && !line.toLowerCase().includes('ninguna'))
+        .filter(line => line.length > 0 && !line.toLowerCase().includes("ninguna"))
         .slice(0, 10); // Máximo 10 banderas rojas
         
     } catch (error) {
-      this.logger.error('Error parseando banderas rojas:', error);
+      this.logger.error("Error parseando banderas rojas:", error);
       return [];
     }
   }
@@ -837,11 +837,11 @@ RESPUESTA JSON:`;
         return JSON.parse(jsonMatch[0]);
       }
       
-      this.logger.warn('No se encontró JSON válido en respuesta de extracción');
+      this.logger.warn("No se encontró JSON válido en respuesta de extracción");
       return {};
       
     } catch (error) {
-      this.logger.error('Error parseando hechos clínicos:', error);
+      this.logger.error("Error parseando hechos clínicos:", error);
       return {};
     }
   }
@@ -857,10 +857,10 @@ RESPUESTA JSON:`;
         return JSON.parse(jsonMatch[0]);
       }
       
-      throw new Error('No se encontró JSON válido en análisis final');
+      throw new Error("No se encontró JSON válido en análisis final");
       
     } catch (error) {
-      this.logger.error('Error parseando análisis final:', error);
+      this.logger.error("Error parseando análisis final:", error);
       throw error;
     }
   }

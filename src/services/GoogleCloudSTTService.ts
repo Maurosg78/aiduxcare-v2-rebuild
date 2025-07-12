@@ -25,10 +25,10 @@ export interface TranscriptionResponse {
 }
 
 export class GoogleCloudSTTService {
-  private readonly speechToTextEndpoint = 'https://us-central1-aiduxcare-stt-20250706.cloudfunctions.net/transcribeAudio';
+  private readonly speechToTextEndpoint = "https://us-central1-aiduxcare-stt-20250706.cloudfunctions.net/transcribeAudio";
   
   constructor() {
-    console.log('🎙️ GoogleCloudSTTService inicializado - Enterprise Speech-to-Text');
+    console.log("🎙️ GoogleCloudSTTService inicializado - Enterprise Speech-to-Text");
   }
 
   /**
@@ -37,14 +37,14 @@ export class GoogleCloudSTTService {
   async isServiceAvailable(): Promise<boolean> {
     try {
       const response = await fetch(`${this.speechToTextEndpoint}/health`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         }
       });
       return response.ok;
     } catch (error) {
-      console.warn('⚠️ Google Cloud STT no disponible:', error);
+      console.warn("⚠️ Google Cloud STT no disponible:", error);
       return false;
     }
   }
@@ -59,13 +59,13 @@ export class GoogleCloudSTTService {
     
     const defaultOptions: TranscriptionOptions = {
       enableSpeakerDiarization: true,
-      language: 'es-ES',
+      language: "es-ES",
       medicalContext: true,
       sampleRate: 48000,
       ...options
     };
 
-    console.log('🎤 Iniciando transcripción con Google Cloud STT:', {
+    console.log("🎤 Iniciando transcripción con Google Cloud STT:", {
       audioSize: audioBlob.size,
       audioType: audioBlob.type,
       options: defaultOptions
@@ -76,14 +76,14 @@ export class GoogleCloudSTTService {
       if (!audioBlob || audioBlob.size === 0) {
         return {
           success: false,
-          error: 'Audio blob inválido o vacío'
+          error: "Audio blob inválido o vacío"
         };
       }
 
       // Convertir audio a Base64 para envío
       const audioBase64 = await this.blobToBase64(audioBlob);
       
-      console.log('📡 Enviando audio a Google Cloud STT:', {
+      console.log("📡 Enviando audio a Google Cloud STT:", {
         base64Length: audioBase64.length,
         originalSize: audioBlob.size,
         encoding: audioBlob.type
@@ -102,9 +102,9 @@ export class GoogleCloudSTTService {
 
       // Enviar a Google Cloud Speech-to-Text Function
       const response = await fetch(this.speechToTextEndpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload)
       });
@@ -113,7 +113,7 @@ export class GoogleCloudSTTService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Error de Google Cloud STT:', {
+        console.error("❌ Error de Google Cloud STT:", {
           status: response.status,
           statusText: response.statusText,
           error: errorText
@@ -128,7 +128,7 @@ export class GoogleCloudSTTService {
 
       const result = await response.json();
 
-      console.log('✅ Transcripción completada:', {
+      console.log("✅ Transcripción completada:", {
         success: result.success,
         transcriptionLength: result.transcription?.length || 0,
         confidence: result.confidence,
@@ -140,7 +140,7 @@ export class GoogleCloudSTTService {
       if (!result.success) {
         return {
           success: false,
-          error: result.error || 'Error desconocido en transcripción',
+          error: result.error || "Error desconocido en transcripción",
           processingTime
         };
       }
@@ -155,9 +155,9 @@ export class GoogleCloudSTTService {
       };
 
     } catch (error) {
-      console.error('❌ Error crítico en transcripción:', error);
+      console.error("❌ Error crítico en transcripción:", error);
       
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
       
       return {
         success: false,
@@ -174,15 +174,15 @@ export class GoogleCloudSTTService {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
+        if (typeof reader.result === "string") {
           // Remover el prefijo "data:audio/webm;base64," 
-          const base64 = reader.result.split(',')[1] || reader.result;
+          const base64 = reader.result.split(",")[1] || reader.result;
           resolve(base64);
         } else {
-          reject(new Error('Error convirtiendo audio a Base64'));
+          reject(new Error("Error convirtiendo audio a Base64"));
         }
       };
-      reader.onerror = () => reject(new Error('Error leyendo archivo de audio'));
+      reader.onerror = () => reject(new Error("Error leyendo archivo de audio"));
       reader.readAsDataURL(blob);
     });
   }
@@ -191,6 +191,6 @@ export class GoogleCloudSTTService {
    * Obtiene información del servicio
    */
   getServiceInfo(): string {
-    return 'GoogleCloudSTTService: Enterprise Speech-to-Text con Speaker Diarization';
+    return "GoogleCloudSTTService: Enterprise Speech-to-Text con Speaker Diarization";
   }
 } 

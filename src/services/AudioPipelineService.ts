@@ -3,7 +3,7 @@
  * Pipeline profesional: MediaRecorder → Google Cloud Speech-to-Text → Análisis Clínico
  */
 
-import { GoogleCloudAudioService } from './GoogleCloudAudioService';
+import { GoogleCloudAudioService } from "./GoogleCloudAudioService";
 
 interface TranscriptionResult {
   text: string;
@@ -35,13 +35,13 @@ export class AudioPipelineService {
 
   constructor(callbacks: AudioPipelineCallbacks) {
     this.callbacks = callbacks;
-    console.log('🎙️ AudioPipelineService inicializado - Pipeline Profesional Google Cloud');
+    console.log("🎙️ AudioPipelineService inicializado - Pipeline Profesional Google Cloud");
     this.googleCloudService = new GoogleCloudAudioService();
   }
 
   public async startRecording(): Promise<void> {
     if (this.isRecording) {
-      console.warn('Ya hay una grabación en curso');
+      console.warn("Ya hay una grabación en curso");
       return;
     }
 
@@ -60,8 +60,8 @@ export class AudioPipelineService {
       this.mediaRecorder.start(1000); // Chunk cada 1 segundo
     } catch (error) {
       const transcriptionError: TranscriptionError = {
-        code: 'RECORDING_ERROR',
-        message: error instanceof Error ? error.message : 'Error desconocido al iniciar grabación',
+        code: "RECORDING_ERROR",
+        message: error instanceof Error ? error.message : "Error desconocido al iniciar grabación",
         details: error
       };
       this.callbacks.onTranscriptionError(transcriptionError);
@@ -80,8 +80,8 @@ export class AudioPipelineService {
       this.callbacks.onTranscriptionResult(transcriptionResult);
     } catch (error) {
       const transcriptionError: TranscriptionError = {
-        code: 'PROCESSING_ERROR',
-        message: error instanceof Error ? error.message : 'Error al procesar audio',
+        code: "PROCESSING_ERROR",
+        message: error instanceof Error ? error.message : "Error al procesar audio",
         details: error
       };
       this.callbacks.onTranscriptionError(transcriptionError);
@@ -90,7 +90,7 @@ export class AudioPipelineService {
 
   public stopRecording(): void {
     if (!this.isRecording) {
-      console.warn('No hay grabación activa para detener');
+      console.warn("No hay grabación activa para detener");
       return;
     }
 

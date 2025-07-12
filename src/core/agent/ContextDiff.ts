@@ -1,16 +1,16 @@
-import { MCPContext, MCPMemoryBlock } from '../mcp/schema';
+import { MCPContext, MCPMemoryBlock } from "../mcp/schema";
 
 /**
  * Tipos de estado de diferencia entre bloques de memoria
  */
-export type DiffStatus = 'unchanged' | 'modified' | 'added';
+export type DiffStatus = "unchanged" | "modified" | "added";
 
 /**
  * Resultado de la comparación de un bloque de memoria
  */
 export interface DiffResultBlock {
   id?: string;
-  type: 'contextual' | 'persistent' | 'semantic';
+  type: "contextual" | "persistent" | "semantic";
   status: DiffStatus;
   originalContent?: string;
   newContent: string;
@@ -31,7 +31,7 @@ export function computeContextDiff(
   const result: DiffResultBlock[] = [];
   
   // Función auxiliar para procesar los bloques de memoria desde la estructura MCPContext
-  const extractBlocks = (memoryData: { data: { id: string; type: 'contextual' | 'persistent' | 'semantic'; content: string; metadata?: Record<string, unknown> }[] }): MCPMemoryBlock[] => {
+  const extractBlocks = (memoryData: { data: { id: string; type: "contextual" | "persistent" | "semantic"; content: string; metadata?: Record<string, unknown> }[] }): MCPMemoryBlock[] => {
     return memoryData.data.map(item => ({
       id: item.id,
       type: item.type,
@@ -42,7 +42,7 @@ export function computeContextDiff(
 
   // Función auxiliar para comparar arrays de bloques de memoria
   const compareBlocks = (
-    type: 'contextual' | 'persistent' | 'semantic',
+    type: "contextual" | "persistent" | "semantic",
     originalBlocks: MCPMemoryBlock[],
     modifiedBlocks: MCPMemoryBlock[]
   ) => {
@@ -60,7 +60,7 @@ export function computeContextDiff(
         // Bloques sin ID se consideran nuevos
         result.push({
           type,
-          status: 'added',
+          status: "added",
           newContent: modifiedBlock.content,
           metadata: modifiedBlock.metadata
         });
@@ -74,7 +74,7 @@ export function computeContextDiff(
         result.push({
           id: modifiedBlock.id,
           type,
-          status: 'added',
+          status: "added",
           newContent: modifiedBlock.content,
           metadata: modifiedBlock.metadata
         });
@@ -84,7 +84,7 @@ export function computeContextDiff(
           result.push({
             id: modifiedBlock.id,
             type,
-            status: 'modified',
+            status: "modified",
             originalContent: originalBlock.content,
             newContent: modifiedBlock.content,
             metadata: modifiedBlock.metadata
@@ -94,7 +94,7 @@ export function computeContextDiff(
           result.push({
             id: modifiedBlock.id,
             type,
-            status: 'unchanged',
+            status: "unchanged",
             originalContent: originalBlock.content,
             newContent: modifiedBlock.content,
             metadata: modifiedBlock.metadata
@@ -112,19 +112,19 @@ export function computeContextDiff(
   
   // Procesar y comparar bloques por tipo
   compareBlocks(
-    'contextual', 
+    "contextual", 
     original.contextual ? extractBlocks(original.contextual) : [], 
     modified.contextual ? extractBlocks(modified.contextual) : []
   );
   
   compareBlocks(
-    'persistent', 
+    "persistent", 
     original.persistent ? extractBlocks(original.persistent) : [], 
     modified.persistent ? extractBlocks(modified.persistent) : []
   );
   
   compareBlocks(
-    'semantic', 
+    "semantic", 
     original.semantic ? extractBlocks(original.semantic) : [], 
     modified.semantic ? extractBlocks(modified.semantic) : []
   );

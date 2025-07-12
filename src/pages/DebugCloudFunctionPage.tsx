@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 interface DebugResponse {
   success: boolean;
@@ -21,14 +21,14 @@ export default function DebugCloudFunctionPage() {
       // Simular una llamada a la función
       const testResponse: DebugResponse = {
         success: true,
-        message: 'Test exitoso'
+        message: "Test exitoso"
       };
       setResponse(testResponse);
       setError(null);
     } catch (err) {
       const debugError: DebugError = {
-        code: 'TEST_ERROR',
-        message: err instanceof Error ? err.message : 'Error desconocido'
+        code: "TEST_ERROR",
+        message: err instanceof Error ? err.message : "Error desconocido"
       };
       setError(debugError);
       setResponse(null);

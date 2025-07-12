@@ -1,11 +1,11 @@
-import { MCPManager } from './MCPManager';
+import { MCPManager } from "./MCPManager";
 /**
  * Script para depurar el funcionamiento del MCPContextBuilder
  * 
  * Este script muestra el resultado del builder con cada tipo de entrada
  * para ayudar a diagnosticar problemas.
  */
-import { buildMCPContext } from './MCPContextBuilder';
+import { buildMCPContext } from "./MCPContextBuilder";
 
 // Crear datos de prueba manualmente en lugar de importar los mocks
 // para evitar problemas de rutas
@@ -20,12 +20,12 @@ const fullContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'ctx-001',
+        id: "ctx-001",
         created_at: NOW,
-        type: 'contextual',
-        content: 'Paciente femenina de 65 años acude a consulta por dolor torácico',
-        visit_id: 'visit-12345',
-        patient_id: 'patient-6789'
+        type: "contextual",
+        content: "Paciente femenina de 65 años acude a consulta por dolor torácico",
+        visit_id: "visit-12345",
+        patient_id: "patient-6789"
       }
     ]
   },
@@ -33,11 +33,11 @@ const fullContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'per-001',
+        id: "per-001",
         created_at: NOW,
-        type: 'persistent',
-        content: 'Antecedentes: Hipertensión arterial, Diabetes mellitus tipo 2',
-        patient_id: 'patient-6789'
+        type: "persistent",
+        content: "Antecedentes: Hipertensión arterial, Diabetes mellitus tipo 2",
+        patient_id: "patient-6789"
       }
     ]
   },
@@ -45,10 +45,10 @@ const fullContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'sem-001',
+        id: "sem-001",
         created_at: NOW,
-        type: 'semantic',
-        content: 'El dolor torácico puede estar asociado a cardiopatía isquémica'
+        type: "semantic",
+        content: "El dolor torácico puede estar asociado a cardiopatía isquémica"
       }
     ]
   }
@@ -63,12 +63,12 @@ const missingContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'missing-ctx-001',
+        id: "missing-ctx-001",
         created_at: NOW,
-        type: 'contextual',
-        content: 'Paciente con dolor abdominal',
+        type: "contextual",
+        content: "Paciente con dolor abdominal",
         // Sin visit_id
-        patient_id: 'patient-9876'
+        patient_id: "patient-9876"
       }
     ]
   },
@@ -76,10 +76,10 @@ const missingContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'missing-per-001',
+        id: "missing-per-001",
         created_at: NOW,
-        type: 'persistent',
-        content: 'Antecedentes: Ninguno relevante'
+        type: "persistent",
+        content: "Antecedentes: Ninguno relevante"
         // Sin patient_id
       }
     ]
@@ -88,10 +88,10 @@ const missingContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'missing-sem-001',
+        id: "missing-sem-001",
         created_at: NOW,
-        type: 'semantic',
-        content: 'El dolor abdominal puede tener múltiples causas'
+        type: "semantic",
+        content: "El dolor abdominal puede tener múltiples causas"
       }
     ]
   }
@@ -106,20 +106,20 @@ const inconsistentContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'inconsistent-ctx-001',
+        id: "inconsistent-ctx-001",
         created_at: NOW,
-        type: 'contextual',
-        content: 'Paciente con dolor epigástrico',
-        visit_id: 'visit-54321',
-        patient_id: 'patient-54321'
+        type: "contextual",
+        content: "Paciente con dolor epigástrico",
+        visit_id: "visit-54321",
+        patient_id: "patient-54321"
       },
       {
-        id: 'inconsistent-ctx-002',
+        id: "inconsistent-ctx-002",
         created_at: "fecha-invalida", // Formato inválido
-        type: 'contextual',
-        content: '', // Contenido vacío
-        visit_id: 'visit-54321',
-        patient_id: 'patient-54321'
+        type: "contextual",
+        content: "", // Contenido vacío
+        visit_id: "visit-54321",
+        patient_id: "patient-54321"
       }
     ]
   },
@@ -127,11 +127,11 @@ const inconsistentContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'inconsistent-per-001',
+        id: "inconsistent-per-001",
         // Sin created_at
-        type: 'persistent',
-        content: 'Antecedentes: Gastritis crónica',
-        patient_id: 'patient-54321'
+        type: "persistent",
+        content: "Antecedentes: Gastritis crónica",
+        patient_id: "patient-54321"
       }
     ]
   },
@@ -139,15 +139,15 @@ const inconsistentContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'inconsistent-sem-001',
+        id: "inconsistent-sem-001",
         created_at: NOW,
-        type: 'semantic',
-        content: 'El dolor epigástrico puede estar asociado a enfermedad ácido-péptica'
+        type: "semantic",
+        content: "El dolor epigástrico puede estar asociado a enfermedad ácido-péptica"
       },
       {
-        id: 'inconsistent-sem-002',
+        id: "inconsistent-sem-002",
         created_at: NOW,
-        type: 'semantic',
+        type: "semantic",
         content: null // Contenido null
       }
     ]
@@ -163,11 +163,11 @@ const minimalContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'minimal-ctx-001',
+        id: "minimal-ctx-001",
         created_at: NOW,
-        type: 'contextual',
-        content: 'Paciente acude a control. Sin síntomas activos.',
-        visit_id: 'visit-minimal'
+        type: "contextual",
+        content: "Paciente acude a control. Sin síntomas activos.",
+        visit_id: "visit-minimal"
       }
     ]
   },
@@ -175,11 +175,11 @@ const minimalContext = buildMCPContext(
     source: "test-data",
     data: [
       {
-        id: 'minimal-per-001',
+        id: "minimal-per-001",
         created_at: NOW,
-        type: 'persistent',
-        content: 'Sin antecedentes patológicos de relevancia.',
-        patient_id: 'patient-minimal'
+        type: "persistent",
+        content: "Sin antecedentes patológicos de relevancia.",
+        patient_id: "patient-minimal"
       }
     ]
   },

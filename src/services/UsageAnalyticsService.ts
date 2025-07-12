@@ -1,6 +1,6 @@
-import supabase from '@/core/auth/supabaseClient';
-import { SupabaseClient } from '@supabase/supabase-js';
-import { track } from '@/lib/analytics';
+import supabase from "@/core/auth/supabaseClient";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { track } from "@/lib/analytics";
 
 /**
  * Tipo que define la estructura de una métrica de uso en el sistema
@@ -21,12 +21,12 @@ export interface UsageMetric {
  * Tipos válidos de métricas de uso
  */
 export type UsageMetricType =
-  | 'suggestions_generated'
-  | 'suggestions_accepted'
-  | 'suggestions_integrated'
-  | 'suggestions_rejected'
-  | 'suggestion_field_matched'
-  | 'agent_execution_failed';
+  | "suggestions_generated"
+  | "suggestions_accepted"
+  | "suggestions_integrated"
+  | "suggestions_rejected"
+  | "suggestion_field_matched"
+  | "agent_execution_failed";
 
 /**
  * Tipo que define la estructura de métricas longitudinales entre visitas
@@ -44,8 +44,8 @@ export interface LongitudinalMetric {
   suggestions_integrated: number;
   audio_items_validated: number;
   time_saved_minutes: number;
-  risk_level_summary: 'low' | 'medium' | 'high';
-  clinical_evolution: 'improved' | 'stable' | 'worsened';
+  risk_level_summary: "low" | "medium" | "high";
+  clinical_evolution: "improved" | "stable" | "worsened";
   notes?: string;
   details?: Record<string, unknown>;
 }
@@ -81,14 +81,14 @@ const longitudinalMetricsStore: LongitudinalMetric[] = [];
 export const logMetric = (metric: UsageMetric): void => {
   // Validar que la métrica tenga todos los campos requeridos
   if (!metric.timestamp || !metric.visitId || !metric.userId || !metric.type || metric.value === undefined) {
-    throw new Error('La métrica debe contener todos los campos requeridos');
+    throw new Error("La métrica debe contener todos los campos requeridos");
   }
   
   // Añadir la métrica al almacén en memoria
   metricsStore.push({
     ...metric,
     // Asegurar que timestamp sea string en formato ISO
-    timestamp: typeof metric.timestamp === 'string' 
+    timestamp: typeof metric.timestamp === "string" 
       ? metric.timestamp 
       : new Date().toISOString()
   });
@@ -105,7 +105,7 @@ export const logMetric = (metric: UsageMetric): void => {
  */
 export interface UsageMetricData {
   suggestionId: string;
-  suggestionType: 'recommendation' | 'warning' | 'info';
+  suggestionType: "recommendation" | "warning" | "info";
   suggestionField: string;
 }
 
@@ -116,7 +116,7 @@ export const trackMetric = async (
   visitId: string
 ): Promise<void> => {
   // Aquí iría la implementación real
-  console.log('Track Metric:', { metricType, data, userId, visitId });
+  console.log("Track Metric:", { metricType, data, userId, visitId });
 };
 
 /**
@@ -159,19 +159,19 @@ export const getMetricsSummaryByVisit = (visitId: string): {
   
   return {
     generated: metrics
-      .filter(m => m.type === 'suggestions_generated')
+      .filter(m => m.type === "suggestions_generated")
       .reduce((sum, m) => sum + m.value, 0),
       
     accepted: metrics
-      .filter(m => m.type === 'suggestions_accepted')
+      .filter(m => m.type === "suggestions_accepted")
       .reduce((sum, m) => sum + m.value, 0),
       
     integrated: metrics
-      .filter(m => m.type === 'suggestions_integrated')
+      .filter(m => m.type === "suggestions_integrated")
       .reduce((sum, m) => sum + m.value, 0),
 
     field_matched: metrics
-      .filter(m => m.type === 'suggestions_generated' && m.metadata?.field_matched)
+      .filter(m => m.type === "suggestions_generated" && m.metadata?.field_matched)
       .reduce((sum, m) => sum + m.value, 0),
       
     warnings: warningCount,
@@ -200,19 +200,19 @@ export const calculateLongitudinalMetrics = async (
   userId: string,
   fieldsChanged: number = 0,
   audioItemsValidated: number = 0,
-  clinicalEvolution: 'improved' | 'stable' | 'worsened' = 'stable'
+  clinicalEvolution: "improved" | "stable" | "worsened" = "stable"
 ): Promise<LongitudinalMetric> => {
   // Obtener métricas de ambas visitas
   const currentMetrics = getMetricsSummaryByVisit(currentVisitId);
   const previousMetrics = getMetricsSummaryByVisit(previousVisitId);
   
   // Determinar el nivel de riesgo basado en advertencias y adherencia a sugerencias
-  let riskLevel: 'low' | 'medium' | 'high' = 'low';
+  let riskLevel: "low" | "medium" | "high" = "low";
   
   // Si hay más advertencias en la visita actual y/o baja adherencia a sugerencias,
   // aumentar el nivel de riesgo
   if (currentMetrics.warnings > previousMetrics.warnings) {
-    riskLevel = 'medium';
+    riskLevel = "medium";
   }
   
   // Si la adherencia a sugerencias es baja (menos del 50% de sugerencias aceptadas)
@@ -221,7 +221,7 @@ export const calculateLongitudinalMetrics = async (
     : 1;
     
   if (adherenceRate < 0.5 && currentMetrics.warnings > 0) {
-    riskLevel = 'high';
+    riskLevel = "high";
   }
   
   // Crear la métrica longitudinal
@@ -270,20 +270,20 @@ export const saveLongitudinalMetricsToSupabase = async (metric: LongitudinalMetr
     
     // Guardar en la tabla metrics_by_visit
     const { error } = await client
-      .from('metrics_by_visit')
+      .from("metrics_by_visit")
       .insert([{
         ...metric,
         details: JSON.stringify(metric.details)
       }]);
     
     if (error) {
-      console.error('Error guardando métricas longitudinales:', error);
+      console.error("Error guardando métricas longitudinales:", error);
       return false;
     }
     
     return true;
   } catch (e) {
-    console.error('Error guardando métricas longitudinales:', e);
+    console.error("Error guardando métricas longitudinales:", e);
     return false;
   }
 };
@@ -300,13 +300,13 @@ export const getLongitudinalMetricsByPatient = async (patientId: string): Promis
     const client = getSupabaseClient();
     
     const { data, error } = await client
-      .from('metrics_by_visit')
-      .select('*')
-      .eq('patient_id', patientId)
-      .order('date', { ascending: false });
+      .from("metrics_by_visit")
+      .select("*")
+      .eq("patient_id", patientId)
+      .order("date", { ascending: false });
     
     if (error) {
-      console.error('Error obteniendo métricas longitudinales:', error);
+      console.error("Error obteniendo métricas longitudinales:", error);
       // Retornar las métricas del almacén local como fallback
       return longitudinalMetricsStore.filter(m => m.patient_id === patientId);
     }
@@ -330,15 +330,15 @@ export const getLongitudinalMetricsByPatient = async (patientId: string): Promis
       suggestions_integrated: metric.suggestions_integrated,
       audio_items_validated: metric.audio_items_validated as number,
       time_saved_minutes: metric.time_saved_minutes,
-      risk_level_summary: metric.risk_level_summary as 'low' | 'medium' | 'high',
-      clinical_evolution: metric.clinical_evolution as 'improved' | 'stable' | 'worsened',
+      risk_level_summary: metric.risk_level_summary as "low" | "medium" | "high",
+      clinical_evolution: metric.clinical_evolution as "improved" | "stable" | "worsened",
       notes: metric.notes as string | undefined,
       details: metric.details 
         ? JSON.parse(metric.details as string) 
         : undefined
     }));
   } catch (e) {
-    console.error('Error obteniendo métricas longitudinales:', e);
+    console.error("Error obteniendo métricas longitudinales:", e);
     // En caso de error, devolver del almacén local
     return longitudinalMetricsStore.filter(m => m.patient_id === patientId);
   }
@@ -359,15 +359,15 @@ export const getLongitudinalMetricForVisit = async (visitId: string): Promise<Lo
     
     // Obtener la métrica de Supabase
     const { data, error } = await supabase
-      .from('metrics_by_visit')
-      .select('*')
-      .eq('visit_id', visitId)
+      .from("metrics_by_visit")
+      .select("*")
+      .eq("visit_id", visitId)
       .single();
     
     if (error) {
       // Si la tabla no existe o hay un error, generar datos de respaldo
-      if (error.code === 'PGRST116' || error.code === '42P01') {
-        console.warn('Tabla metrics_by_visit no encontrada, generando métricas simuladas');
+      if (error.code === "PGRST116" || error.code === "42P01") {
+        console.warn("Tabla metrics_by_visit no encontrada, generando métricas simuladas");
         return generateFallbackMetric(visitId);
       }
       
@@ -382,12 +382,12 @@ export const getLongitudinalMetricForVisit = async (visitId: string): Promise<Lo
     // Procesar los datos para convertir detalles de JSON a objeto
     return {
       ...data,
-      details: typeof data.details === 'string' 
+      details: typeof data.details === "string" 
         ? JSON.parse(data.details) 
         : data.details
     };
   } catch (err) {
-    console.error('Error al obtener métrica longitudinal:', err);
+    console.error("Error al obtener métrica longitudinal:", err);
     return generateFallbackMetric(visitId);
   }
 };
@@ -401,9 +401,9 @@ export const getLongitudinalMetricForVisit = async (visitId: string): Promise<Lo
 const generateFallbackMetric = (visitId: string): LongitudinalMetric => {
   // Generar un ID para la visita anterior y el paciente
   const randomId = () => 
-    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
       const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      const v = c === "x" ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   
@@ -415,11 +415,11 @@ const generateFallbackMetric = (visitId: string): LongitudinalMetric => {
   const timeSaved = suggestionsIntegrated * 2 + audioValidated;
   
   // Determinar evolución clínica aleatoria
-  const evolutions: Array<'improved' | 'stable' | 'worsened'> = ['improved', 'stable', 'worsened'];
+  const evolutions: Array<"improved" | "stable" | "worsened"> = ["improved", "stable", "worsened"];
   const randomEvolution = evolutions[Math.floor(Math.random() * evolutions.length)];
   
   // Determinar nivel de riesgo
-  const riskLevels: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
+  const riskLevels: Array<"low" | "medium" | "high"> = ["low", "medium", "high"];
   const randomRisk = riskLevels[Math.floor(Math.random() * riskLevels.length)];
   
   // Crear métrica de respaldo
@@ -438,7 +438,7 @@ const generateFallbackMetric = (visitId: string): LongitudinalMetric => {
     time_saved_minutes: timeSaved,
     risk_level_summary: randomRisk,
     clinical_evolution: randomEvolution,
-    notes: 'Métrica simulada para demostración',
+    notes: "Métrica simulada para demostración",
     details: {
       previous_metrics: {
         generated: suggestionsGenerated - 2,
@@ -453,13 +453,13 @@ const generateFallbackMetric = (visitId: string): LongitudinalMetric => {
         accepted: suggestionsAccepted,
         integrated: suggestionsIntegrated,
         field_matched: 0,
-        warnings: randomRisk === 'low' ? 0 : randomRisk === 'medium' ? 1 : 3,
+        warnings: randomRisk === "low" ? 0 : randomRisk === "medium" ? 1 : 3,
         estimated_time_saved_minutes: timeSaved
       },
       comparison_date: new Date().toISOString(),
       pain_level_comparison: {
-        previous: randomEvolution === 'improved' ? 7 : randomEvolution === 'stable' ? 5 : 3,
-        current: randomEvolution === 'improved' ? 3 : randomEvolution === 'stable' ? 5 : 7
+        previous: randomEvolution === "improved" ? 7 : randomEvolution === "stable" ? 5 : 3,
+        current: randomEvolution === "improved" ? 3 : randomEvolution === "stable" ? 5 : 7
       }
     }
   };
@@ -482,21 +482,21 @@ export const calculateClinicalEvolution = (
   currentFields: number,
   previousFields: number,
   isPositiveEvolution: boolean = true
-): 'improved' | 'stable' | 'worsened' => {
+): "improved" | "stable" | "worsened" => {
   const difference = currentFields - previousFields;
   
   // Sin cambio significativo
   if (Math.abs(difference) < 0.1 * previousFields) {
-    return 'stable';
+    return "stable";
   }
   
   // Para métricas donde un incremento es positivo (ej. rango de movimiento)
   if (isPositiveEvolution) {
-    return difference > 0 ? 'improved' : 'worsened';
+    return difference > 0 ? "improved" : "worsened";
   }
   
   // Para métricas donde un decremento es positivo (ej. nivel de dolor)
-  return difference < 0 ? 'improved' : 'worsened';
+  return difference < 0 ? "improved" : "worsened";
 };
 
 /**
@@ -505,12 +505,12 @@ export const calculateClinicalEvolution = (
  * @param evolution Estado de evolución clínica
  * @returns Emoji representativo
  */
-export const getEvolutionIndicator = (evolution: 'improved' | 'stable' | 'worsened'): string => {
+export const getEvolutionIndicator = (evolution: "improved" | "stable" | "worsened"): string => {
   switch (evolution) {
-    case 'improved': return '🟢'; // Verde: mejora
-    case 'stable': return '🟡';   // Amarillo: estable
-    case 'worsened': return '🔴'; // Rojo: empeoramiento
-    default: return '⚪';         // Blanco: desconocido
+  case "improved": return "🟢"; // Verde: mejora
+  case "stable": return "🟡";   // Amarillo: estable
+  case "worsened": return "🔴"; // Rojo: empeoramiento
+  default: return "⚪";         // Blanco: desconocido
   }
 };
 
@@ -536,7 +536,7 @@ export class UsageAnalyticsService {
         ...metadata
       });
     } catch (error) {
-      console.error('Error al registrar métrica de uso:', error);
+      console.error("Error al registrar métrica de uso:", error);
       throw error;
     }
   }

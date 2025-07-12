@@ -5,32 +5,32 @@
  * Prueba solo la funcionalidad RAG sin dependencias complejas
  */
 
-import { config } from 'dotenv';
+import { config } from "dotenv";
 config();
 
-import { RAGMedicalMCP } from '../src/core/mcp/RAGMedicalMCP';
-import { ollamaNode } from './ollama-client-node';
+import { RAGMedicalMCP } from "../src/core/mcp/RAGMedicalMCP";
+import { ollamaNode } from "./ollama-client-node";
 
 // === CASOS DE PRUEBA CLÍNICOS ===
 
 const CASOS_CLINICOS = [
   {
-    titulo: 'Cervicalgia Aguda',
-    descripcion: 'Paciente de 45 años con dolor cervical intenso tras dormir mal',
-    entidades: ['dolor cervical', 'contractura muscular', 'trapecio'],
-    query: 'cervical pain manual therapy effectiveness'
+    titulo: "Cervicalgia Aguda",
+    descripcion: "Paciente de 45 años con dolor cervical intenso tras dormir mal",
+    entidades: ["dolor cervical", "contractura muscular", "trapecio"],
+    query: "cervical pain manual therapy effectiveness"
   },
   {
-    titulo: 'Lumbalgia Crónica',
-    descripcion: 'Mujer de 55 años con dolor lumbar crónico de 6 meses',
-    entidades: ['lumbalgia crónica', 'debilidad core', 'estabilización'],
-    query: 'chronic low back pain core stabilization exercises'
+    titulo: "Lumbalgia Crónica",
+    descripcion: "Mujer de 55 años con dolor lumbar crónico de 6 meses",
+    entidades: ["lumbalgia crónica", "debilidad core", "estabilización"],
+    query: "chronic low back pain core stabilization exercises"
   },
   {
-    titulo: 'Post-Operatorio Rodilla',
-    descripcion: 'Deportista post artroscopia de menisco, 4 semanas evolución',
-    entidades: ['post artroscopia', 'menisco', 'cuádriceps atrofia'],
-    query: 'post arthroscopy knee rehabilitation protocol'
+    titulo: "Post-Operatorio Rodilla",
+    descripcion: "Deportista post artroscopia de menisco, 4 semanas evolución",
+    entidades: ["post artroscopia", "menisco", "cuádriceps atrofia"],
+    query: "post arthroscopy knee rehabilitation protocol"
   }
 ];
 
@@ -40,30 +40,30 @@ const CASOS_CLINICOS = [
  * Test básico de conectividad
  */
 async function testConectividad(): Promise<boolean> {
-  console.log('🔧 Verificando conectividad...');
+  console.log("🔧 Verificando conectividad...");
   
   // Test Ollama
   try {
     const health = await ollamaNode.healthCheck();
     console.log(`   ✅ Ollama: ${health.status} (${health.latency_ms}ms)`);
     
-    if (health.status !== 'healthy') {
-      console.log('   ❌ Ollama no disponible');
+    if (health.status !== "healthy") {
+      console.log("   ❌ Ollama no disponible");
       return false;
     }
   } catch (error) {
-    console.log('   ❌ Error conectando a Ollama:', error);
+    console.log("   ❌ Error conectando a Ollama:", error);
     return false;
   }
   
   // Test PubMed
   try {
-    const response = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed', {
+    const response = await fetch("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed", {
       signal: AbortSignal.timeout(5000)
     });
-    console.log(`   ✅ PubMed: ${response.ok ? 'disponible' : 'no disponible'}`);
+    console.log(`   ✅ PubMed: ${response.ok ? "disponible" : "no disponible"}`);
   } catch (error) {
-    console.log('   ⚠️ PubMed: no disponible (sin internet)');
+    console.log("   ⚠️ PubMed: no disponible (sin internet)");
   }
   
   return true;
@@ -76,7 +76,7 @@ async function testRAGPorCaso(caso: any): Promise<void> {
   console.log(`\n🏥 Caso: ${caso.titulo}`);
   console.log(`📝 ${caso.descripcion}`);
   console.log(`🔍 Query: "${caso.query}"`);
-  console.log('─'.repeat(60));
+  console.log("─".repeat(60));
   
   const startTime = Date.now();
   
@@ -84,7 +84,7 @@ async function testRAGPorCaso(caso: any): Promise<void> {
     // Ejecutar búsqueda RAG
     const ragResult = await RAGMedicalMCP.retrieveRelevantKnowledge(
       caso.query, 
-      'fisioterapia', 
+      "fisioterapia", 
       5
     );
     
@@ -96,7 +96,7 @@ async function testRAGPorCaso(caso: any): Promise<void> {
     console.log(`🎯 Confianza: ${Math.round(ragResult.confidence_score * 100)}%`);
     
     if (ragResult.citations.length > 0) {
-      console.log('\n📚 Referencias científicas:');
+      console.log("\n📚 Referencias científicas:");
       ragResult.citations.slice(0, 3).forEach((citation, i) => {
         console.log(`   ${i + 1}. ${citation.title.substring(0, 80)}...`);
         console.log(`      📖 ${citation.journal} (${citation.year})`);
@@ -105,17 +105,17 @@ async function testRAGPorCaso(caso: any): Promise<void> {
         if (citation.pmid) {
           console.log(`      🔗 PMID: ${citation.pmid}`);
         }
-        console.log('');
+        console.log("");
       });
       
       // Mostrar contexto médico
       if (ragResult.medical_context.length > 100) {
-        console.log(`📝 Contexto médico generado:`);
+        console.log("📝 Contexto médico generado:");
         console.log(`   ${ragResult.medical_context.substring(0, 200)}...`);
       }
       
     } else {
-      console.log('   ⚠️ No se encontraron resultados relevantes');
+      console.log("   ⚠️ No se encontraron resultados relevantes");
     }
     
   } catch (error) {
@@ -128,13 +128,13 @@ async function testRAGPorCaso(caso: any): Promise<void> {
  */
 async function testSOAPConEvidencia(caso: any): Promise<void> {
   console.log(`\n🧠 Generando SOAP con evidencia para: ${caso.titulo}`);
-  console.log('─'.repeat(60));
+  console.log("─".repeat(60));
   
   try {
     // Primero obtener evidencia RAG
     const ragResult = await RAGMedicalMCP.retrieveRelevantKnowledge(
       caso.query, 
-      'fisioterapia', 
+      "fisioterapia", 
       3
     );
     
@@ -144,7 +144,7 @@ Genera una nota SOAP profesional para fisioterapia basada en el siguiente caso c
 
 CASO: ${caso.titulo}
 DESCRIPCIÓN: ${caso.descripcion}
-ENTIDADES CLÍNICAS: ${caso.entidades.join(', ')}`;
+ENTIDADES CLÍNICAS: ${caso.entidades.join(", ")}`;
 
     if (ragResult.citations.length > 0) {
       prompt += `
@@ -154,8 +154,8 @@ ${ragResult.medical_context}
 
 REFERENCIAS:
 ${ragResult.citations.slice(0, 2).map(c => 
-  `- ${c.title} (${c.authors}, ${c.journal} ${c.year})`
-).join('\n')}`;
+    `- ${c.title} (${c.authors}, ${c.journal} ${c.year})`
+  ).join("\n")}`;
     }
 
     prompt += `
@@ -172,7 +172,7 @@ ASSESSMENT:
 [Análisis clínico profesional]
 
 PLAN:
-[Plan de tratamiento ${ragResult.citations.length > 0 ? 'basado en evidencia científica' : 'clínicamente apropiado'}]`;
+[Plan de tratamiento ${ragResult.citations.length > 0 ? "basado en evidencia científica" : "clínicamente apropiado"}]`;
 
     // Generar SOAP con Ollama
     const startTime = Date.now();
@@ -183,14 +183,14 @@ PLAN:
     const duration = Date.now() - startTime;
     
     console.log(`⏱️ Generación SOAP: ${duration}ms`);
-    console.log(`🔬 Con evidencia RAG: ${ragResult.citations.length > 0 ? 'Sí' : 'No'}`);
-    console.log('\n📋 SOAP generado:');
-    console.log('─'.repeat(50));
+    console.log(`🔬 Con evidencia RAG: ${ragResult.citations.length > 0 ? "Sí" : "No"}`);
+    console.log("\n📋 SOAP generado:");
+    console.log("─".repeat(50));
     console.log(response.response);
-    console.log('─'.repeat(50));
+    console.log("─".repeat(50));
     
   } catch (error) {
-    console.error(`❌ Error generando SOAP:`, error);
+    console.error("❌ Error generando SOAP:", error);
   }
 }
 
@@ -198,13 +198,13 @@ PLAN:
  * Test de performance con múltiples queries
  */
 async function testPerformance(): Promise<void> {
-  console.log('\n⚡ Test de Performance RAG');
-  console.log('═'.repeat(50));
+  console.log("\n⚡ Test de Performance RAG");
+  console.log("═".repeat(50));
   
   const queries = [
-    'shoulder impingement exercise therapy',
-    'ankle sprain rehabilitation protocol',
-    'tennis elbow treatment evidence'
+    "shoulder impingement exercise therapy",
+    "ankle sprain rehabilitation protocol",
+    "tennis elbow treatment evidence"
   ];
   
   const tiempos: number[] = [];
@@ -213,7 +213,7 @@ async function testPerformance(): Promise<void> {
     console.log(`\n🔍 "${query}"`);
     
     const startTime = Date.now();
-    const result = await RAGMedicalMCP.retrieveRelevantKnowledge(query, 'fisioterapia', 3);
+    const result = await RAGMedicalMCP.retrieveRelevantKnowledge(query, "fisioterapia", 3);
     const duration = Date.now() - startTime;
     
     tiempos.push(duration);
@@ -224,36 +224,36 @@ async function testPerformance(): Promise<void> {
   const maximo = Math.max(...tiempos);
   const minimo = Math.min(...tiempos);
   
-  console.log('\n📊 Estadísticas de Performance:');
+  console.log("\n📊 Estadísticas de Performance:");
   console.log(`   Promedio: ${Math.round(promedio)}ms`);
   console.log(`   Mínimo: ${minimo}ms`);
   console.log(`   Máximo: ${maximo}ms`);
   
   if (promedio < 3000) {
-    console.log('   ✅ EXCELENTE (<3s promedio)');
+    console.log("   ✅ EXCELENTE (<3s promedio)");
   } else if (promedio < 5000) {
-    console.log('   ✅ BUENO (<5s promedio)');
+    console.log("   ✅ BUENO (<5s promedio)");
   } else {
-    console.log('   ⚠️ ACEPTABLE (considerar optimización)');
+    console.log("   ⚠️ ACEPTABLE (considerar optimización)");
   }
 }
 
 // === MAIN EXECUTION ===
 
 async function main(): Promise<void> {
-  console.log('🧬 AiDuxCare - Test RAG Medical Integration');
-  console.log('═════════════════════════════════════════════════════════════════════');
+  console.log("🧬 AiDuxCare - Test RAG Medical Integration");
+  console.log("═════════════════════════════════════════════════════════════════════");
   
   try {
     // 1. Verificar conectividad
     const conectividad = await testConectividad();
     if (!conectividad) {
-      console.log('❌ Sistema no está listo');
+      console.log("❌ Sistema no está listo");
       return;
     }
     
-    console.log('\n🎯 TESTING CASOS CLÍNICOS CON RAG');
-    console.log('═'.repeat(70));
+    console.log("\n🎯 TESTING CASOS CLÍNICOS CON RAG");
+    console.log("═".repeat(70));
     
     // 2. Test RAG por cada caso clínico
     for (const caso of CASOS_CLINICOS) {
@@ -263,8 +263,8 @@ async function main(): Promise<void> {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
-    console.log('\n🧠 TESTING SOAP CON EVIDENCIA CIENTÍFICA');
-    console.log('═'.repeat(70));
+    console.log("\n🧠 TESTING SOAP CON EVIDENCIA CIENTÍFICA");
+    console.log("═".repeat(70));
     
     // 3. Test generación SOAP con evidencia (solo primer caso)
     await testSOAPConEvidencia(CASOS_CLINICOS[0]);
@@ -272,26 +272,26 @@ async function main(): Promise<void> {
     // 4. Test de performance
     await testPerformance();
     
-    console.log('\n🎉 ¡RAG Testing Completado Exitosamente!');
-    console.log('\n📋 Capacidades demostradas:');
-    console.log('   ✅ Búsqueda en PubMed con 35+ millones de artículos');
-    console.log('   ✅ Clasificación automática de niveles de evidencia');
-    console.log('   ✅ Generación de contexto médico relevante');
-    console.log('   ✅ Integración con LLM local para SOAP enriquecido');
-    console.log('   ✅ Performance clínica adecuada (<5s por búsqueda)');
-    console.log('   ✅ Costo operativo: $0.00');
+    console.log("\n🎉 ¡RAG Testing Completado Exitosamente!");
+    console.log("\n📋 Capacidades demostradas:");
+    console.log("   ✅ Búsqueda en PubMed con 35+ millones de artículos");
+    console.log("   ✅ Clasificación automática de niveles de evidencia");
+    console.log("   ✅ Generación de contexto médico relevante");
+    console.log("   ✅ Integración con LLM local para SOAP enriquecido");
+    console.log("   ✅ Performance clínica adecuada (<5s por búsqueda)");
+    console.log("   ✅ Costo operativo: $0.00");
     
-    console.log('\n🚀 ¡Sistema RAG listo para integración con NLP!');
+    console.log("\n🚀 ¡Sistema RAG listo para integración con NLP!");
     
   } catch (error) {
-    console.error('❌ Error en testing RAG:', error);
+    console.error("❌ Error en testing RAG:", error);
     process.exit(1);
   }
 }
 
 // Ejecutar inmediatamente
 main().catch(error => {
-  console.error('Fatal error:', error);
+  console.error("Fatal error:", error);
   process.exit(1);
 });
 

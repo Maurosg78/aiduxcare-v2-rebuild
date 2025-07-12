@@ -1,8 +1,8 @@
-const Joi = require('joi');
-const winston = require('winston');
+const Joi = require("joi");
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -21,8 +21,8 @@ class ResponseParser {
       warnings: Joi.array().items(
         Joi.object({
           id: Joi.string().required(),
-          severity: Joi.string().valid('HIGH', 'MEDIUM', 'LOW').required(),
-          category: Joi.string().valid('contraindication', 'red_flag', 'safety_concern', 'clinical_alert').required(),
+          severity: Joi.string().valid("HIGH", "MEDIUM", "LOW").required(),
+          category: Joi.string().valid("contraindication", "red_flag", "safety_concern", "clinical_alert").required(),
           title: Joi.string().required(),
           description: Joi.string().required(),
           recommendation: Joi.string().required(),
@@ -33,11 +33,11 @@ class ResponseParser {
       suggestions: Joi.array().items(
         Joi.object({
           id: Joi.string().required(),
-          type: Joi.string().valid('assessment_question', 'treatment_modification', 'additional_evaluation', 'patient_education').required(),
+          type: Joi.string().valid("assessment_question", "treatment_modification", "additional_evaluation", "patient_education").required(),
           title: Joi.string().required(),
           description: Joi.string().required(),
           rationale: Joi.string().required(),
-          priority: Joi.string().valid('HIGH', 'MEDIUM', 'LOW').required()
+          priority: Joi.string().valid("HIGH", "MEDIUM", "LOW").required()
         })
       ).required(),
       
@@ -64,7 +64,7 @@ class ResponseParser {
     const startTime = Date.now();
     
     try {
-      logger.info('Starting response parsing', {
+      logger.info("Starting response parsing", {
         specialty,
         responseLength: rawResponse.length,
         timestamp: new Date().toISOString()
@@ -75,7 +75,7 @@ class ResponseParser {
       try {
         parsedResponse = JSON.parse(rawResponse);
       } catch (jsonError) {
-        logger.error('Failed to parse JSON response', {
+        logger.error("Failed to parse JSON response", {
           error: jsonError.message,
           responsePreview: rawResponse.substring(0, 200)
         });
@@ -91,7 +91,7 @@ class ResponseParser {
       });
 
       if (error) {
-        logger.warn('Response validation failed, attempting to repair', {
+        logger.warn("Response validation failed, attempting to repair", {
           validationErrors: error.details.map(detail => ({
             path: detail.path,
             message: detail.message
@@ -108,13 +108,13 @@ class ResponseParser {
         });
         
         if (repairError) {
-          logger.error('Failed to repair response', {
+          logger.error("Failed to repair response", {
             repairErrors: repairError.details.map(detail => ({
               path: detail.path,
               message: detail.message
             }))
           });
-          throw new Error('Response validation failed after repair attempt');
+          throw new Error("Response validation failed after repair attempt");
         }
         
         parsedResponse = repairedValue;
@@ -130,7 +130,7 @@ class ResponseParser {
 
       const processingTime = Date.now() - startTime;
 
-      logger.info('Response parsing completed', {
+      logger.info("Response parsing completed", {
         specialty,
         processingTimeMs: processingTime,
         warningsCount: filteredResponse.warnings.length,
@@ -144,7 +144,7 @@ class ResponseParser {
     } catch (error) {
       const processingTime = Date.now() - startTime;
       
-      logger.error('Response parsing failed', {
+      logger.error("Response parsing failed", {
         error: error.message,
         stack: error.stack,
         specialty,
@@ -167,11 +167,11 @@ class ResponseParser {
       }
       
       // Si no se puede extraer, crear estructura básica
-      throw new Error('No valid JSON found in response');
+      throw new Error("No valid JSON found in response");
       
     } catch (error) {
-      logger.error('JSON repair failed', { error: error.message });
-      throw new Error('Unable to repair malformed JSON response');
+      logger.error("JSON repair failed", { error: error.message });
+      throw new Error("Unable to repair malformed JSON response");
     }
   }
 
@@ -180,45 +180,45 @@ class ResponseParser {
 
     // Reparar campos faltantes o inválidos
     validationErrors.forEach(error => {
-      const path = error.path.join('.');
+      const path = error.path.join(".");
       
       switch (path) {
-        case 'warnings':
-          if (!repairedResponse.warnings || !Array.isArray(repairedResponse.warnings)) {
-            repairedResponse.warnings = [];
-          }
-          break;
+      case "warnings":
+        if (!repairedResponse.warnings || !Array.isArray(repairedResponse.warnings)) {
+          repairedResponse.warnings = [];
+        }
+        break;
           
-        case 'suggestions':
-          if (!repairedResponse.suggestions || !Array.isArray(repairedResponse.suggestions)) {
-            repairedResponse.suggestions = [];
-          }
-          break;
+      case "suggestions":
+        if (!repairedResponse.suggestions || !Array.isArray(repairedResponse.suggestions)) {
+          repairedResponse.suggestions = [];
+        }
+        break;
           
-        case 'soap_analysis':
-          if (!repairedResponse.soap_analysis) {
-            repairedResponse.soap_analysis = {
-              subjective_completeness: 50,
-              objective_completeness: 50,
-              assessment_quality: 50,
-              plan_appropriateness: 50,
-              overall_quality: 50,
-              missing_elements: ['Unable to analyze - parsing error']
-            };
-          }
-          break;
+      case "soap_analysis":
+        if (!repairedResponse.soap_analysis) {
+          repairedResponse.soap_analysis = {
+            subjective_completeness: 50,
+            objective_completeness: 50,
+            assessment_quality: 50,
+            plan_appropriateness: 50,
+            overall_quality: 50,
+            missing_elements: ["Unable to analyze - parsing error"]
+          };
+        }
+        break;
           
-        case 'session_quality':
-          if (!repairedResponse.session_quality) {
-            repairedResponse.session_quality = {
-              communication_score: 50,
-              clinical_thoroughness: 50,
-              patient_engagement: 50,
-              professional_standards: 50,
-              areas_for_improvement: ['Unable to analyze - parsing error']
-            };
-          }
-          break;
+      case "session_quality":
+        if (!repairedResponse.session_quality) {
+          repairedResponse.session_quality = {
+            communication_score: 50,
+            clinical_thoroughness: 50,
+            patient_engagement: 50,
+            professional_standards: 50,
+            areas_for_improvement: ["Unable to analyze - parsing error"]
+          };
+        }
+        break;
       }
     });
 
@@ -255,7 +255,7 @@ class ResponseParser {
 
     // Filtrar advertencias de baja confianza
     filteredResponse.warnings = response.warnings.filter(warning => 
-      warning.confidence >= 0.7 || warning.severity === 'HIGH'
+      warning.confidence >= 0.7 || warning.severity === "HIGH"
     );
 
     // Ordenar sugerencias por relevancia
@@ -269,10 +269,10 @@ class ResponseParser {
   calculateConfidence(warning, specialty) {
     // Lógica básica de confianza basada en categoría y especialidad
     const baseConfidence = {
-      'contraindication': 0.9,
-      'red_flag': 0.85,
-      'safety_concern': 0.8,
-      'clinical_alert': 0.75
+      "contraindication": 0.9,
+      "red_flag": 0.85,
+      "safety_concern": 0.8,
+      "clinical_alert": 0.75
     };
 
     let confidence = baseConfidence[warning.category] || 0.7;
@@ -295,19 +295,19 @@ class ResponseParser {
   calculateRelevance(suggestion, specialty) {
     // Lógica básica de relevancia
     const baseRelevance = {
-      'assessment_question': 0.8,
-      'treatment_modification': 0.9,
-      'additional_evaluation': 0.7,
-      'patient_education': 0.6
+      "assessment_question": 0.8,
+      "treatment_modification": 0.9,
+      "additional_evaluation": 0.7,
+      "patient_education": 0.6
     };
 
     let relevance = baseRelevance[suggestion.type] || 0.5;
 
     // Ajustar por prioridad
     const priorityMultiplier = {
-      'HIGH': 1.2,
-      'MEDIUM': 1.0,
-      'LOW': 0.8
+      "HIGH": 1.2,
+      "MEDIUM": 1.0,
+      "LOW": 0.8
     };
 
     relevance *= priorityMultiplier[suggestion.priority] || 1.0;
@@ -346,7 +346,7 @@ class ResponseParser {
 
   calculateSafetyCompliance(response) {
     // Basado en la presencia y calidad de advertencias de seguridad
-    const highSeverityWarnings = response.warnings.filter(w => w.severity === 'HIGH').length;
+    const highSeverityWarnings = response.warnings.filter(w => w.severity === "HIGH").length;
     const totalWarnings = response.warnings.length;
     
     if (totalWarnings === 0) return 100; // No hay problemas de seguridad
@@ -369,31 +369,31 @@ class ResponseParser {
   }
 
   createFallbackResponse(specialty, errorMessage) {
-    logger.warn('Creating fallback response due to parsing failure', {
+    logger.warn("Creating fallback response due to parsing failure", {
       specialty,
       error: errorMessage
     });
 
     return {
       warnings: [{
-        id: 'fallback_warning_001',
-        severity: 'MEDIUM',
-        category: 'clinical_alert',
-        title: 'Análisis Clínico Incompleto',
-        description: 'No se pudo completar el análisis clínico automatizado de esta transcripción.',
-        recommendation: 'Revisar manualmente la transcripción para identificar posibles problemas clínicos.',
-        evidence: 'Error en el procesamiento automático',
+        id: "fallback_warning_001",
+        severity: "MEDIUM",
+        category: "clinical_alert",
+        title: "Análisis Clínico Incompleto",
+        description: "No se pudo completar el análisis clínico automatizado de esta transcripción.",
+        recommendation: "Revisar manualmente la transcripción para identificar posibles problemas clínicos.",
+        evidence: "Error en el procesamiento automático",
         specialty,
         timestamp: new Date().toISOString(),
         confidence: 0.5
       }],
       suggestions: [{
-        id: 'fallback_suggestion_001',
-        type: 'additional_evaluation',
-        title: 'Revisión Manual Requerida',
-        description: 'Se recomienda una revisión manual de la transcripción debido a limitaciones en el análisis automatizado.',
-        rationale: 'El sistema no pudo procesar completamente la información clínica.',
-        priority: 'MEDIUM',
+        id: "fallback_suggestion_001",
+        type: "additional_evaluation",
+        title: "Revisión Manual Requerida",
+        description: "Se recomienda una revisión manual de la transcripción debido a limitaciones en el análisis automatizado.",
+        rationale: "El sistema no pudo procesar completamente la información clínica.",
+        priority: "MEDIUM",
         specialty,
         timestamp: new Date().toISOString(),
         relevance_score: 0.8
@@ -404,14 +404,14 @@ class ResponseParser {
         assessment_quality: 0,
         plan_appropriateness: 0,
         overall_quality: 0,
-        missing_elements: ['Análisis automático fallido']
+        missing_elements: ["Análisis automático fallido"]
       },
       session_quality: {
         communication_score: 0,
         clinical_thoroughness: 0,
         patient_engagement: 0,
         professional_standards: 0,
-        areas_for_improvement: ['Análisis automático fallido']
+        areas_for_improvement: ["Análisis automático fallido"]
       },
       specialty_metrics: {
         specialty,

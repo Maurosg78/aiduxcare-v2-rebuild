@@ -1,17 +1,17 @@
-const functions = require('@google-cloud/functions-framework');
-const speech = require('@google-cloud/speech');
-const busboy = require('busboy');
+const functions = require("@google-cloud/functions-framework");
+const speech = require("@google-cloud/speech");
+const busboy = require("busboy");
 
 // Crear cliente de Speech-to-Text
 const client = new speech.SpeechClient();
 
 // Función para manejar CORS manualmente - MEJORADA
 const setCorsHeaders = (res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
-  res.set('Access-Control-Max-Age', '3600');
-  res.set('Access-Control-Allow-Credentials', 'false');
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Requested-With");
+  res.set("Access-Control-Max-Age", "3600");
+  res.set("Access-Control-Allow-Credentials", "false");
 };
 
 // Función para logging detallado
@@ -23,7 +23,7 @@ const logDetailed = (level, message, data = null) => {
     message,
     ...(data && { data })
   };
-  console.log(`[${level}] ${timestamp}: ${message}`, data ? JSON.stringify(data, null, 2) : '');
+  console.log(`[${level}] ${timestamp}: ${message}`, data ? JSON.stringify(data, null, 2) : "");
 };
 
 // Parser manual de FormData usando busboy
@@ -34,12 +34,12 @@ const parseFormData = (req) => {
     let fileBuffer = null;
     let fileInfo = {};
 
-    bb.on('field', (fieldname, val) => {
+    bb.on("field", (fieldname, val) => {
       fields[fieldname] = val;
     });
 
-    bb.on('file', (fieldname, file, info) => {
-      logDetailed('INFO', 'Archivo detectado', {
+    bb.on("file", (fieldname, file, info) => {
+      logDetailed("INFO", "Archivo detectado", {
         fieldname,
         filename: info.filename,
         encoding: info.encoding,
@@ -55,21 +55,21 @@ const parseFormData = (req) => {
 
       const chunks = [];
       
-      file.on('data', (chunk) => {
+      file.on("data", (chunk) => {
         chunks.push(chunk);
       });
       
-      file.on('end', () => {
+      file.on("end", () => {
         fileBuffer = Buffer.concat(chunks);
         fileInfo.size = fileBuffer.length;
-        logDetailed('INFO', 'Archivo procesado completamente', {
+        logDetailed("INFO", "Archivo procesado completamente", {
           size: fileInfo.size,
           chunks: chunks.length
         });
       });
     });
 
-    bb.on('finish', () => {
+    bb.on("finish", () => {
       if (fileBuffer) {
         resolve({
           file: {
@@ -79,12 +79,12 @@ const parseFormData = (req) => {
           fields
         });
       } else {
-        reject(new Error('No se encontró archivo de audio'));
+        reject(new Error("No se encontró archivo de audio"));
       }
     });
 
-    bb.on('error', (err) => {
-      logDetailed('ERROR', 'Error en busboy', { error: err.message });
+    bb.on("error", (err) => {
+      logDetailed("ERROR", "Error en busboy", { error: err.message });
       reject(err);
     });
 
@@ -93,68 +93,68 @@ const parseFormData = (req) => {
 };
 
 // Función principal de transcripción
-functions.http('transcribeAudio', async (req, res) => {
+functions.http("transcribeAudio", async (req, res) => {
   // Manejar preflight CORS - MEJORADO
   setCorsHeaders(res);
   
-  if (req.method === 'OPTIONS') {
-    logDetailed('INFO', 'CORS preflight request handled', {
+  if (req.method === "OPTIONS") {
+    logDetailed("INFO", "CORS preflight request handled", {
       origin: req.headers.origin,
-      method: req.headers['access-control-request-method'],
-      headers: req.headers['access-control-request-headers']
+      method: req.headers["access-control-request-method"],
+      headers: req.headers["access-control-request-headers"]
     });
     res.status(204).send();
     return;
   }
 
-  if (req.method !== 'POST') {
-    logDetailed('ERROR', 'Method not allowed', { method: req.method });
+  if (req.method !== "POST") {
+    logDetailed("ERROR", "Method not allowed", { method: req.method });
     res.status(405).json({ 
       success: false, 
-      error: 'Method not allowed',
-      allowedMethods: ['POST', 'OPTIONS']
+      error: "Method not allowed",
+      allowedMethods: ["POST", "OPTIONS"]
     });
     return;
   }
 
   try {
-    logDetailed('INFO', 'Iniciando procesamiento de transcripción', {
-      contentType: req.headers['content-type'],
-      contentLength: req.headers['content-length'],
-      userAgent: req.headers['user-agent']
+    logDetailed("INFO", "Iniciando procesamiento de transcripción", {
+      contentType: req.headers["content-type"],
+      contentLength: req.headers["content-length"],
+      userAgent: req.headers["user-agent"]
     });
 
     // NUEVA LÓGICA: Manejar tanto FormData como JSON directo
     let file;
     
-    if (req.headers['content-type']?.includes('application/json')) {
+    if (req.headers["content-type"]?.includes("application/json")) {
       // BYPASS: Manejar payload JSON con Base64
-      logDetailed('INFO', 'Procesando payload JSON con Base64');
+      logDetailed("INFO", "Procesando payload JSON con Base64");
       
       const payload = req.body;
       
       if (!payload.audioData) {
-        logDetailed('ERROR', 'No se encontró audioData en payload JSON');
+        logDetailed("ERROR", "No se encontró audioData en payload JSON");
         return res.status(400).json({
           success: false,
-          error: 'No se encontró datos de audio',
-          expectedField: 'audioData'
+          error: "No se encontró datos de audio",
+          expectedField: "audioData"
         });
       }
       
       // Convertir Base64 a Buffer
-      const audioBuffer = Buffer.from(payload.audioData, 'base64');
+      const audioBuffer = Buffer.from(payload.audioData, "base64");
       
       file = {
         originalname: `medical_audio_${payload.timestamp || Date.now()}.webm`,
-        mimetype: payload.mimeType || 'audio/webm',
+        mimetype: payload.mimeType || "audio/webm",
         size: audioBuffer.length,
-        encoding: 'base64',
-        fieldname: 'audio',
+        encoding: "base64",
+        fieldname: "audio",
         buffer: audioBuffer
       };
       
-      logDetailed('INFO', 'Archivo JSON procesado exitosamente', {
+      logDetailed("INFO", "Archivo JSON procesado exitosamente", {
         originalSize: payload.size,
         bufferSize: audioBuffer.length,
         mimeType: file.mimetype,
@@ -163,15 +163,15 @@ functions.http('transcribeAudio', async (req, res) => {
       
     } else {
       // FALLBACK: Usar parseFormData para FormData tradicional
-      logDetailed('INFO', 'Procesando FormData tradicional');
+      logDetailed("INFO", "Procesando FormData tradicional");
       const { file: parsedFile } = await parseFormData(req);
       file = parsedFile;
     }
 
     // Validar formato de audio
-    const supportedFormats = ['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/flac', 'audio/webm', 'audio/ogg', 'audio/mp4'];
-    if (!supportedFormats.some(format => file.mimetype.includes(format.split('/')[1]))) {
-      logDetailed('WARN', 'Formato de audio no reconocido, intentando procesar', {
+    const supportedFormats = ["audio/wav", "audio/mpeg", "audio/mp3", "audio/flac", "audio/webm", "audio/ogg", "audio/mp4"];
+    if (!supportedFormats.some(format => file.mimetype.includes(format.split("/")[1]))) {
+      logDetailed("WARN", "Formato de audio no reconocido, intentando procesar", {
         received: file.mimetype,
         supported: supportedFormats
       });
@@ -179,30 +179,30 @@ functions.http('transcribeAudio', async (req, res) => {
 
     // Validar que el archivo no esté vacío o corrupto
     if (file.size === 0) {
-      logDetailed('ERROR', 'Archivo de audio vacío');
+      logDetailed("ERROR", "Archivo de audio vacío");
       return res.status(400).json({
         success: false,
-        error: 'Archivo de audio vacío',
-        details: 'El archivo recibido no contiene datos'
+        error: "Archivo de audio vacío",
+        details: "El archivo recibido no contiene datos"
       });
     }
 
     try {
       // Configuración para Google Cloud Speech-to-Text CORREGIDA
       const audioConfig = {
-        encoding: file.mimetype.includes('wav') ? 'LINEAR16' : 
-                 file.mimetype.includes('webm') ? 'WEBM_OPUS' :
-                 file.mimetype.includes('ogg') ? 'OGG_OPUS' :
-                 file.mimetype.includes('mp3') ? 'MP3' :
-                 file.mimetype.includes('mp4') ? 'MP3' : 'WEBM_OPUS',
+        encoding: file.mimetype.includes("wav") ? "LINEAR16" : 
+          file.mimetype.includes("webm") ? "WEBM_OPUS" :
+            file.mimetype.includes("ogg") ? "OGG_OPUS" :
+              file.mimetype.includes("mp3") ? "MP3" :
+                file.mimetype.includes("mp4") ? "MP3" : "WEBM_OPUS",
         sampleRateHertz: 48000,
-        languageCode: 'es-ES',
+        languageCode: "es-ES",
         // ELIMINADO: alternativeLanguageCodes no compatible con modelo médico
         enableSpeakerDiarization: true,
         diarizationSpeakerCount: 2,
         enableAutomaticPunctuation: true,
         enableWordTimeOffsets: true,
-        model: 'latest_long', // Cambiado de medical_conversation a latest_long
+        model: "latest_long", // Cambiado de medical_conversation a latest_long
         useEnhanced: true,
         // Optimizaciones de rendimiento
         enableWordConfidence: true,
@@ -212,23 +212,23 @@ functions.http('transcribeAudio', async (req, res) => {
         speechContexts: [{
           phrases: [
             // Frases médicas más frecuentes para mejor reconocimiento
-            'dolor', 'síntomas', 'tratamiento', 'diagnóstico', 'paciente',
-            'fisioterapia', 'kinesiología', 'rehabilitación', 'ejercicio',
-            'hombro', 'rodilla', 'espalda', 'cuello', 'lumbar', 'cervical',
-            'inflamación', 'contractura', 'tensión', 'rigidez'
+            "dolor", "síntomas", "tratamiento", "diagnóstico", "paciente",
+            "fisioterapia", "kinesiología", "rehabilitación", "ejercicio",
+            "hombro", "rodilla", "espalda", "cuello", "lumbar", "cervical",
+            "inflamación", "contractura", "tensión", "rigidez"
           ],
           boost: 15 // Aumentar boost para mejor precisión
         }],
         metadata: {
-          interactionType: 'DISCUSSION',
+          interactionType: "DISCUSSION",
           industryNanosicCode: 621111, // Offices of physicians
-          microphoneDistance: 'NEARFIELD',
-          originalMediaType: 'AUDIO',
-          recordingDeviceType: 'PC'
+          microphoneDistance: "NEARFIELD",
+          originalMediaType: "AUDIO",
+          recordingDeviceType: "PC"
         }
       };
 
-      logDetailed('INFO', 'Configuración de transcripción optimizada', {
+      logDetailed("INFO", "Configuración de transcripción optimizada", {
         encoding: audioConfig.encoding,
         sampleRate: audioConfig.sampleRateHertz,
         language: audioConfig.languageCode,
@@ -239,12 +239,12 @@ functions.http('transcribeAudio', async (req, res) => {
 
       const request = {
         audio: {
-          content: file.buffer.toString('base64'),
+          content: file.buffer.toString("base64"),
         },
         config: audioConfig,
       };
 
-      logDetailed('INFO', 'Enviando solicitud optimizada a Google Cloud Speech-to-Text', {
+      logDetailed("INFO", "Enviando solicitud optimizada a Google Cloud Speech-to-Text", {
         audioSizeBytes: file.buffer.length,
         base64Length: request.audio.content.length,
         timestamp: Date.now()
@@ -256,34 +256,34 @@ functions.http('transcribeAudio', async (req, res) => {
       const [response] = await Promise.race([
         client.recognize(request),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout de procesamiento (45s)')), 45000)
+          setTimeout(() => reject(new Error("Timeout de procesamiento (45s)")), 45000)
         )
       ]);
       
       const processingTime = Date.now() - startProcessing;
       
-      logDetailed('INFO', 'Respuesta recibida de Google Cloud', {
+      logDetailed("INFO", "Respuesta recibida de Google Cloud", {
         resultsCount: response.results?.length || 0,
         totalBilledTime: response.totalBilledTime,
         processingTimeMs: processingTime
       });
 
       if (!response.results || response.results.length === 0) {
-        logDetailed('WARN', 'No se obtuvieron resultados de transcripción', {
+        logDetailed("WARN", "No se obtuvieron resultados de transcripción", {
           response: JSON.stringify(response, null, 2)
         });
         
         return res.json({
           success: false,
-          message: 'No se pudo transcribir el audio. Intenta hablar más claro o cerca del micrófono.',
-          details: 'No results from Google Cloud Speech-to-Text'
+          message: "No se pudo transcribir el audio. Intenta hablar más claro o cerca del micrófono.",
+          details: "No results from Google Cloud Speech-to-Text"
         });
       }
 
       // Procesar resultados
       const transcription = response.results
         .map(result => result.alternatives[0].transcript)
-        .join(' ');
+        .join(" ");
 
       // Procesar información de hablantes
       let segments = [];
@@ -303,7 +303,7 @@ functions.http('transcribeAudio', async (req, res) => {
         
         // Agrupar palabras por hablante
         let currentSpeaker = null;
-        let currentText = '';
+        let currentText = "";
         
         words.forEach(word => {
           if (word.speakerTag !== currentSpeaker) {
@@ -316,7 +316,7 @@ functions.http('transcribeAudio', async (req, res) => {
             currentSpeaker = word.speakerTag;
             currentText = word.word;
           } else {
-            currentText += ' ' + word.word;
+            currentText += " " + word.word;
           }
         });
         
@@ -345,11 +345,11 @@ functions.http('transcribeAudio', async (req, res) => {
           audioSize: file.size,
           processingTime: Date.now(),
           language: audioConfig.languageCode,
-          method: req.headers['content-type']?.includes('application/json') ? 'JSON_BASE64' : 'FORMDATA'
+          method: req.headers["content-type"]?.includes("application/json") ? "JSON_BASE64" : "FORMDATA"
         }
       };
 
-      logDetailed('SUCCESS', 'Transcripción completada exitosamente', {
+      logDetailed("SUCCESS", "Transcripción completada exitosamente", {
         transcriptionLength: transcription.length,
         confidence: confidence,
         speakersDetected: totalSpeakers,
@@ -360,7 +360,7 @@ functions.http('transcribeAudio', async (req, res) => {
       res.json(result);
 
     } catch (speechError) {
-      logDetailed('ERROR', 'Error en Google Cloud Speech-to-Text', {
+      logDetailed("ERROR", "Error en Google Cloud Speech-to-Text", {
         error: speechError.message,
         code: speechError.code,
         details: speechError.details,
@@ -369,41 +369,41 @@ functions.http('transcribeAudio', async (req, res) => {
 
       res.status(500).json({
         success: false,
-        error: 'Error en el servicio de transcripción',
+        error: "Error en el servicio de transcripción",
         details: speechError.message,
         code: speechError.code
       });
     }
 
   } catch (error) {
-    logDetailed('ERROR', 'Error general en transcribeAudio', {
+    logDetailed("ERROR", "Error general en transcribeAudio", {
       error: error.message,
       stack: error.stack
     });
 
     res.status(500).json({
       success: false,
-      error: 'Error interno del servidor',
+      error: "Error interno del servidor",
       details: error.message
     });
   }
 });
 
 // Health check endpoint
-functions.http('healthCheck', (req, res) => {
+functions.http("healthCheck", (req, res) => {
   setCorsHeaders(res);
   
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     res.status(200).send();
     return;
   }
 
-  logDetailed('INFO', 'Health check solicitado');
+  logDetailed("INFO", "Health check solicitado");
   
   res.json({ 
-    status: 'healthy',
+    status: "healthy",
     timestamp: new Date().toISOString(),
-    service: 'Google Cloud Speech-to-Text',
-    version: '2.0.0'
+    service: "Google Cloud Speech-to-Text",
+    version: "2.0.0"
   });
 }); 

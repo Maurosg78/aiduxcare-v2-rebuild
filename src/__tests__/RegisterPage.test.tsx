@@ -1,75 +1,50 @@
-// src/__tests__/RegisterPage.test.tsx
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import RegisterPage from '../pages/RegisterPage';
-import { supabaseClientMock } from '../__mocks__/supabase/authMock';
+import { render, screen, fireEvent } from "@testing-library/react";
+import RegisterPage from "../pages/RegisterPage";
+import { AUTH_CREDENTIALS } from "../constants/test-data";
+import { vi } from "vitest";
 
-// Mock del cliente de Supabase
-vi.mock('../core/auth/supabaseClient', () => ({
-  default: supabaseClientMock
+// Mock de dependencias
+const signUpMock = vi.fn();
+vi.mock("../core/auth/supabaseClient", () => ({
+  default: {
+    auth: {
+      signUp: signUpMock,
+    },
+  },
 }));
 
-// Mock de checkSupabaseConnection
-vi.mock('../utils/checkSupabaseConnection', () => ({
-  checkSupabaseConnection: () =>
-    Promise.resolve({ isConnected: true, url: 'https://test.supabase.co', latency: 50 }),
-  logSupabaseConnectionStatus: vi.fn()
-}));
-
-// Mock de useNavigate sin TS2698
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>(
-    'react-router-dom'
-  );
-  return {
-    ...actual,
-    useNavigate: () => vi.fn()
-  };
-});
-
-describe('RegisterPage Component', () => {
-  it('renderiza el formulario de registro correctamente', () => {
-    render(
-      <BrowserRouter>
-        <RegisterPage />
-      </BrowserRouter>
-    );
-
-    expect(screen.getByRole('heading', { name: 'Registro' })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Correo electrónico')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Nombre completo')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Contraseña')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Registrarme' })).toBeInTheDocument();
+describe("RegisterPage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('muestra errores de validación cuando faltan campos', async () => {
-    render(
-      <BrowserRouter>
-        <RegisterPage />
-      </BrowserRouter>
-    );
-    fireEvent.submit(screen.getByTestId('register-form'));
+  it("debe permitir al usuario escribir en los campos de registro", () => {
+    render(<RegisterPage />);
+    
+    const emailInput = screen.getByLabelText(AUTH_CREDENTIALS.EMAIL_LABEL) as HTMLInputElement;
+    const passwordInput = screen.getByLabelText(AUTH_CREDENTIALS.PASSWORD_LABEL) as HTMLInputElement;
 
-    await waitFor(() => {
-      expect(screen.getByText('Por favor, completa todos los campos')).toBeInTheDocument();
+    fireEvent.change(emailInput, { target: { value: AUTH_CREDENTIALS.TEST_EMAIL } });
+    fireEvent.change(passwordInput, { target: { value: AUTH_CREDENTIALS.TEST_PASSWORD } });
+
+    expect(emailInput.value).toBe(AUTH_CREDENTIALS.TEST_EMAIL);
+    expect(passwordInput.value).toBe(AUTH_CREDENTIALS.TEST_PASSWORD);
+  });
+
+  it("debe llamar a signUp al hacer clic en el botón de registro", () => {
+    render(<RegisterPage />);
+    
+    const emailInput = screen.getByLabelText(AUTH_CREDENTIALS.EMAIL_LABEL);
+    const passwordInput = screen.getByLabelText(AUTH_CREDENTIALS.PASSWORD_LABEL);
+    const registerButton = screen.getByRole("button", { name: /sign up/i });
+
+    fireEvent.change(emailInput, { target: { value: AUTH_CREDENTIALS.TEST_EMAIL } });
+    fireEvent.change(passwordInput, { target: { value: AUTH_CREDENTIALS.TEST_PASSWORD } });
+    fireEvent.click(registerButton);
+
+    expect(signUpMock).toHaveBeenCalledWith({
+      email: AUTH_CREDENTIALS.TEST_EMAIL,
+      password: AUTH_CREDENTIALS.TEST_PASSWORD,
     });
-  });
-
-  it('permite escribir en los inputs', async () => {
-    render(
-      <BrowserRouter>
-        <RegisterPage />
-      </BrowserRouter>
-    );
-
-    await userEvent.type(screen.getByPlaceholderText('Correo electrónico'), 'juan@ejemplo.com');
-    await userEvent.type(screen.getByPlaceholderText('Nombre completo'), 'Juan Pérez');
-    await userEvent.type(screen.getByPlaceholderText('Contraseña'), 'password123');
-
-    expect(screen.getByPlaceholderText('Correo electrónico')).toHaveValue('juan@ejemplo.com');
-    expect(screen.getByPlaceholderText('Nombre completo')).toHaveValue('Juan Pérez');
-    expect(screen.getByPlaceholderText('Contraseña')).toHaveValue('password123');
   });
 });

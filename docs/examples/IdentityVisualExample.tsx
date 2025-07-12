@@ -1,5 +1,5 @@
-import React from 'react';
-import { AiDuxCareLogo, AiDuxCareLogoCompact, AiDuxCareLogoHero } from '../../src/components/branding/AiDuxCareLogo';
+import React from "react";
+import { AiDuxCareLogo, AiDuxCareLogoCompact, AiDuxCareLogoHero } from "../../src/components/branding/AiDuxCareLogo";
 
 const IdentityVisualExample: React.FC = () => {
   return (

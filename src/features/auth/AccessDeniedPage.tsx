@@ -1,6 +1,6 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../core/auth/UserContext';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../../core/auth/UserContext";
 
 /**
  * Página que se muestra cuando un usuario intenta acceder a una sección para la que no tiene permisos
@@ -10,7 +10,7 @@ const AccessDeniedPage = () => {
   const navigate = useNavigate();
 
   const handleGoHome = () => {
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -34,7 +34,7 @@ const AccessDeniedPage = () => {
             className="mx-auto h-40" 
             onError={(e) => {
               // Si la imagen no se encuentra, ocultarla
-              e.currentTarget.style.display = 'none';
+              e.currentTarget.style.display = "none";
             }}
           />
         </div>

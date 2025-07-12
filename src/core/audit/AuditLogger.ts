@@ -1,4 +1,4 @@
-import supabase from '@/core/auth/supabaseClient';
+import supabase from "@/core/auth/supabaseClient";
 
 export interface AuditEvent {
   id: string;
@@ -40,7 +40,7 @@ export interface AuditLogEntry {
 
 export interface BlockUpdate {
   id: string;
-  type: 'contextual' | 'persistent' | 'semantic';
+  type: "contextual" | "persistent" | "semantic";
   content: string;
   visit_id: string;
   patient_id?: string;
@@ -80,15 +80,15 @@ export class AuditLogger {
     const entry: AuditLogEntry = {
       id: crypto.randomUUID(),
       user_id: userId,
-      action: 'block.update',
+      action: "block.update",
       visit_id: visitId,
-      patient_id: oldBlocks[0]?.patient_id || '',
+      patient_id: oldBlocks[0]?.patient_id || "",
       timestamp: new Date().toISOString(),
       metadata: {
         oldBlocks,
         newBlocks
       },
-      event_type: 'mcp.block.update',
+      event_type: "mcp.block.update",
       block_type: oldBlocks[0]?.type,
       old_content: oldBlocks[0]?.content,
       new_content: newBlocks[0]?.content
@@ -138,14 +138,14 @@ export class AuditLogger {
     userId: string,
     visitId: string,
     suggestionId: string,
-    suggestionType: 'recommendation' | 'warning' | 'info',
+    suggestionType: "recommendation" | "warning" | "info",
     content: string,
     section: string
   ): void {
-    this.log('suggestion.integration', {
+    this.log("suggestion.integration", {
       userId,
       visitId,
-      patientId: '', // Necesitamos obtener el patientId de alguna manera
+      patientId: "", // Necesitamos obtener el patientId de alguna manera
       suggestionId,
       suggestionType,
       content,
@@ -165,13 +165,13 @@ export class AuditLogger {
     userId: string,
     visitId: string,
     suggestionId: string,
-    feedbackType: 'useful' | 'irrelevant' | 'incorrect' | 'dangerous',
+    feedbackType: "useful" | "irrelevant" | "incorrect" | "dangerous",
     suggestionType: string
   ): void {
-    this.log('suggestion_feedback_given', {
+    this.log("suggestion_feedback_given", {
       userId,
       visitId,
-      patientId: '', // Necesitamos obtener el patientId de alguna manera
+      patientId: "", // Necesitamos obtener el patientId de alguna manera
       suggestionId,
       suggestion_type: suggestionType,
       feedback_type: feedbackType,
@@ -187,7 +187,7 @@ export class AuditLogger {
   ): Promise<void> {
     try {
       const { error } = await supabase
-        .from('audit_logs')
+        .from("audit_logs")
         .insert({
           type,
           user_id: userId,
@@ -200,7 +200,7 @@ export class AuditLogger {
         throw error;
       }
     } catch (error) {
-      console.error('Error al registrar evento de auditoría:', error);
+      console.error("Error al registrar evento de auditoría:", error);
       throw error;
     }
   }
@@ -212,20 +212,20 @@ export class AuditLogger {
   ): Promise<AuditEvent[]> {
     try {
       let query = supabase
-        .from('audit_logs')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (userId) {
-        query = query.eq('user_id', userId);
+        query = query.eq("user_id", userId);
       }
 
       if (visitId) {
-        query = query.eq('visit_id', visitId);
+        query = query.eq("visit_id", visitId);
       }
 
       if (type) {
-        query = query.eq('type', type);
+        query = query.eq("type", type);
       }
 
       const { data, error } = await query;
@@ -243,16 +243,16 @@ export class AuditLogger {
         createdAt: new Date(event.created_at)
       }));
     } catch (error) {
-      console.error('Error al obtener eventos de auditoría:', error);
+      console.error("Error al obtener eventos de auditoría:", error);
       throw error;
     }
   }
 }
 
 export type MCPUpdateAuditEntry = AuditLogEntry & {
-  event_type: 'mcp.block.update';
+  event_type: "mcp.block.update";
 };
 
 export type SuggestionIntegrationAuditEntry = AuditLogEntry & {
-  event_type: 'suggestion.integrated';
+  event_type: "suggestion.integrated";
 };

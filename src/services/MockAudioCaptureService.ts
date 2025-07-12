@@ -9,7 +9,7 @@ interface TranscriptionCallback {
 
 export class MockAudioCaptureService {
   private isRecording: boolean = false;
-  private currentTranscript: string = '';
+  private currentTranscript: string = "";
   private onTranscriptionCallback: TranscriptionCallback | null = null;
   private simulationTimer: NodeJS.Timeout | null = null;
   private simulationStep: number = 0;
@@ -26,21 +26,21 @@ export class MockAudioCaptureService {
   ];
 
   constructor() {
-    console.log('🎭 MockAudioCaptureService inicializado - Modo demostración');
+    console.log("🎭 MockAudioCaptureService inicializado - Modo demostración");
   }
 
   async startRecording(callback: TranscriptionCallback): Promise<void> {
     if (this.isRecording) {
-      console.warn('Ya hay una grabación simulada en progreso');
+      console.warn("Ya hay una grabación simulada en progreso");
       return;
     }
 
     this.onTranscriptionCallback = callback;
-    this.currentTranscript = '';
+    this.currentTranscript = "";
     this.simulationStep = 0;
     this.isRecording = true;
 
-    console.log('🎭 Iniciando grabación simulada...');
+    console.log("🎭 Iniciando grabación simulada...");
     
     // Simular transcripción en tiempo real
     this.startSimulation();
@@ -53,7 +53,7 @@ export class MockAudioCaptureService {
       }
 
       const currentSentence = this.sampleTranscriptions[this.simulationStep];
-      const words = currentSentence.split(' ');
+      const words = currentSentence.split(" ");
       
       // Simular palabras apareciendo gradualmente
       let wordIndex = 0;
@@ -63,7 +63,7 @@ export class MockAudioCaptureService {
           
           // Marcar la frase como final
           if (this.isRecording && this.onTranscriptionCallback) {
-            this.currentTranscript += currentSentence + ' ';
+            this.currentTranscript += currentSentence + " ";
             this.onTranscriptionCallback(this.currentTranscript, true);
           }
           
@@ -72,7 +72,7 @@ export class MockAudioCaptureService {
         }
 
         // Agregar palabra intermedia
-        const partialSentence = words.slice(0, wordIndex + 1).join(' ');
+        const partialSentence = words.slice(0, wordIndex + 1).join(" ");
         if (this.onTranscriptionCallback) {
           this.onTranscriptionCallback(this.currentTranscript + partialSentence, false);
         }
@@ -85,7 +85,7 @@ export class MockAudioCaptureService {
 
   stopRecording(): string {
     if (!this.isRecording) {
-      console.warn('No hay grabación simulada en progreso');
+      console.warn("No hay grabación simulada en progreso");
       return this.currentTranscript;
     }
 
@@ -98,7 +98,7 @@ export class MockAudioCaptureService {
 
     this.onTranscriptionCallback = null;
     
-    console.log('🎭 Grabación simulada detenida. Transcripción final:', this.currentTranscript);
+    console.log("🎭 Grabación simulada detenida. Transcripción final:", this.currentTranscript);
     return this.currentTranscript.trim();
   }
 
@@ -121,14 +121,14 @@ export class MockAudioCaptureService {
     simulationStep: number;
     userAgent: string;
     isHTTPS: boolean;
-  } {
+    } {
     return {
       isSupported: true,
       isRecording: this.isRecording,
       currentTranscript: this.currentTranscript,
       simulationStep: this.simulationStep,
       userAgent: navigator.userAgent,
-      isHTTPS: window.location.protocol === 'https:'
+      isHTTPS: window.location.protocol === "https:"
     };
   }
 }

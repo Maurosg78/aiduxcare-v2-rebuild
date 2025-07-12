@@ -3,7 +3,7 @@
  * Convierte transcripciones de audio en datos estructurados SOAP
  */
 
-import { GoogleCloudAudioService, ClinicalAnalysisRequest, ClinicalAnalysisResponse } from './GoogleCloudAudioService';
+import { GoogleCloudAudioService, ClinicalAnalysisRequest, ClinicalAnalysisResponse } from "./GoogleCloudAudioService";
 
 interface SOAPData {
   subjective: string;
@@ -36,18 +36,18 @@ export class AudioToSOAPBridge {
       
       const response = await this.googleCloudService.analyzeClinicalTranscription({
         transcription: base64Audio,
-        specialty: 'physiotherapy',
-        sessionType: 'initial'
+        specialty: "physiotherapy",
+        sessionType: "initial"
       } as ClinicalAnalysisRequest);
 
       return {
         success: true,
-        transcription: (response as ClinicalAnalysisResponse).transcription || 'Transcripción procesada'
+        transcription: (response as ClinicalAnalysisResponse).transcription || "Transcripción procesada"
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Error desconocido'
+        error: error instanceof Error ? error.message : "Error desconocido"
       };
     }
   }
@@ -56,11 +56,11 @@ export class AudioToSOAPBridge {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          const base64 = reader.result.split(',')[1];
+        if (typeof reader.result === "string") {
+          const base64 = reader.result.split(",")[1];
           resolve(base64);
         } else {
-          reject(new Error('Error al convertir blob a base64'));
+          reject(new Error("Error al convertir blob a base64"));
         }
       };
       reader.onerror = () => reject(reader.error);
@@ -86,7 +86,7 @@ export class AudioToSOAPBridge {
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      console.error('Error procesando transcripción a SOAP:', error);
+      console.error("Error procesando transcripción a SOAP:", error);
       return this.createEmptySOAP();
     }
   }
@@ -94,7 +94,7 @@ export class AudioToSOAPBridge {
   /**
    * Clasifica el contenido de la transcripción en secciones SOAP
    */
-  private static classifyContentToSOAP(transcription: string): Omit<SOAPData, 'confidence' | 'timestamp'> {
+  private static classifyContentToSOAP(transcription: string): Omit<SOAPData, "confidence" | "timestamp"> {
     // Patrones para identificar diferentes tipos de contenido
     const subjectivePatterns = [
       /paciente (refiere|dice|comenta|indica|reporta|menciona)/,
@@ -126,47 +126,47 @@ export class AudioToSOAPBridge {
     // Extraer oraciones que coincidan con cada patrón
     const sentences = transcription.split(/[.!?]+/).filter(s => s.trim().length > 0);
     
-    let subjective = '';
-    let objective = '';
-    let assessment = '';
-    let plan = '';
+    let subjective = "";
+    let objective = "";
+    let assessment = "";
+    let plan = "";
 
     sentences.forEach(sentence => {
       const lowerSentence = sentence.toLowerCase();
       
       // Clasificar por patrones (una oración puede ir a múltiples secciones)
       if (this.matchesPatterns(lowerSentence, subjectivePatterns)) {
-        subjective += sentence.trim() + '. ';
+        subjective += sentence.trim() + ". ";
       }
       
       if (this.matchesPatterns(lowerSentence, objectivePatterns)) {
-        objective += sentence.trim() + '. ';
+        objective += sentence.trim() + ". ";
       }
       
       if (this.matchesPatterns(lowerSentence, assessmentPatterns)) {
-        assessment += sentence.trim() + '. ';
+        assessment += sentence.trim() + ". ";
       }
       
       if (this.matchesPatterns(lowerSentence, planPatterns)) {
-        plan += sentence.trim() + '. ';
+        plan += sentence.trim() + ". ";
       }
     });
 
     // Si alguna sección está vacía, usar contenido genérico
     if (!subjective.trim()) {
-      subjective = 'Paciente reporta síntomas según transcripción de la sesión.';
+      subjective = "Paciente reporta síntomas según transcripción de la sesión.";
     }
     
     if (!objective.trim()) {
-      objective = 'Evaluación física realizada según protocolo clínico.';
+      objective = "Evaluación física realizada según protocolo clínico.";
     }
     
     if (!assessment.trim()) {
-      assessment = 'Análisis clínico basado en hallazgos objetivos y subjetivos.';
+      assessment = "Análisis clínico basado en hallazgos objetivos y subjetivos.";
     }
     
     if (!plan.trim()) {
-      plan = 'Plan de tratamiento definido según evaluación clínica.';
+      plan = "Plan de tratamiento definido según evaluación clínica.";
     }
 
     return {
@@ -187,7 +187,7 @@ export class AudioToSOAPBridge {
   /**
    * Calcula la confianza del procesamiento SOAP
    */
-  private static calculateConfidence(soapData: Omit<SOAPData, 'confidence' | 'timestamp'>): number {
+  private static calculateConfidence(soapData: Omit<SOAPData, "confidence" | "timestamp">): number {
     let confidence = 0;
     
     // Puntuación basada en la completitud y especificidad
@@ -197,10 +197,10 @@ export class AudioToSOAPBridge {
     if (soapData.plan && soapData.plan.length > 20) confidence += 0.25;
     
     // Bonificación por contenido específico (no genérico)
-    if (!soapData.subjective.includes('según transcripción')) confidence += 0.1;
-    if (!soapData.objective.includes('según protocolo')) confidence += 0.1;
-    if (!soapData.assessment.includes('basado en hallazgos')) confidence += 0.1;
-    if (!soapData.plan.includes('según evaluación')) confidence += 0.1;
+    if (!soapData.subjective.includes("según transcripción")) confidence += 0.1;
+    if (!soapData.objective.includes("según protocolo")) confidence += 0.1;
+    if (!soapData.assessment.includes("basado en hallazgos")) confidence += 0.1;
+    if (!soapData.plan.includes("según evaluación")) confidence += 0.1;
     
     return Math.min(confidence, 1.0);
   }
@@ -210,10 +210,10 @@ export class AudioToSOAPBridge {
    */
   private static createEmptySOAP(): SOAPData {
     return {
-      subjective: 'Sin información subjetiva registrada.',
-      objective: 'Sin hallazgos objetivos registrados.',
-      assessment: 'Evaluación pendiente.',
-      plan: 'Plan de tratamiento por definir.',
+      subjective: "Sin información subjetiva registrada.",
+      objective: "Sin hallazgos objetivos registrados.",
+      assessment: "Evaluación pendiente.",
+      plan: "Plan de tratamiento por definir.",
       confidence: 0.1,
       timestamp: new Date().toISOString()
     };

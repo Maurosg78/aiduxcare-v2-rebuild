@@ -1,21 +1,21 @@
-import { z } from 'zod';
-import { supabase } from '@/lib/supabaseClient';
-import { formDataSourceSupabase } from '../dataSources/formDataSourceSupabase';
-import { AuditLogger } from '../audit/AuditLogger';
-import { trackMetric } from '../services/UsageAnalyticsService';
-import { FormDataSource } from '../dataSources/FormDataSource';
-import { ClinicalFormData, EMRContent, EMRForm } from '@/types/forms';
-import { SuggestionType } from '@/types/agent';
+import { z } from "zod";
+import { supabase } from "@/lib/supabaseClient";
+import { formDataSourceSupabase } from "../dataSources/formDataSourceSupabase";
+import { AuditLogger } from "../audit/AuditLogger";
+import { trackMetric } from "../services/UsageAnalyticsService";
+import { FormDataSource } from "../dataSources/FormDataSource";
+import { ClinicalFormData, EMRContent, EMRForm } from "@/types/forms";
+import { SuggestionType } from "@/types/agent";
 
 /**
  * Tipos de secciones del EMR donde se pueden integrar sugerencias
  */
-export type EMRSection = 'subjective' | 'objective' | 'assessment' | 'plan' | 'notes';
+export type EMRSection = "subjective" | "objective" | "assessment" | "plan" | "notes";
 
 /**
  * Tipos de sugerencias que se pueden integrar al EMR
  */
-export const INTEGRABLE_SUGGESTION_TYPES = ['recommendation', 'warning', 'info'] as const;
+export const INTEGRABLE_SUGGESTION_TYPES = ["recommendation", "warning", "info"] as const;
 export type IntegrableSuggestionType = typeof INTEGRABLE_SUGGESTION_TYPES[number];
 
 /**
@@ -26,11 +26,11 @@ export const EMRFormSchema = z.object({
   visitId: z.string(),
   patientId: z.string(),
   professionalId: z.string(),
-  subjective: z.string().default(''),
-  objective: z.string().default(''),
-  assessment: z.string().default(''),
-  plan: z.string().default(''),
-  notes: z.string().default(''),
+  subjective: z.string().default(""),
+  objective: z.string().default(""),
+  assessment: z.string().default(""),
+  plan: z.string().default(""),
+  notes: z.string().default(""),
   updatedAt: z.string().optional(),
   createdAt: z.string().optional()
 });
@@ -67,7 +67,7 @@ export class EMRFormService {
       const forms = await formDataSourceSupabase.getFormsByVisitId(visitId);
       
       // Buscar un formulario de tipo SOAP (o el primero que exista)
-      const soapForm = forms.find(form => form.form_type === 'SOAP') || forms[0];
+      const soapForm = forms.find(form => form.form_type === "SOAP") || forms[0];
       
       if (!soapForm) return null;
       
@@ -78,7 +78,7 @@ export class EMRFormService {
         // Intentar parsear el contenido JSON
         emrContent = JSON.parse(soapForm.content);
       } catch (e) {
-        console.error('Error parsing form content:', e);
+        console.error("Error parsing form content:", e);
         return null;
       }
       
@@ -88,11 +88,11 @@ export class EMRFormService {
         visitId: soapForm.visit_id,
         patientId: soapForm.patient_id,
         professionalId: soapForm.professional_id,
-        subjective: emrContent.subjective || '',
-        objective: emrContent.objective || '',
-        assessment: emrContent.assessment || '',
-        plan: emrContent.plan || '',
-        notes: emrContent.notes || '',
+        subjective: emrContent.subjective || "",
+        objective: emrContent.objective || "",
+        assessment: emrContent.assessment || "",
+        plan: emrContent.plan || "",
+        notes: emrContent.notes || "",
         updatedAt: soapForm.updated_at,
         createdAt: soapForm.created_at
       };
@@ -100,7 +100,7 @@ export class EMRFormService {
       // Validar con Zod
       return EMRFormSchema.parse(emrForm);
     } catch (error) {
-      console.error('Error fetching EMR form:', error);
+      console.error("Error fetching EMR form:", error);
       return null;
     }
   }
@@ -114,22 +114,22 @@ export class EMRFormService {
     suggestionType: SuggestionType
   ): EMRSection {
     switch (suggestionType) {
-      case 'recommendation':
-        return 'plan';
-      case 'warning':
-        return 'assessment';
-      case 'info':
-        return 'notes';
-      case 'diagnostic':
-        return 'assessment';
-      case 'treatment':
-        return 'plan';
-      case 'followup':
-        return 'plan';
-      case 'contextual':
-        return 'notes';
-      default:
-        return 'notes';
+    case "recommendation":
+      return "plan";
+    case "warning":
+      return "assessment";
+    case "info":
+      return "notes";
+    case "diagnostic":
+      return "assessment";
+    case "treatment":
+      return "plan";
+    case "followup":
+      return "plan";
+    case "contextual":
+      return "notes";
+    default:
+      return "notes";
     }
   }
 
@@ -161,12 +161,12 @@ export class EMRFormService {
     suggestion: SuggestionToIntegrate,
     visitId: string,
     patientId: string,
-    userId: string = 'anonymous'
+    userId: string = "anonymous"
   ): Promise<boolean> {
     try {
       // Verificar que el tipo de sugerencia sea integrable
       if (!INTEGRABLE_SUGGESTION_TYPES.includes(suggestion.type)) {
-        console.warn('Tipo de sugerencia no soportado para integración:', suggestion.type);
+        console.warn("Tipo de sugerencia no soportado para integración:", suggestion.type);
         return false;
       }
 
@@ -176,13 +176,13 @@ export class EMRFormService {
       if (!emrForm) {
         // Si no hay formulario, verificar si obtenemos el professionalId
         const { data, error } = await supabase
-          .from('visits')
-          .select('professional_id')
-          .eq('id', visitId)
+          .from("visits")
+          .select("professional_id")
+          .eq("id", visitId)
           .single();
           
         if (error || !data) {
-          console.error('Error fetching professional_id for visit:', error);
+          console.error("Error fetching professional_id for visit:", error);
           return false;
         }
         
@@ -193,11 +193,11 @@ export class EMRFormService {
           visitId,
           patientId,
           professionalId,
-          subjective: '',
-          objective: '',
-          assessment: '',
-          plan: '',
-          notes: '',
+          subjective: "",
+          objective: "",
+          assessment: "",
+          plan: "",
+          notes: "",
           updatedAt: new Date().toISOString(),
           createdAt: new Date().toISOString()
         };
@@ -221,7 +221,7 @@ export class EMRFormService {
 
       // Actualizar el formulario en la base de datos
       const { error } = await supabase
-        .from('forms')
+        .from("forms")
         .update({
           content: JSON.stringify({
             subjective: emrForm.subjective,
@@ -232,16 +232,16 @@ export class EMRFormService {
           }),
           updated_at: new Date().toISOString()
         })
-        .eq('id', emrForm.id);
+        .eq("id", emrForm.id);
 
       if (error) {
-        console.error('Error updating form:', error);
+        console.error("Error updating form:", error);
         return false;
       }
 
       // Registrar el evento de auditoría
       await AuditLogger.logEvent(
-        'suggestion.integrated',
+        "suggestion.integrated",
         userId,
         {
           suggestionId: suggestion.id,
@@ -254,7 +254,7 @@ export class EMRFormService {
 
       // Registrar métrica de uso
       trackMetric(
-        'suggestion_integrated',
+        "suggestion_integrated",
         userId,
         visitId,
         1,
@@ -266,7 +266,7 @@ export class EMRFormService {
 
       return true;
     } catch (error) {
-      console.error('Error inserting suggestion:', error);
+      console.error("Error inserting suggestion:", error);
       return false;
     }
   }
@@ -283,10 +283,10 @@ export class EMRFormService {
   ): Promise<string> {
     try {
       const emrForm = await this.getEMRForm(visitId);
-      return emrForm ? emrForm[section] : '';
+      return emrForm ? emrForm[section] : "";
     } catch (error) {
-      console.error('Error getting section content:', error);
-      return '';
+      console.error("Error getting section content:", error);
+      return "";
     }
   }
 
@@ -306,7 +306,7 @@ export class EMRFormService {
 
       // Actualizar el formulario en la base de datos
       const { error } = await supabase
-        .from('forms')
+        .from("forms")
         .update({
           content: JSON.stringify({
             subjective: validatedData.subjective,
@@ -317,16 +317,16 @@ export class EMRFormService {
           }),
           updated_at: new Date().toISOString()
         })
-        .eq('id', validatedData.id);
+        .eq("id", validatedData.id);
 
       if (error) {
-        console.error('Error updating form:', error);
+        console.error("Error updating form:", error);
         return false;
       }
 
       // Registrar el evento de auditoría
       await AuditLogger.logEvent(
-        'form.updated',
+        "form.updated",
         userId,
         {
           formId: validatedData.id,
@@ -338,7 +338,7 @@ export class EMRFormService {
 
       return true;
     } catch (error) {
-      console.error('Error updating EMR form:', error);
+      console.error("Error updating EMR form:", error);
       return false;
     }
   }

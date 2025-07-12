@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Enumeración para estado de visitas
 export enum VisitStatus {
-  SCHEDULED = 'scheduled',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
+  SCHEDULED = "scheduled",
+  IN_PROGRESS = "in_progress",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled"
 }
 
 // Esquema de validación para Visita
@@ -26,12 +26,12 @@ export type Visit = z.infer<typeof VisitSchema>;
 export interface CreateVisitDTO {
   patient_id: string;
   date: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
+  status: "scheduled" | "completed" | "cancelled";
   notes?: string;
 }
 
 export interface UpdateVisitDTO {
   date?: string;
-  status?: 'scheduled' | 'completed' | 'cancelled';
+  status?: "scheduled" | "completed" | "cancelled";
   notes?: string;
 } 

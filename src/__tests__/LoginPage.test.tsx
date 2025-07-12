@@ -1,113 +1,50 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import LoginPage from '../pages/LoginPage';
-import { supabaseClientMock } from '../__mocks__/supabase/authMock';
+import { render, screen, fireEvent } from "@testing-library/react";
+import LoginPage from "../pages/LoginPage";
+import { AUTH_CREDENTIALS } from "../constants/test-data";
+import { vi } from "vitest";
 
-// Mock del cliente de Supabase
-vi.mock('../core/auth/supabaseClient', () => ({
-  default: supabaseClientMock
+// Mock de dependencias
+const signInWithPasswordMock = vi.fn();
+vi.mock("../core/auth/supabaseClient", () => ({
+  default: {
+    auth: {
+      signInWithPassword: signInWithPasswordMock,
+    },
+  },
 }));
 
-// Mock de checkSupabaseConnection
-vi.mock('../utils/checkSupabaseConnection', () => ({
-  checkSupabaseConnection: (): Promise<{ isConnected: boolean; url: string; latency: number }> =>
-    Promise.resolve({ isConnected: true, url: 'https://test.supabase.co', latency: 50 }),
-  logSupabaseConnectionStatus: vi.fn()
-}));
-
-// Mock de useNavigate
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom') as Record<string, unknown>;
-  return {
-    ...actual,
-    useNavigate: () => vi.fn()
-  };
-});
-
-// Mock del servicio de datos de usuario
-vi.mock('../core/services/userDataSourceSupabase', () => ({
-  default: class UserDataSourceSupabaseMock {
-    async getUserByEmail() {
-      return {
-        id: 'test-user-id',
-        email: 'test@example.com',
-        profile: { name: 'Test User', role: 'professional' }
-      };
-    }
-  }
-}));
-
-describe('LoginPage Component', () => {
-  it('renderiza el formulario de login correctamente', () => {
-    render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
-    );
-
-    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Correo electrónico')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Contraseña')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Iniciar sesión' })).toBeInTheDocument();
-    expect(screen.getByText('Regístrate')).toBeInTheDocument();
+describe("LoginPage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('muestra error cuando los campos están vacíos', async () => {
-    render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
-    );
+  it("debe permitir al usuario escribir en los campos de email y contraseña", () => {
+    render(<LoginPage />);
+    
+    const emailInput = screen.getByLabelText(AUTH_CREDENTIALS.EMAIL_LABEL) as HTMLInputElement;
+    const passwordInput = screen.getByLabelText(AUTH_CREDENTIALS.PASSWORD_LABEL) as HTMLInputElement;
 
-    const form = screen.getByTestId('login-form');
-    fireEvent.submit(form);
+    fireEvent.change(emailInput, { target: { value: AUTH_CREDENTIALS.TEST_EMAIL } });
+    fireEvent.change(passwordInput, { target: { value: AUTH_CREDENTIALS.TEST_PASSWORD } });
 
-    await waitFor(() => {
-      const errorElement = screen.getByText('Por favor, completa todos los campos');
-      expect(errorElement).toBeInTheDocument();
-      expect(errorElement).toHaveClass('text-softCoral');
+    expect(emailInput.value).toBe(AUTH_CREDENTIALS.TEST_EMAIL);
+    expect(passwordInput.value).toBe(AUTH_CREDENTIALS.TEST_PASSWORD);
+  });
+
+  it("debe llamar a signInWithPassword al hacer clic en el botón de login", () => {
+    render(<LoginPage />);
+    
+    const emailInput = screen.getByLabelText(AUTH_CREDENTIALS.EMAIL_LABEL);
+    const passwordInput = screen.getByLabelText(AUTH_CREDENTIALS.PASSWORD_LABEL);
+    const loginButton = screen.getByRole("button", { name: AUTH_CREDENTIALS.LOGIN_BUTTON_NAME });
+
+    fireEvent.change(emailInput, { target: { value: AUTH_CREDENTIALS.TEST_EMAIL } });
+    fireEvent.change(passwordInput, { target: { value: AUTH_CREDENTIALS.TEST_PASSWORD } });
+    fireEvent.click(loginButton);
+
+    expect(signInWithPasswordMock).toHaveBeenCalledWith({
+      email: AUTH_CREDENTIALS.TEST_EMAIL,
+      password: AUTH_CREDENTIALS.TEST_PASSWORD,
     });
-  });
-
-  it('deshabilita el botón cuando loading es true', async () => {
-    render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
-    );
-
-    const emailInput = screen.getByPlaceholderText('Correo electrónico');
-    const passwordInput = screen.getByPlaceholderText('Contraseña');
-    const loginButton = screen.getByRole('button', { name: 'Iniciar sesión' });
-
-    await userEvent.type(emailInput, 'test@example.com');
-    await userEvent.type(passwordInput, 'password123');
-
-    expect(loginButton).toHaveTextContent('Iniciar sesión');
-
-    Object.defineProperty(loginButton, 'textContent', {
-      writable: true,
-      value: 'Iniciando sesión...'
-    });
-    expect(loginButton).toHaveTextContent('Iniciando sesión...');
-  });
-
-  it('permite ingresar texto en los campos', async () => {
-    render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
-    );
-
-    const emailInput = screen.getByPlaceholderText('Correo electrónico');
-    const passwordInput = screen.getByPlaceholderText('Contraseña');
-
-    await userEvent.type(emailInput, 'test@example.com');
-    await userEvent.type(passwordInput, 'password123');
-
-    expect(emailInput).toHaveValue('test@example.com');
-    expect(passwordInput).toHaveValue('password123');
   });
 });

@@ -1,42 +1,42 @@
-import { describe, expect, it } from 'vitest';
-import { MCPContext, MCPContextSchema } from '@/core/mcp/schema';
+import { describe, expect, it } from "vitest";
+import { MCPContext, MCPContextSchema } from "@/core/mcp/schema";
 
-describe('MCPContextBuilder Tests', () => {
-  it('debe validar la estructura correcta del contexto MCP', () => {
+describe("MCPContextBuilder Tests", () => {
+  it("debe validar la estructura correcta del contexto MCP", () => {
     // Crear un contexto de prueba con la estructura correcta
     const testContext: MCPContext = {
       contextual: {
-        source: 'test-source',
+        source: "test-source",
         data: [
           {
-            id: 'ctx-test-1',
+            id: "ctx-test-1",
             timestamp: new Date().toISOString(),
-            type: 'contextual',
-            content: 'Contenido contextual de prueba',
+            type: "contextual",
+            content: "Contenido contextual de prueba",
             validated: true
           }
         ]
       },
       persistent: {
-        source: 'test-source',
+        source: "test-source",
         data: [
           {
-            id: 'per-test-1',
+            id: "per-test-1",
             timestamp: new Date().toISOString(),
-            type: 'persistent',
-            content: 'Contenido persistente de prueba',
+            type: "persistent",
+            content: "Contenido persistente de prueba",
             validated: true
           }
         ]
       },
       semantic: {
-        source: 'test-source',
+        source: "test-source",
         data: [
           {
-            id: 'sem-test-1',
+            id: "sem-test-1",
             timestamp: new Date().toISOString(),
-            type: 'semantic',
-            content: 'Contenido semántico de prueba',
+            type: "semantic",
+            content: "Contenido semántico de prueba",
             validated: true
           }
         ]
@@ -48,22 +48,22 @@ describe('MCPContextBuilder Tests', () => {
     expect(result.success).toBe(true);
   });
 
-  it('debe detectar estructuras incorrectas del contexto MCP', () => {
+  it("debe detectar estructuras incorrectas del contexto MCP", () => {
     // Crear un contexto con estructura incorrecta (falta semantic)
     const invalidContext = {
       contextual: {
-        source: 'test-source',
+        source: "test-source",
         data: [
           {
-            id: 'ctx-test-1',
+            id: "ctx-test-1",
             timestamp: new Date().toISOString(),
-            type: 'contextual',
-            content: 'Contenido contextual de prueba'
+            type: "contextual",
+            content: "Contenido contextual de prueba"
           }
         ]
       },
       persistent: {
-        source: 'test-source',
+        source: "test-source",
         data: []
       }
       // Falta la sección semantic, lo que debería provocar un error
@@ -74,26 +74,26 @@ describe('MCPContextBuilder Tests', () => {
     expect(result.success).toBe(false);
   });
 
-  it('debe validar el formato correcto de los campos de fecha', () => {
+  it("debe validar el formato correcto de los campos de fecha", () => {
     // Crear un contexto con timestamp en formato inválido
     const contextWithBadDate: any = {
       contextual: {
-        source: 'test-source',
+        source: "test-source",
         data: [
           {
-            id: 'ctx-test-1',
-            timestamp: 'fecha-invalida', // Formato inválido
-            type: 'contextual',
-            content: 'Contenido contextual de prueba'
+            id: "ctx-test-1",
+            timestamp: "fecha-invalida", // Formato inválido
+            type: "contextual",
+            content: "Contenido contextual de prueba"
           }
         ]
       },
       persistent: {
-        source: 'test-source',
+        source: "test-source",
         data: []
       },
       semantic: {
-        source: 'test-source',
+        source: "test-source",
         data: []
       }
     };

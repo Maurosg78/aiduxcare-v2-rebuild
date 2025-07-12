@@ -1,8 +1,8 @@
-const Joi = require('joi');
-const winston = require('winston');
+const Joi = require("joi");
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -23,22 +23,22 @@ class ResponseParser {
       suggestionsCount: 1,
       warnings: [],
       suggestions: [{
-        id: 'system_fallback',
-        type: 'system',
-        severity: 'MEDIUM',
-        category: 'technical',
-        title: 'Análisis procesado con sistema de respaldo',
-        description: 'El análisis principal no estuvo disponible, se aplicó procesamiento básico',
-        recommendation: 'Revisar transcripción manualmente si hay dudas clínicas',
-        evidence: 'Sistema de respaldo activado',
+        id: "system_fallback",
+        type: "system",
+        severity: "MEDIUM",
+        category: "technical",
+        title: "Análisis procesado con sistema de respaldo",
+        description: "El análisis principal no estuvo disponible, se aplicó procesamiento básico",
+        recommendation: "Revisar transcripción manualmente si hay dudas clínicas",
+        evidence: "Sistema de respaldo activado",
         confidence: 0.75
       }],
       analysis: {
-        emergencyLevel: 'MEDIUM',
+        emergencyLevel: "MEDIUM",
         confidence: 0.75,
-        medicalContext: 'Análisis general aplicado'
+        medicalContext: "Análisis general aplicado"
       },
-      modelUsed: 'fallback-system',
+      modelUsed: "fallback-system",
       processingTime: Date.now() % 1000
     };
   }
@@ -48,8 +48,8 @@ class ResponseParser {
     return Joi.object({
       warnings: Joi.array().items(
         Joi.object({
-          severity: Joi.string().valid('HIGH', 'MEDIUM', 'LOW').required(),
-          category: Joi.string().valid('red_flag', 'contraindication', 'referral', 'safety', 'clinical_alert').required(),
+          severity: Joi.string().valid("HIGH", "MEDIUM", "LOW").required(),
+          category: Joi.string().valid("red_flag", "contraindication", "referral", "safety", "clinical_alert").required(),
           title: Joi.string().required(),
           description: Joi.string().required(),
           action: Joi.string().required()
@@ -58,10 +58,10 @@ class ResponseParser {
       
       suggestions: Joi.array().items(
         Joi.object({
-          type: Joi.string().valid('assessment', 'treatment', 'education', 'referral', 'system_recommendation').required(),
+          type: Joi.string().valid("assessment", "treatment", "education", "referral", "system_recommendation").required(),
           title: Joi.string().required(),
           description: Joi.string().required(),
-          priority: Joi.string().valid('HIGH', 'MEDIUM', 'LOW').required()
+          priority: Joi.string().valid("HIGH", "MEDIUM", "LOW").required()
         })
       ).default([]),
       
@@ -80,8 +80,8 @@ class ResponseParser {
       warnings: Joi.array().items(
         Joi.object({
           id: Joi.string().required(),
-          severity: Joi.string().valid('HIGH', 'MEDIUM', 'LOW').required(),
-          category: Joi.string().valid('contraindication', 'red_flag', 'safety_concern', 'clinical_alert').required(),
+          severity: Joi.string().valid("HIGH", "MEDIUM", "LOW").required(),
+          category: Joi.string().valid("contraindication", "red_flag", "safety_concern", "clinical_alert").required(),
           title: Joi.string().required(),
           description: Joi.string().required(),
           recommendation: Joi.string().required(),
@@ -92,11 +92,11 @@ class ResponseParser {
       suggestions: Joi.array().items(
         Joi.object({
           id: Joi.string().required(),
-          type: Joi.string().valid('assessment_question', 'treatment_modification', 'additional_evaluation', 'patient_education').required(),
+          type: Joi.string().valid("assessment_question", "treatment_modification", "additional_evaluation", "patient_education").required(),
           title: Joi.string().required(),
           description: Joi.string().required(),
           rationale: Joi.string().required(),
-          priority: Joi.string().valid('HIGH', 'MEDIUM', 'LOW').required()
+          priority: Joi.string().valid("HIGH", "MEDIUM", "LOW").required()
         })
       ).required(),
       
@@ -123,7 +123,7 @@ class ResponseParser {
     const startTime = Date.now();
     
     try {
-      logger.info('🚀 STARTING RESPONSE PARSING V2', {
+      logger.info("🚀 STARTING RESPONSE PARSING V2", {
         specialty,
         responseLength: rawResponse.length,
         timestamp: new Date().toISOString()
@@ -134,7 +134,7 @@ class ResponseParser {
       try {
         parsedResponse = JSON.parse(rawResponse);
       } catch (jsonError) {
-        logger.error('Failed to parse JSON response', {
+        logger.error("Failed to parse JSON response", {
           error: jsonError.message,
           responsePreview: rawResponse.substring(0, 200)
         });
@@ -146,8 +146,8 @@ class ResponseParser {
       // 🚀 DETECTAR FORMATO: V2 (PromptFactory calibrado) vs Legacy
       const isV2Format = this.isV2Format(parsedResponse);
       
-      logger.info('🔍 FORMATO DETECTADO:', {
-        format: isV2Format ? 'V2 (Calibrado)' : 'Legacy',
+      logger.info("🔍 FORMATO DETECTADO:", {
+        format: isV2Format ? "V2 (Calibrado)" : "Legacy",
         hasSOAPQuality: !!parsedResponse.soap_quality,
         hasSOAPAnalysis: !!parsedResponse.soap_analysis,
         specialty
@@ -168,9 +168,9 @@ class ResponseParser {
 
       const processingTime = Date.now() - startTime;
 
-      logger.info('🎯 RESPONSE PARSING V2 COMPLETED', {
+      logger.info("🎯 RESPONSE PARSING V2 COMPLETED", {
         specialty,
-        format: isV2Format ? 'V2' : 'Legacy',
+        format: isV2Format ? "V2" : "Legacy",
         processingTimeMs: processingTime,
         warningsCount: enrichedResponse.warnings.length,
         suggestionsCount: enrichedResponse.suggestions.length,
@@ -183,7 +183,7 @@ class ResponseParser {
     } catch (error) {
       const processingTime = Date.now() - startTime;
       
-      logger.error('Response parsing failed', {
+      logger.error("Response parsing failed", {
         error: error.message,
         stack: error.stack,
         specialty,
@@ -209,7 +209,7 @@ class ResponseParser {
     });
 
     if (error) {
-      logger.warn('V2 response validation issues, attempting repair', {
+      logger.warn("V2 response validation issues, attempting repair", {
         validationErrors: error.details.map(detail => ({
           path: detail.path,
           message: detail.message
@@ -226,13 +226,13 @@ class ResponseParser {
       });
       
       if (repairError) {
-        logger.error('Failed to repair V2 response', {
+        logger.error("Failed to repair V2 response", {
           repairErrors: repairError.details.map(detail => ({
             path: detail.path,
             message: detail.message
           }))
         });
-        throw new Error('V2 response validation failed after repair attempt');
+        throw new Error("V2 response validation failed after repair attempt");
       }
       
       return repairedValue;
@@ -249,7 +249,7 @@ class ResponseParser {
     });
 
     if (error) {
-      logger.warn('Legacy response validation failed, attempting to repair', {
+      logger.warn("Legacy response validation failed, attempting to repair", {
         validationErrors: error.details.map(detail => ({
           path: detail.path,
           message: detail.message
@@ -266,13 +266,13 @@ class ResponseParser {
       });
       
       if (repairError) {
-        logger.error('Failed to repair legacy response', {
+        logger.error("Failed to repair legacy response", {
           repairErrors: repairError.details.map(detail => ({
             path: detail.path,
             message: detail.message
           }))
         });
-        throw new Error('Legacy response validation failed after repair attempt');
+        throw new Error("Legacy response validation failed after repair attempt");
       }
       
       return repairedValue;
@@ -295,15 +295,15 @@ class ResponseParser {
         warning.action = warning.recommendation;
       }
       if (!warning.action) {
-        warning.action = 'Evaluar clínicamente';
+        warning.action = "Evaluar clínicamente";
       }
       return warning;
     });
 
     // Reparar suggestions
     repaired.suggestions = repaired.suggestions.map(suggestion => {
-      if (!suggestion.priority) suggestion.priority = 'MEDIUM';
-      if (!suggestion.type) suggestion.type = 'assessment';
+      if (!suggestion.priority) suggestion.priority = "MEDIUM";
+      if (!suggestion.type) suggestion.type = "assessment";
       return suggestion;
     });
 
@@ -318,7 +318,7 @@ class ResponseParser {
       };
     }
 
-    logger.info('🔧 V2 response repaired', {
+    logger.info("🔧 V2 response repaired", {
       originalErrors: validationErrors.length,
       repairedWarnings: repaired.warnings.length,
       repairedSuggestions: repaired.suggestions.length,
@@ -386,11 +386,11 @@ class ResponseParser {
       }
       
       // Si no se puede extraer, crear estructura básica
-      throw new Error('No valid JSON found in response');
+      throw new Error("No valid JSON found in response");
       
     } catch (error) {
-      logger.error('JSON repair failed', { error: error.message });
-      throw new Error('Unable to repair malformed JSON response');
+      logger.error("JSON repair failed", { error: error.message });
+      throw new Error("Unable to repair malformed JSON response");
     }
   }
 
@@ -399,45 +399,45 @@ class ResponseParser {
 
     // Reparar campos faltantes o inválidos
     validationErrors.forEach(error => {
-      const path = error.path.join('.');
+      const path = error.path.join(".");
       
       switch (path) {
-        case 'warnings':
-          if (!repairedResponse.warnings || !Array.isArray(repairedResponse.warnings)) {
-            repairedResponse.warnings = [];
-          }
-          break;
+      case "warnings":
+        if (!repairedResponse.warnings || !Array.isArray(repairedResponse.warnings)) {
+          repairedResponse.warnings = [];
+        }
+        break;
           
-        case 'suggestions':
-          if (!repairedResponse.suggestions || !Array.isArray(repairedResponse.suggestions)) {
-            repairedResponse.suggestions = [];
-          }
-          break;
+      case "suggestions":
+        if (!repairedResponse.suggestions || !Array.isArray(repairedResponse.suggestions)) {
+          repairedResponse.suggestions = [];
+        }
+        break;
           
-        case 'soap_analysis':
-          if (!repairedResponse.soap_analysis) {
-            repairedResponse.soap_analysis = {
-              subjective_completeness: 50,
-              objective_completeness: 50,
-              assessment_quality: 50,
-              plan_appropriateness: 50,
-              overall_quality: 50,
-              missing_elements: ['Unable to analyze - parsing error']
-            };
-          }
-          break;
+      case "soap_analysis":
+        if (!repairedResponse.soap_analysis) {
+          repairedResponse.soap_analysis = {
+            subjective_completeness: 50,
+            objective_completeness: 50,
+            assessment_quality: 50,
+            plan_appropriateness: 50,
+            overall_quality: 50,
+            missing_elements: ["Unable to analyze - parsing error"]
+          };
+        }
+        break;
           
-        case 'session_quality':
-          if (!repairedResponse.session_quality) {
-            repairedResponse.session_quality = {
-              communication_score: 50,
-              clinical_thoroughness: 50,
-              patient_engagement: 50,
-              professional_standards: 50,
-              areas_for_improvement: ['Unable to analyze - parsing error']
-            };
-          }
-          break;
+      case "session_quality":
+        if (!repairedResponse.session_quality) {
+          repairedResponse.session_quality = {
+            communication_score: 50,
+            clinical_thoroughness: 50,
+            patient_engagement: 50,
+            professional_standards: 50,
+            areas_for_improvement: ["Unable to analyze - parsing error"]
+          };
+        }
+        break;
       }
     });
 
@@ -474,7 +474,7 @@ class ResponseParser {
 
     // Filtrar advertencias de baja confianza
     filteredResponse.warnings = response.warnings.filter(warning => 
-      warning.confidence >= 0.7 || warning.severity === 'HIGH'
+      warning.confidence >= 0.7 || warning.severity === "HIGH"
     );
 
     // Ordenar sugerencias por relevancia
@@ -488,10 +488,10 @@ class ResponseParser {
   calculateConfidence(warning, specialty) {
     // Lógica básica de confianza basada en categoría y especialidad
     const baseConfidence = {
-      'contraindication': 0.9,
-      'red_flag': 0.85,
-      'safety_concern': 0.8,
-      'clinical_alert': 0.75
+      "contraindication": 0.9,
+      "red_flag": 0.85,
+      "safety_concern": 0.8,
+      "clinical_alert": 0.75
     };
 
     let confidence = baseConfidence[warning.category] || 0.7;
@@ -514,19 +514,19 @@ class ResponseParser {
   calculateRelevance(suggestion, specialty) {
     // Lógica básica de relevancia
     const baseRelevance = {
-      'assessment_question': 0.8,
-      'treatment_modification': 0.9,
-      'additional_evaluation': 0.7,
-      'patient_education': 0.6
+      "assessment_question": 0.8,
+      "treatment_modification": 0.9,
+      "additional_evaluation": 0.7,
+      "patient_education": 0.6
     };
 
     let relevance = baseRelevance[suggestion.type] || 0.5;
 
     // Ajustar por prioridad
     const priorityMultiplier = {
-      'HIGH': 1.2,
-      'MEDIUM': 1.0,
-      'LOW': 0.8
+      "HIGH": 1.2,
+      "MEDIUM": 1.0,
+      "LOW": 0.8
     };
 
     relevance *= priorityMultiplier[suggestion.priority] || 1.0;
@@ -565,7 +565,7 @@ class ResponseParser {
 
   calculateSafetyCompliance(response) {
     // Basado en la presencia y calidad de advertencias de seguridad
-    const highSeverityWarnings = response.warnings.filter(w => w.severity === 'HIGH').length;
+    const highSeverityWarnings = response.warnings.filter(w => w.severity === "HIGH").length;
     const totalWarnings = response.warnings.length;
     
     if (totalWarnings === 0) return 100; // No hay problemas de seguridad
@@ -588,31 +588,31 @@ class ResponseParser {
   }
 
   createFallbackResponse(specialty, errorMessage) {
-    logger.warn('Creating fallback response due to parsing failure', {
+    logger.warn("Creating fallback response due to parsing failure", {
       specialty,
       error: errorMessage
     });
 
     return {
       warnings: [{
-        id: 'fallback_warning_001',
-        severity: 'MEDIUM',
-        category: 'clinical_alert',
-        title: 'Análisis Clínico Incompleto',
-        description: 'No se pudo completar el análisis clínico automatizado de esta transcripción.',
-        recommendation: 'Revisar manualmente la transcripción para identificar posibles problemas clínicos.',
-        evidence: 'Error en el procesamiento automático',
+        id: "fallback_warning_001",
+        severity: "MEDIUM",
+        category: "clinical_alert",
+        title: "Análisis Clínico Incompleto",
+        description: "No se pudo completar el análisis clínico automatizado de esta transcripción.",
+        recommendation: "Revisar manualmente la transcripción para identificar posibles problemas clínicos.",
+        evidence: "Error en el procesamiento automático",
         specialty,
         timestamp: new Date().toISOString(),
         confidence: 0.5
       }],
       suggestions: [{
-        id: 'fallback_suggestion_001',
-        type: 'additional_evaluation',
-        title: 'Revisión Manual Requerida',
-        description: 'Se recomienda una revisión manual de la transcripción debido a limitaciones en el análisis automatizado.',
-        rationale: 'El sistema no pudo procesar completamente la información clínica.',
-        priority: 'MEDIUM',
+        id: "fallback_suggestion_001",
+        type: "additional_evaluation",
+        title: "Revisión Manual Requerida",
+        description: "Se recomienda una revisión manual de la transcripción debido a limitaciones en el análisis automatizado.",
+        rationale: "El sistema no pudo procesar completamente la información clínica.",
+        priority: "MEDIUM",
         specialty,
         timestamp: new Date().toISOString(),
         relevance_score: 0.8
@@ -623,14 +623,14 @@ class ResponseParser {
         assessment_quality: 0,
         plan_appropriateness: 0,
         overall_quality: 0,
-        missing_elements: ['Análisis automático fallido']
+        missing_elements: ["Análisis automático fallido"]
       },
       session_quality: {
         communication_score: 0,
         clinical_thoroughness: 0,
         patient_engagement: 0,
         professional_standards: 0,
-        areas_for_improvement: ['Análisis automático fallido']
+        areas_for_improvement: ["Análisis automático fallido"]
       },
       specialty_metrics: {
         specialty,
@@ -645,19 +645,19 @@ class ResponseParser {
    * PARSING MULTINIVEL - Múltiples estrategias de recuperación
    */
   parseResponse(rawResponse, context = {}) {
-    console.log('🔍 INICIANDO PARSING BLINDADO:', {
+    console.log("🔍 INICIANDO PARSING BLINDADO:", {
       responseLength: rawResponse.length,
-      responsePreview: rawResponse.substring(0, 200) + '...',
+      responsePreview: rawResponse.substring(0, 200) + "...",
       context: context
     });
 
     // ESTRATEGIA 1: JSON directo (ideal case)
     try {
       const directJSON = JSON.parse(rawResponse.trim());
-      console.log('✅ PARSING DIRECTO EXITOSO');
+      console.log("✅ PARSING DIRECTO EXITOSO");
       return this.validateAndCleanResponse(directJSON);
     } catch (directError) {
-      console.log('⚠️ Parsing directo falló, intentando estrategias de recuperación...');
+      console.log("⚠️ Parsing directo falló, intentando estrategias de recuperación...");
     }
 
     // ESTRATEGIA 2: Extraer JSON de bloques de código
@@ -665,11 +665,11 @@ class ResponseParser {
       const codeBlockMatch = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
       if (codeBlockMatch) {
         const extractedJSON = JSON.parse(codeBlockMatch[1].trim());
-        console.log('✅ JSON EXTRAÍDO DE BLOQUE DE CÓDIGO');
+        console.log("✅ JSON EXTRAÍDO DE BLOQUE DE CÓDIGO");
         return this.validateAndCleanResponse(extractedJSON);
       }
     } catch (codeBlockError) {
-      console.log('⚠️ Extracción de bloque de código falló...');
+      console.log("⚠️ Extracción de bloque de código falló...");
     }
 
     // ESTRATEGIA 3: Buscar objeto JSON entre llaves
@@ -678,26 +678,26 @@ class ResponseParser {
       const jsonMatch = rawResponse.match(jsonPattern);
       if (jsonMatch) {
         const extractedJSON = JSON.parse(jsonMatch[0]);
-        console.log('✅ JSON EXTRAÍDO POR PATTERN MATCHING');
+        console.log("✅ JSON EXTRAÍDO POR PATTERN MATCHING");
         return this.validateAndCleanResponse(extractedJSON);
       }
     } catch (patternError) {
-      console.log('⚠️ Pattern matching falló...');
+      console.log("⚠️ Pattern matching falló...");
     }
 
     // ESTRATEGIA 4: Reparación automática de errores comunes
     try {
       const repairedJSON = this.repairCommonJSONErrors(rawResponse);
       if (repairedJSON) {
-        console.log('✅ JSON REPARADO AUTOMÁTICAMENTE');
+        console.log("✅ JSON REPARADO AUTOMÁTICAMENTE");
         return this.validateAndCleanResponse(repairedJSON);
       }
     } catch (repairError) {
-      console.log('⚠️ Reparación automática falló...');
+      console.log("⚠️ Reparación automática falló...");
     }
 
     // ESTRATEGIA 5: Fallback inteligente basado en el texto
-    console.log('🚨 TODAS LAS ESTRATEGIAS FALLARON - ACTIVANDO FALLBACK INTELIGENTE');
+    console.log("🚨 TODAS LAS ESTRATEGIAS FALLARON - ACTIVANDO FALLBACK INTELIGENTE");
     return this.generateIntelligentFallback(rawResponse, context);
   }
 
@@ -708,28 +708,28 @@ class ResponseParser {
     let repaired = text;
 
     // Remover texto antes del primer {
-    const firstBrace = repaired.indexOf('{');
+    const firstBrace = repaired.indexOf("{");
     if (firstBrace > 0) {
       repaired = repaired.substring(firstBrace);
     }
 
     // Remover texto después del último }
-    const lastBrace = repaired.lastIndexOf('}');
+    const lastBrace = repaired.lastIndexOf("}");
     if (lastBrace > 0 && lastBrace < repaired.length - 1) {
       repaired = repaired.substring(0, lastBrace + 1);
     }
 
     // Reparar comas sobrantes antes de }
-    repaired = repaired.replace(/,(\s*})/g, '$1');
+    repaired = repaired.replace(/,(\s*})/g, "$1");
     
     // Reparar comas sobrantes antes de ]
-    repaired = repaired.replace(/,(\s*])/g, '$1');
+    repaired = repaired.replace(/,(\s*])/g, "$1");
 
     // Reparar comillas simples por dobles
-    repaired = repaired.replace(/'/g, '"');
+    repaired = repaired.replace(/'/g, "\"");
 
     // Reparar claves sin comillas
-    repaired = repaired.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":');
+    repaired = repaired.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, "$1\"$2\":");
 
     try {
       return JSON.parse(repaired);
@@ -746,43 +746,43 @@ class ResponseParser {
     const fallback = { ...this.fallbackTemplate };
 
     // Detectar menciones de emergencias en el texto
-    if (lowerResponse.includes('emergencia') || lowerResponse.includes('crítico') || 
-        lowerResponse.includes('urgente') || lowerResponse.includes('inmediato')) {
-      fallback.analysis.emergencyLevel = 'HIGH';
+    if (lowerResponse.includes("emergencia") || lowerResponse.includes("crítico") || 
+        lowerResponse.includes("urgente") || lowerResponse.includes("inmediato")) {
+      fallback.analysis.emergencyLevel = "HIGH";
       fallback.hasWarnings = true;
       fallback.warningsCount = 1;
       fallback.warnings = [{
-        id: 'text_emergency_detected',
-        severity: 'HIGH',
-        category: 'emergency',
-        title: 'Posible emergencia detectada en análisis',
-        description: 'El texto de respuesta menciona términos de emergencia',
-        recommendation: 'Revisar caso inmediatamente',
-        evidence: 'Detección por análisis de texto de respaldo',
+        id: "text_emergency_detected",
+        severity: "HIGH",
+        category: "emergency",
+        title: "Posible emergencia detectada en análisis",
+        description: "El texto de respuesta menciona términos de emergencia",
+        recommendation: "Revisar caso inmediatamente",
+        evidence: "Detección por análisis de texto de respaldo",
         confidence: 0.8
       }];
     }
 
     // Detectar menciones de síntomas específicos
-    const symptoms = ['dolor', 'disnea', 'mareo', 'náusea', 'pérdida', 'sangrado'];
+    const symptoms = ["dolor", "disnea", "mareo", "náusea", "pérdida", "sangrado"];
     const detectedSymptoms = symptoms.filter(symptom => lowerResponse.includes(symptom));
     
     if (detectedSymptoms.length > 0) {
       fallback.suggestions.push({
-        id: 'symptoms_detected_fallback',
-        type: 'clinical',
-        severity: 'MEDIUM',
-        category: 'symptom_analysis',
-        title: `Síntomas detectados: ${detectedSymptoms.join(', ')}`,
-        description: 'Se detectaron síntomas relevantes en el análisis de respaldo',
-        recommendation: 'Evaluar estos síntomas en contexto clínico',
-        evidence: `Términos detectados: ${detectedSymptoms.join(', ')}`,
+        id: "symptoms_detected_fallback",
+        type: "clinical",
+        severity: "MEDIUM",
+        category: "symptom_analysis",
+        title: `Síntomas detectados: ${detectedSymptoms.join(", ")}`,
+        description: "Se detectaron síntomas relevantes en el análisis de respaldo",
+        recommendation: "Evaluar estos síntomas en contexto clínico",
+        evidence: `Términos detectados: ${detectedSymptoms.join(", ")}`,
         confidence: 0.7
       });
       fallback.suggestionsCount = 2;
     }
 
-    console.log('🔄 FALLBACK INTELIGENTE GENERADO:', {
+    console.log("🔄 FALLBACK INTELIGENTE GENERADO:", {
       emergencyLevel: fallback.analysis.emergencyLevel,
       warningsCount: fallback.warningsCount,
       suggestionsCount: fallback.suggestionsCount,
@@ -805,8 +805,8 @@ class ResponseParser {
       suggestionsCount: response.suggestionsCount || 0,
       warnings: Array.isArray(response.warnings) ? response.warnings : [],
       suggestions: Array.isArray(response.suggestions) ? response.suggestions : [],
-      analysis: response.analysis || { emergencyLevel: 'LOW', confidence: 0.8 },
-      modelUsed: response.modelUsed || 'unknown',
+      analysis: response.analysis || { emergencyLevel: "LOW", confidence: 0.8 },
+      modelUsed: response.modelUsed || "unknown",
       processingTime: response.processingTime || Date.now() % 1000
     };
 
@@ -816,7 +816,7 @@ class ResponseParser {
     cleaned.hasWarnings = cleaned.warningsCount > 0;
     cleaned.hasSuggestions = cleaned.suggestionsCount > 0;
 
-    console.log('✅ RESPUESTA VALIDADA Y LIMPIADA:', {
+    console.log("✅ RESPUESTA VALIDADA Y LIMPIADA:", {
       success: cleaned.success,
       warningsCount: cleaned.warningsCount,
       suggestionsCount: cleaned.suggestionsCount,
@@ -832,10 +832,10 @@ class ResponseParser {
   getParsingStats() {
     return {
       strategiesAvailable: 5,
-      successMethods: ['direct-json', 'code-block', 'pattern-match', 'auto-repair', 'intelligent-fallback'],
-      fallbackReliability: '100%',
-      averageParsingTime: '<50ms',
-      supportedErrorTypes: ['syntax-errors', 'extra-text', 'security-filters', 'truncated-responses']
+      successMethods: ["direct-json", "code-block", "pattern-match", "auto-repair", "intelligent-fallback"],
+      fallbackReliability: "100%",
+      averageParsingTime: "<50ms",
+      supportedErrorTypes: ["syntax-errors", "extra-text", "security-filters", "truncated-responses"]
     };
   }
 }

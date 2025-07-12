@@ -6,7 +6,7 @@
  * - Caso 2: Con banderas rojas → Pro
  */
 
-const ClinicalInsightService = require('./src/services/ClinicalInsightService');
+const ClinicalInsightService = require("./src/services/ClinicalInsightService");
 
 // =========================================
 // CASOS DE PRUEBA PARA DEMOSTRACIÓN
@@ -44,24 +44,24 @@ No déficit neurológico focal, pero refiere ocasional sensación de hormigueo e
 // =========================================
 
 async function demostrarModelSelectorInteligente() {
-  console.log('🎯 INICIANDO DEMOSTRACIÓN MODELSELECTOR INTELIGENTE V3.0');
-  console.log('============================================================\n');
+  console.log("🎯 INICIANDO DEMOSTRACIÓN MODELSELECTOR INTELIGENTE V3.0");
+  console.log("============================================================\n");
 
   const clinicalService = new ClinicalInsightService();
 
   try {
     // CASO 1: SIN BANDERAS ROJAS (debería seleccionar Flash)
-    console.log('📋 CASO 1: PACIENTE SIN BANDERAS ROJAS');
-    console.log('───────────────────────────────────────');
-    console.log('Caso: Dolor lumbar mecánico leve post-actividad física');
-    console.log('Expectativa: ModelSelector debe elegir Gemini-Flash\n');
+    console.log("📋 CASO 1: PACIENTE SIN BANDERAS ROJAS");
+    console.log("───────────────────────────────────────");
+    console.log("Caso: Dolor lumbar mecánico leve post-actividad física");
+    console.log("Expectativa: ModelSelector debe elegir Gemini-Flash\n");
 
     const resultado1 = await clinicalService.processTranscriptionWithIntelligentModel(
       CASO_SIN_BANDERAS_ROJAS,
-      { specialty: 'fisioterapia', sessionType: 'initial' }
+      { specialty: "fisioterapia", sessionType: "initial" }
     );
 
-    console.log('✅ RESULTADO CASO 1:');
+    console.log("✅ RESULTADO CASO 1:");
     console.log(`   Modelo Seleccionado: ${resultado1.intelligent_model_metadata.model_decision.selected_model}`);
     console.log(`   Razonamiento: ${resultado1.intelligent_model_metadata.model_decision.reasoning}`);
     console.log(`   Banderas Rojas: ${resultado1.intelligent_model_metadata.model_decision.triage_result.redFlags.length}`);
@@ -70,66 +70,66 @@ async function demostrarModelSelectorInteligente() {
     console.log(`   Tiempo Total: ${resultado1.intelligent_model_metadata.total_processing_time}s\n`);
 
     // Pausa entre casos
-    console.log('⏳ Esperando 2 segundos antes del siguiente caso...\n');
+    console.log("⏳ Esperando 2 segundos antes del siguiente caso...\n");
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // CASO 2: CON BANDERAS ROJAS (debería seleccionar Pro)
-    console.log('🚨 CASO 2: PACIENTE CON MÚLTIPLES BANDERAS ROJAS');
-    console.log('─────────────────────────────────────────────────');
-    console.log('Caso: Dolor nocturno + rigidez matutina + pérdida peso + antecedentes');
-    console.log('Expectativa: ModelSelector debe elegir Gemini-Pro\n');
+    console.log("🚨 CASO 2: PACIENTE CON MÚLTIPLES BANDERAS ROJAS");
+    console.log("─────────────────────────────────────────────────");
+    console.log("Caso: Dolor nocturno + rigidez matutina + pérdida peso + antecedentes");
+    console.log("Expectativa: ModelSelector debe elegir Gemini-Pro\n");
 
     const resultado2 = await clinicalService.processTranscriptionWithIntelligentModel(
       CASO_CON_BANDERAS_ROJAS,
-      { specialty: 'fisioterapia', sessionType: 'initial' }
+      { specialty: "fisioterapia", sessionType: "initial" }
     );
 
-    console.log('✅ RESULTADO CASO 2:');
+    console.log("✅ RESULTADO CASO 2:");
     console.log(`   Modelo Seleccionado: ${resultado2.intelligent_model_metadata.model_decision.selected_model}`);
     console.log(`   Razonamiento: ${resultado2.intelligent_model_metadata.model_decision.reasoning}`);
     console.log(`   Banderas Rojas: ${resultado2.intelligent_model_metadata.model_decision.triage_result.redFlags.length}`);
     if (resultado2.intelligent_model_metadata.model_decision.triage_result.redFlags.length > 0) {
-      console.log(`   Banderas Detectadas: ${resultado2.intelligent_model_metadata.model_decision.triage_result.redFlags.join(', ')}`);
+      console.log(`   Banderas Detectadas: ${resultado2.intelligent_model_metadata.model_decision.triage_result.redFlags.join(", ")}`);
     }
     console.log(`   Nivel de Riesgo: ${resultado2.intelligent_model_metadata.model_decision.triage_result.riskLevel}`);
     console.log(`   Optimización de Costos: ${resultado2.intelligent_model_metadata.model_decision.cost_optimization.savingsVsPro || resultado2.intelligent_model_metadata.model_decision.cost_optimization}`);
     console.log(`   Tiempo Total: ${resultado2.intelligent_model_metadata.total_processing_time}s\n`);
 
     // RESUMEN COMPARATIVO
-    console.log('📊 RESUMEN COMPARATIVO DEL ÁRBOL DE DECISIÓN');
-    console.log('============================================================');
-    console.log('│ CASO                    │ MODELO         │ BANDERAS │ TIEMPO │');
-    console.log('├─────────────────────────┼────────────────┼──────────┼────────┤');
+    console.log("📊 RESUMEN COMPARATIVO DEL ÁRBOL DE DECISIÓN");
+    console.log("============================================================");
+    console.log("│ CASO                    │ MODELO         │ BANDERAS │ TIEMPO │");
+    console.log("├─────────────────────────┼────────────────┼──────────┼────────┤");
     console.log(`│ Lumbar mecánico leve    │ ${resultado1.intelligent_model_metadata.model_decision.selected_model.padEnd(14)} │ ${String(resultado1.intelligent_model_metadata.model_decision.triage_result.redFlags.length).padEnd(8)} │ ${resultado1.intelligent_model_metadata.total_processing_time.toFixed(1)}s  │`);
     console.log(`│ Dolor inflamatorio      │ ${resultado2.intelligent_model_metadata.model_decision.selected_model.padEnd(14)} │ ${String(resultado2.intelligent_model_metadata.model_decision.triage_result.redFlags.length).padEnd(8)} │ ${resultado2.intelligent_model_metadata.total_processing_time.toFixed(1)}s  │`);
-    console.log('└─────────────────────────┴────────────────┴──────────┴────────┘\n');
+    console.log("└─────────────────────────┴────────────────┴──────────┴────────┘\n");
 
     // VALIDACIÓN DE OBJETIVOS
-    console.log('🎯 VALIDACIÓN DE OBJETIVOS DEL MODELSELECTOR:');
-    console.log('─────────────────────────────────────────────');
+    console.log("🎯 VALIDACIÓN DE OBJETIVOS DEL MODELSELECTOR:");
+    console.log("─────────────────────────────────────────────");
     
-    const caso1EsFlash = resultado1.intelligent_model_metadata.model_decision.selected_model === 'gemini-2.5-flash';
-    const caso2EsPro = resultado2.intelligent_model_metadata.model_decision.selected_model === 'gemini-2.5-pro';
+    const caso1EsFlash = resultado1.intelligent_model_metadata.model_decision.selected_model === "gemini-2.5-flash";
+    const caso2EsPro = resultado2.intelligent_model_metadata.model_decision.selected_model === "gemini-2.5-pro";
     
-    console.log(`✅ Caso sin banderas rojas usa Flash: ${caso1EsFlash ? 'CORRECTO' : 'ERROR'}`);
-    console.log(`✅ Caso con banderas rojas usa Pro: ${caso2EsPro ? 'CORRECTO' : 'ERROR'}`);
-    console.log(`✅ Triaje detecta banderas rojas: ${resultado2.intelligent_model_metadata.model_decision.triage_result.redFlags.length > 0 ? 'CORRECTO' : 'ERROR'}`);
-    console.log(`✅ Optimización de costos caso estándar: ${resultado1.intelligent_model_metadata.model_decision.cost_optimization.savingsVsPro ? 'CORRECTO' : 'N/A'}`);
+    console.log(`✅ Caso sin banderas rojas usa Flash: ${caso1EsFlash ? "CORRECTO" : "ERROR"}`);
+    console.log(`✅ Caso con banderas rojas usa Pro: ${caso2EsPro ? "CORRECTO" : "ERROR"}`);
+    console.log(`✅ Triaje detecta banderas rojas: ${resultado2.intelligent_model_metadata.model_decision.triage_result.redFlags.length > 0 ? "CORRECTO" : "ERROR"}`);
+    console.log(`✅ Optimización de costos caso estándar: ${resultado1.intelligent_model_metadata.model_decision.cost_optimization.savingsVsPro ? "CORRECTO" : "N/A"}`);
 
     // LOGS PARA PULL REQUEST
-    console.log('\n📋 LOGS PARA PULL REQUEST:');
-    console.log('═══════════════════════════');
-    console.log('CASO 1 (Sin Banderas Rojas):');
+    console.log("\n📋 LOGS PARA PULL REQUEST:");
+    console.log("═══════════════════════════");
+    console.log("CASO 1 (Sin Banderas Rojas):");
     console.log(`"${resultado1.intelligent_model_metadata.model_decision.reasoning}"`);
-    console.log('\nCASO 2 (Con Banderas Rojas):');
+    console.log("\nCASO 2 (Con Banderas Rojas):");
     console.log(`"${resultado2.intelligent_model_metadata.model_decision.reasoning}"`);
 
-    console.log('\n🎉 DEMOSTRACIÓN COMPLETADA EXITOSAMENTE');
-    console.log('✨ El ModelSelector Inteligente está funcionando correctamente!');
+    console.log("\n🎉 DEMOSTRACIÓN COMPLETADA EXITOSAMENTE");
+    console.log("✨ El ModelSelector Inteligente está funcionando correctamente!");
 
   } catch (error) {
-    console.error('❌ ERROR EN DEMOSTRACIÓN:', error.message);
-    console.error('Stack:', error.stack);
+    console.error("❌ ERROR EN DEMOSTRACIÓN:", error.message);
+    console.error("Stack:", error.stack);
   }
 }
 
@@ -137,11 +137,11 @@ async function demostrarModelSelectorInteligente() {
 if (require.main === module) {
   demostrarModelSelectorInteligente()
     .then(() => {
-      console.log('\n🏁 Proceso de demostración finalizado');
+      console.log("\n🏁 Proceso de demostración finalizado");
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 Error fatal en demostración:', error);
+      console.error("💥 Error fatal en demostración:", error);
       process.exit(1);
     });
 }

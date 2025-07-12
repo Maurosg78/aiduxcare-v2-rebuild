@@ -6,11 +6,11 @@
  * Test específico para debuggear por qué las respuestas JSON están vacías
  */
 
-const ClinicalInsightService = require('./src/services/ClinicalInsightService');
+const ClinicalInsightService = require("./src/services/ClinicalInsightService");
 
 async function debugPhysiotherapyWorkflow() {
-  console.log('🔍 INICIANDO DEBUG FISIOTERAPIA');
-  console.log('==============================');
+  console.log("🔍 INICIANDO DEBUG FISIOTERAPIA");
+  console.log("==============================");
   
   const clinicalService = new ClinicalInsightService();
   
@@ -18,20 +18,20 @@ async function debugPhysiotherapyWorkflow() {
   const clinicalFacts = { region: "cervical", duration: "2 semanas" };
   
   try {
-    console.log('\n📋 PASO 1: GENERANDO PREGUNTAS DE PUNTOS CIEGOS');
-    console.log('Transcripción:', transcription);
-    console.log('Clinical Facts:', clinicalFacts);
+    console.log("\n📋 PASO 1: GENERANDO PREGUNTAS DE PUNTOS CIEGOS");
+    console.log("Transcripción:", transcription);
+    console.log("Clinical Facts:", clinicalFacts);
     
     const result = await clinicalService.generateBlindSpotQuestions(transcription, clinicalFacts);
     
-    console.log('\n📊 RESULTADO COMPLETO:');
+    console.log("\n📊 RESULTADO COMPLETO:");
     console.log(JSON.stringify(result, null, 2));
     
-    console.log('\n✅ Test completado');
+    console.log("\n✅ Test completado");
     
   } catch (error) {
-    console.error('❌ ERROR EN DEBUG:', error);
-    console.error('Stack:', error.stack);
+    console.error("❌ ERROR EN DEBUG:", error);
+    console.error("Stack:", error.stack);
   }
 }
 

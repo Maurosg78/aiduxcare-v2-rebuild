@@ -5,21 +5,21 @@
 
 export interface ClinicalWarning {
   id: string;
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   title: string;
   description: string;
   confidence: number;
-  category: 'symptom' | 'red_flag' | 'emergency' | 'follow_up';
+  category: "symptom" | "red_flag" | "emergency" | "follow_up";
   action?: string;
 }
 
 export interface ClinicalSuggestion {
   id: string;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority: "LOW" | "MEDIUM" | "HIGH";
   title: string;
   description: string;
   rationale: string;
-  category: 'diagnostic' | 'treatment' | 'monitoring' | 'referral';
+  category: "diagnostic" | "treatment" | "monitoring" | "referral";
 }
 
 export interface SOAPAnalysis {
@@ -35,7 +35,7 @@ export interface ClinicalAnalysis {
   warnings: ClinicalWarning[];
   suggestions: ClinicalSuggestion[];
   soapAnalysis: SOAPAnalysis;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   processingTimeMs: number;
   success: boolean;
   modelUsed: string;
@@ -49,13 +49,13 @@ export class ClinicalAnalyzer {
    */
   async analyzeTranscription(
     transcription: string,
-    specialty: string = 'general',
-    sessionType: string = 'initial'
+    specialty: string = "general",
+    sessionType: string = "initial"
   ): Promise<ClinicalAnalysis> {
     this.startTime = Date.now();
 
     try {
-      console.log('🧠 INICIANDO ANÁLISIS CLÍNICO LOCAL:', {
+      console.log("🧠 INICIANDO ANÁLISIS CLÍNICO LOCAL:", {
         transcriptionLength: transcription.length,
         specialty,
         sessionType
@@ -82,10 +82,10 @@ export class ClinicalAnalyzer {
         riskLevel,
         processingTimeMs,
         success: true,
-        modelUsed: 'clinical-analyzer-local-v1.0'
+        modelUsed: "clinical-analyzer-local-v1.0"
       };
 
-      console.log('✅ ANÁLISIS COMPLETADO:', {
+      console.log("✅ ANÁLISIS COMPLETADO:", {
         warningsCount: warnings.length,
         suggestionsCount: suggestions.length,
         riskLevel,
@@ -95,23 +95,23 @@ export class ClinicalAnalyzer {
       return analysis;
 
     } catch (error) {
-      console.error('❌ Error en análisis clínico local:', error);
+      console.error("❌ Error en análisis clínico local:", error);
       
       return {
         warnings: [],
         suggestions: [],
         soapAnalysis: {
-          subjective: transcription.substring(0, 200) + '...',
-          objective: 'Examen físico documentado.',
-          assessment: 'Evaluación pendiente de completar.',
-          plan: 'Continuar evaluación y seguimiento.',
+          subjective: transcription.substring(0, 200) + "...",
+          objective: "Examen físico documentado.",
+          assessment: "Evaluación pendiente de completar.",
+          plan: "Continuar evaluación y seguimiento.",
           confidence: 30,
-          warnings: ['Análisis automático limitado por error técnico']
+          warnings: ["Análisis automático limitado por error técnico"]
         },
-        riskLevel: 'MEDIUM',
+        riskLevel: "MEDIUM",
         processingTimeMs: Date.now() - this.startTime,
         success: false,
-        modelUsed: 'clinical-analyzer-local-v1.0-fallback'
+        modelUsed: "clinical-analyzer-local-v1.0-fallback"
       };
     }
   }
@@ -124,68 +124,68 @@ export class ClinicalAnalyzer {
     const text = transcription.toLowerCase();
 
     // PATRONES CRÍTICOS UNIVERSALES
-         const criticalPatterns = [
-       {
-         pattern: /dolor.*pecho.*brazo|dolor.*torácico.*irrad|opresión.*pecho|dolor.*opresivo.*pecho|sudoración.*profusa|dolor.*brazo.*mandíbula/i,
-         severity: 'CRITICAL' as const,
-         title: 'Sospecha de Síndrome Coronario Agudo',
-         description: 'Combinación de dolor torácico con irradiación sugiere posible evento coronario agudo',
-         category: 'emergency' as const,
-         action: 'Derivación inmediata a urgencias - ECG de 12 derivaciones',
-         confidence: 92
-       },
+    const criticalPatterns = [
+      {
+        pattern: /dolor.*pecho.*brazo|dolor.*torácico.*irrad|opresión.*pecho|dolor.*opresivo.*pecho|sudoración.*profusa|dolor.*brazo.*mandíbula/i,
+        severity: "CRITICAL" as const,
+        title: "Sospecha de Síndrome Coronario Agudo",
+        description: "Combinación de dolor torácico con irradiación sugiere posible evento coronario agudo",
+        category: "emergency" as const,
+        action: "Derivación inmediata a urgencias - ECG de 12 derivaciones",
+        confidence: 92
+      },
       {
         pattern: /dolor.*cabeza.*súbito|cefalea.*intensa.*repentina|peor.*dolor.*vida/i,
-        severity: 'CRITICAL' as const,
-        title: 'Cefalea de Inicio Súbito',
-        description: 'Cefalea súbita intensa puede indicar hemorragia subaracnoidea',
-        category: 'emergency' as const,
-        action: 'Evaluación neurológica urgente - TC cerebral sin contraste',
+        severity: "CRITICAL" as const,
+        title: "Cefalea de Inicio Súbito",
+        description: "Cefalea súbita intensa puede indicar hemorragia subaracnoidea",
+        category: "emergency" as const,
+        action: "Evaluación neurológica urgente - TC cerebral sin contraste",
         confidence: 88
       },
       {
         pattern: /dificultad.*respirar|disnea.*severa|no.*puedo.*respirar/i,
-        severity: 'HIGH' as const,
-        title: 'Dificultad Respiratoria Significativa',
-        description: 'Disnea severa requiere evaluación inmediata de vía aérea y función pulmonar',
-        category: 'red_flag' as const,
-        action: 'Monitoreo saturación O2 - Evaluación vía aérea',
+        severity: "HIGH" as const,
+        title: "Dificultad Respiratoria Significativa",
+        description: "Disnea severa requiere evaluación inmediata de vía aérea y función pulmonar",
+        category: "red_flag" as const,
+        action: "Monitoreo saturación O2 - Evaluación vía aérea",
         confidence: 85
       },
       {
         pattern: /dolor.*abdominal.*intenso|abdomen.*rígido|defensa.*abdominal/i,
-        severity: 'HIGH' as const,
-        title: 'Dolor Abdominal Agudo',
-        description: 'Dolor abdominal severo con signos de irritación peritoneal',
-        category: 'red_flag' as const,
-        action: 'Evaluación quirúrgica - Exámenes complementarios',
+        severity: "HIGH" as const,
+        title: "Dolor Abdominal Agudo",
+        description: "Dolor abdominal severo con signos de irritación peritoneal",
+        category: "red_flag" as const,
+        action: "Evaluación quirúrgica - Exámenes complementarios",
         confidence: 80
       }
     ];
 
     // PATRONES ESPECÍFICOS POR ESPECIALIDAD
-    if (specialty === 'cardiology') {
+    if (specialty === "cardiology") {
       criticalPatterns.push({
         pattern: /palpitaciones.*mareos|taquicardia.*síncope|arritmia/i,
-        severity: 'HIGH' as const,
-        title: 'Síntomas Cardiovasculares Complejos',
-        description: 'Combinación de síntomas sugiere posible arritmia significativa',
-        category: 'red_flag' as const,
-        action: 'Monitoreo ECG continuo - Holter 24h',
+        severity: "HIGH" as const,
+        title: "Síntomas Cardiovasculares Complejos",
+        description: "Combinación de síntomas sugiere posible arritmia significativa",
+        category: "red_flag" as const,
+        action: "Monitoreo ECG continuo - Holter 24h",
         confidence: 78
       });
     }
 
-    if (specialty === 'physiotherapy') {
+    if (specialty === "physiotherapy") {
       criticalPatterns.push(       {
-         pattern: /pérdida.*fuerza|perdido.*fuerza|entumecimiento|hormigueo|debilidad.*súbita|parestesia/i,
-         severity: 'HIGH' as const,
-         title: 'Signos Neurológicos de Alarma',
-         description: 'Pérdida de fuerza o sensibilidad puede indicar compromiso neurológico',
-         category: 'red_flag' as const,
-         action: 'Evaluación neurológica - Derivación a especialista',
-         confidence: 82
-       });
+        pattern: /pérdida.*fuerza|perdido.*fuerza|entumecimiento|hormigueo|debilidad.*súbita|parestesia/i,
+        severity: "HIGH" as const,
+        title: "Signos Neurológicos de Alarma",
+        description: "Pérdida de fuerza o sensibilidad puede indicar compromiso neurológico",
+        category: "red_flag" as const,
+        action: "Evaluación neurológica - Derivación a especialista",
+        confidence: 82
+      });
     }
 
     // Análisis de patrones
@@ -219,14 +219,14 @@ export class ClinicalAnalyzer {
 
     // SUGERENCIAS BASADAS EN ADVERTENCIAS
     warnings.forEach((warning, index) => {
-      if (warning.severity === 'CRITICAL' && warning.category === 'emergency') {
+      if (warning.severity === "CRITICAL" && warning.category === "emergency") {
         suggestions.push({
           id: `suggestion_emergency_${index}`,
-          priority: 'HIGH',
-          title: 'Monitoreo de Signos Vitales',
-          description: 'Vigilar presión arterial, frecuencia cardíaca y saturación de oxígeno',
-          rationale: 'Emergencia detectada requiere monitoreo continuo',
-          category: 'monitoring'
+          priority: "HIGH",
+          title: "Monitoreo de Signos Vitales",
+          description: "Vigilar presión arterial, frecuencia cardíaca y saturación de oxígeno",
+          rationale: "Emergencia detectada requiere monitoreo continuo",
+          category: "monitoring"
         });
       }
     });
@@ -235,45 +235,45 @@ export class ClinicalAnalyzer {
     if (/dolor.*crónico|dolor.*persistente|meses.*dolor/i.test(transcription)) {
       suggestions.push({
         id: `suggestion_chronic_pain_${Date.now()}`,
-        priority: 'MEDIUM',
-        title: 'Evaluación Multidisciplinaria del Dolor',
-        description: 'Considerar enfoque integral para manejo de dolor crónico',
-        rationale: 'Dolor crónico se beneficia de abordaje multidisciplinario',
-        category: 'treatment'
+        priority: "MEDIUM",
+        title: "Evaluación Multidisciplinaria del Dolor",
+        description: "Considerar enfoque integral para manejo de dolor crónico",
+        rationale: "Dolor crónico se beneficia de abordaje multidisciplinario",
+        category: "treatment"
       });
     }
 
     if (/estrés|ansiedad|nervios|preocup/i.test(transcription)) {
       suggestions.push({
         id: `suggestion_psychosocial_${Date.now()}`,
-        priority: 'MEDIUM',
-        title: 'Evaluación Psicosocial',
-        description: 'Considerar impacto de factores psicológicos en la condición',
-        rationale: 'Factores psicosociales pueden influir en la evolución clínica',
-        category: 'diagnostic'
+        priority: "MEDIUM",
+        title: "Evaluación Psicosocial",
+        description: "Considerar impacto de factores psicológicos en la condición",
+        rationale: "Factores psicosociales pueden influir en la evolución clínica",
+        category: "diagnostic"
       });
     }
 
     // SUGERENCIAS POR ESPECIALIDAD
-    if (specialty === 'physiotherapy') {
+    if (specialty === "physiotherapy") {
       suggestions.push({
         id: `suggestion_functional_assessment_${Date.now()}`,
-        priority: 'HIGH',
-        title: 'Evaluación Funcional Completa',
-        description: 'Realizar análisis biomecánico y evaluación de rango de movimiento',
-        rationale: 'Evaluación funcional es esencial en fisioterapia',
-        category: 'diagnostic'
+        priority: "HIGH",
+        title: "Evaluación Funcional Completa",
+        description: "Realizar análisis biomecánico y evaluación de rango de movimiento",
+        rationale: "Evaluación funcional es esencial en fisioterapia",
+        category: "diagnostic"
       });
     }
 
     // SUGERENCIA UNIVERSAL DE DOCUMENTACIÓN
     suggestions.push({
       id: `suggestion_documentation_${Date.now()}`,
-      priority: 'MEDIUM',
-      title: 'Documentar Evolución Temporal',
-      description: 'Registrar tiempo de inicio, duración y características evolutivas',
-      rationale: 'Documentación temporal ayuda al diagnóstico diferencial',
-      category: 'diagnostic'
+      priority: "MEDIUM",
+      title: "Documentar Evolución Temporal",
+      description: "Registrar tiempo de inicio, duración y características evolutivas",
+      rationale: "Documentación temporal ayuda al diagnóstico diferencial",
+      category: "diagnostic"
     });
 
     return suggestions;
@@ -285,10 +285,10 @@ export class ClinicalAnalyzer {
   private classifyToSOAP(transcription: string, specialty: string): SOAPAnalysis {
     const sentences = transcription.split(/[.!?]+/).filter(s => s.trim().length > 0);
     
-    let subjective = '';
-    let objective = '';
-    let assessment = '';
-    let plan = '';
+    let subjective = "";
+    let objective = "";
+    let assessment = "";
+    let plan = "";
     const warnings: string[] = [];
 
     // Clasificación por patrones linguísticos
@@ -297,52 +297,52 @@ export class ClinicalAnalyzer {
       
       // SUBJECTIVE: Lo que dice el paciente
       if (/siento|duele|tengo|me molesta|siento que|noto que/i.test(sentence)) {
-        subjective += sentence.trim() + '. ';
+        subjective += sentence.trim() + ". ";
       }
       
       // OBJECTIVE: Observaciones y exámenes
       else if (/observo|palpo|examen|exploración|inspección|se observa/i.test(sentence)) {
-        objective += sentence.trim() + '. ';
+        objective += sentence.trim() + ". ";
       }
       
       // ASSESSMENT/PLAN: Evaluación y planes del terapeuta
       else if (/recomiendo|sugiero|plan|tratamiento|diagnóstico|impresión/i.test(sentence)) {
         if (/diagnóstico|impresión|evaluación|considero/i.test(sentence)) {
-          assessment += sentence.trim() + '. ';
+          assessment += sentence.trim() + ". ";
         } else {
-          plan += sentence.trim() + '. ';
+          plan += sentence.trim() + ". ";
         }
       }
       
       // DEFAULT: Si es del terapeuta va a objective, si es síntoma va a subjective
       else if (s.length > 10) {
         if (/dolor|molestia|síntoma|siento/i.test(sentence)) {
-          subjective += sentence.trim() + '. ';
+          subjective += sentence.trim() + ". ";
         } else {
-          objective += sentence.trim() + '. ';
+          objective += sentence.trim() + ". ";
         }
       }
     });
 
     // Completar secciones vacías con contenido mínimo
     if (!subjective.trim()) {
-      subjective = 'Paciente refiere molestias según transcripción registrada.';
-      warnings.push('Sección Subjetiva incompleta - requiere ampliación');
+      subjective = "Paciente refiere molestias según transcripción registrada.";
+      warnings.push("Sección Subjetiva incompleta - requiere ampliación");
     }
     
     if (!objective.trim()) {
-      objective = 'Examen físico y evaluación clínica documentados en consulta.';
-      warnings.push('Sección Objetiva requiere complemento con hallazgos físicos');
+      objective = "Examen físico y evaluación clínica documentados en consulta.";
+      warnings.push("Sección Objetiva requiere complemento con hallazgos físicos");
     }
     
     if (!assessment.trim()) {
-      assessment = `Evaluación clínica basada en síntomas presentados y hallazgos de examen. ${specialty === 'physiotherapy' ? 'Requiere análisis funcional detallado.' : 'Requiere evaluación diagnóstica completa.'}`;
-      warnings.push('Assessment generado automáticamente - requiere validación clínica');
+      assessment = `Evaluación clínica basada en síntomas presentados y hallazgos de examen. ${specialty === "physiotherapy" ? "Requiere análisis funcional detallado." : "Requiere evaluación diagnóstica completa."}`;
+      warnings.push("Assessment generado automáticamente - requiere validación clínica");
     }
     
     if (!plan.trim()) {
-      plan = `Continuar evaluación y ${specialty === 'physiotherapy' ? 'programa de rehabilitación' : 'seguimiento clínico'} según evolución. Monitoreo de síntomas y respuesta al tratamiento.`;
-      warnings.push('Plan terapéutico requiere especificación detallada');
+      plan = `Continuar evaluación y ${specialty === "physiotherapy" ? "programa de rehabilitación" : "seguimiento clínico"} según evolución. Monitoreo de síntomas y respuesta al tratamiento.`;
+      warnings.push("Plan terapéutico requiere especificación detallada");
     }
 
     // Calcular confianza basada en completitud
@@ -365,17 +365,17 @@ export class ClinicalAnalyzer {
   /**
    * Cálculo de nivel de riesgo general
    */
-  private calculateRiskLevel(warnings: ClinicalWarning[]): 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' {
-    if (warnings.some(w => w.severity === 'CRITICAL')) {
-      return 'CRITICAL';
+  private calculateRiskLevel(warnings: ClinicalWarning[]): "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" {
+    if (warnings.some(w => w.severity === "CRITICAL")) {
+      return "CRITICAL";
     }
-    if (warnings.some(w => w.severity === 'HIGH')) {
-      return 'HIGH';
+    if (warnings.some(w => w.severity === "HIGH")) {
+      return "HIGH";
     }
-    if (warnings.some(w => w.severity === 'MEDIUM')) {
-      return 'MEDIUM';
+    if (warnings.some(w => w.severity === "MEDIUM")) {
+      return "MEDIUM";
     }
-    return 'LOW';
+    return "LOW";
   }
 }
 

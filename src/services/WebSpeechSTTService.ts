@@ -1,4 +1,4 @@
-import { TranscriptionSegment, TranscriptionActor, TranscriptionConfidence } from '../core/audio/AudioCaptureService';
+import { TranscriptionSegment, TranscriptionActor, TranscriptionConfidence } from "../core/audio/AudioCaptureService";
 
 // Extender Window para TypeScript con Web Speech API
 declare global {
@@ -57,7 +57,7 @@ interface SpeechRecognitionErrorEvent extends Event {
 }
 
 export interface SpeechRecognitionConfig {
-  language: 'es' | 'en';
+  language: "es" | "en";
   continuous: boolean;
   interimResults: boolean;
   maxAlternatives: number;
@@ -82,7 +82,7 @@ export class WebSpeechSTTService {
   private currentStream: MediaStream | null = null;
   private isListening: boolean = false;
   private config: SpeechRecognitionConfig;
-  private sessionId: string = '';
+  private sessionId: string = "";
 
   constructor(config: Partial<SpeechRecognitionConfig> = {}) {
     // Verificar soporte del navegador
@@ -91,7 +91,7 @@ export class WebSpeechSTTService {
     
     // Configuración por defecto optimizada para español médico
     this.config = {
-      language: 'es',
+      language: "es",
       continuous: true,
       interimResults: true,
       maxAlternatives: 1,
@@ -113,35 +113,35 @@ export class WebSpeechSTTService {
     // Configuración optimizada para contexto médico
     this.recognition.continuous = this.config.continuous;
     this.recognition.interimResults = this.config.interimResults;
-    this.recognition.lang = this.config.language === 'es' ? 'es-ES' : 'en-US';
+    this.recognition.lang = this.config.language === "es" ? "es-ES" : "en-US";
     this.recognition.maxAlternatives = this.config.maxAlternatives;
     
     // Eventos básicos de logging
     this.recognition.onstart = () => {
-      console.log('🎙️ Reconocimiento de voz iniciado');
+      console.log("🎙️ Reconocimiento de voz iniciado");
       this.isListening = true;
-      this.logSimple('stt.webspeech.started', { 
-        provider: 'browser_native',
+      this.logSimple("stt.webspeech.started", { 
+        provider: "browser_native",
         language: this.config.language,
         sessionId: this.sessionId
       });
     };
     
     this.recognition.onend = () => {
-      console.log('🎙️ Reconocimiento de voz finalizado');
+      console.log("🎙️ Reconocimiento de voz finalizado");
       this.isListening = false;
-      this.logSimple('stt.webspeech.ended', { 
-        provider: 'browser_native',
+      this.logSimple("stt.webspeech.ended", { 
+        provider: "browser_native",
         sessionId: this.sessionId
       });
     };
     
     this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.error('❌ Error en reconocimiento:', event.error);
+      console.error("❌ Error en reconocimiento:", event.error);
       this.isListening = false;
-      this.logSimple('stt.webspeech.error', { 
+      this.logSimple("stt.webspeech.error", { 
         error: event.error,
-        provider: 'browser_native',
+        provider: "browser_native",
         sessionId: this.sessionId
       });
     };
@@ -163,13 +163,13 @@ export class WebSpeechSTTService {
   ): Promise<void> {
     
     if (!this.isSupported || !this.recognition) {
-      const error = 'Web Speech API no soportada en este navegador';
+      const error = "Web Speech API no soportada en este navegador";
       options.onError?.(error);
       throw new Error(error);
     }
 
     if (this.isListening) {
-      console.warn('Ya hay una sesión de reconocimiento activa');
+      console.warn("Ya hay una sesión de reconocimiento activa");
       return;
     }
 
@@ -186,11 +186,11 @@ export class WebSpeechSTTService {
       // Iniciar reconocimiento
       this.recognition.start();
       
-      console.log('🚀 Transcripción en tiempo real iniciada - GRATIS con Web Speech API');
+      console.log("🚀 Transcripción en tiempo real iniciada - GRATIS con Web Speech API");
       
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Error desconocido';
-      console.error('Error iniciando transcripción:', errorMsg);
+      const errorMsg = error instanceof Error ? error.message : "Error desconocido";
+      console.error("Error iniciando transcripción:", errorMsg);
       options.onError?.(errorMsg);
       throw error;
     }
@@ -227,7 +227,7 @@ export class WebSpeechSTTService {
           
           // Log solo resultados finales para no spamear
           if (result.isFinal) {
-            this.logSimple('stt.webspeech.segment', {
+            this.logSimple("stt.webspeech.segment", {
               sessionId: this.sessionId,
               actor: segment.actor,
               confidence: segment.confidence,
@@ -237,8 +237,8 @@ export class WebSpeechSTTService {
           }
         }
       } catch (error) {
-        console.error('Error procesando resultado STT:', error);
-        options.onError?.('Error procesando transcripción');
+        console.error("Error procesando resultado STT:", error);
+        options.onError?.("Error procesando transcripción");
       }
     };
 
@@ -253,12 +253,12 @@ export class WebSpeechSTTService {
     };
 
     this.recognition.onspeechstart = () => {
-      console.log('🗣️ Habla detectada');
+      console.log("🗣️ Habla detectada");
       options.onSpeechStart?.();
     };
 
     this.recognition.onspeechend = () => {
-      console.log('🔇 Fin de habla detectado');
+      console.log("🔇 Fin de habla detectado");
       options.onSpeechEnd?.();
     };
 
@@ -269,8 +269,8 @@ export class WebSpeechSTTService {
     };
 
     this.recognition.onnomatch = () => {
-      console.warn('No se pudo reconocer el habla');
-      options.onError?.('No se pudo reconocer el habla claramente');
+      console.warn("No se pudo reconocer el habla");
+      options.onError?.("No se pudo reconocer el habla claramente");
     };
   }
 
@@ -287,11 +287,11 @@ export class WebSpeechSTTService {
       this.currentStream = null;
     }
 
-    console.log('⏹️ Transcripción detenida');
+    console.log("⏹️ Transcripción detenida");
     
-    this.logSimple('stt.webspeech.stopped', {
+    this.logSimple("stt.webspeech.stopped", {
       sessionId: this.sessionId,
-      provider: 'browser_native'
+      provider: "browser_native"
     });
   }
 
@@ -310,10 +310,10 @@ export class WebSpeechSTTService {
         }
       });
       
-      console.log('✅ Acceso al micrófono concedido');
+      console.log("✅ Acceso al micrófono concedido");
       
     } catch (error) {
-      const errorMsg = 'Acceso al micrófono denegado. Por favor, permite el acceso para usar la transcripción.';
+      const errorMsg = "Acceso al micrófono denegado. Por favor, permite el acceso para usar la transcripción.";
       console.error(errorMsg, error);
       throw new Error(errorMsg);
     }
@@ -327,19 +327,19 @@ export class WebSpeechSTTService {
     
     // Palabras clave para profesional de la salud
     const professionalKeywords = [
-      'vamos a', 'observe', 'evalúo', 'recomiendo', 'aplicamos', 
-      'necesita', 'veo que', 'trataremos', 'diagnosis', 'procedimiento',
-      'examinemos', 'palpemos', 'flexione', 'extienda', 'presión',
-      'tratamiento', 'terapia', 'ejercicio', 'rehabilitación',
-      'seguimiento', 'control', 'mejora', 'evolución', 'protocolo'
+      "vamos a", "observe", "evalúo", "recomiendo", "aplicamos", 
+      "necesita", "veo que", "trataremos", "diagnosis", "procedimiento",
+      "examinemos", "palpemos", "flexione", "extienda", "presión",
+      "tratamiento", "terapia", "ejercicio", "rehabilitación",
+      "seguimiento", "control", "mejora", "evolución", "protocolo"
     ];
     
     // Palabras clave para paciente
     const patientKeywords = [
-      'me duele', 'siento', 'tengo', 'no puedo', 'cuando',
-      'desde hace', 'me pasa', 'me molesta', 'dolor', 'molestia',
-      'incómodo', 'difícil', 'mejor', 'peor', 'antes', 'ahora',
-      'trabajo', 'casa', 'dormir', 'caminar', 'subir', 'bajar'
+      "me duele", "siento", "tengo", "no puedo", "cuando",
+      "desde hace", "me pasa", "me molesta", "dolor", "molestia",
+      "incómodo", "difícil", "mejor", "peor", "antes", "ahora",
+      "trabajo", "casa", "dormir", "caminar", "subir", "bajar"
     ];
     
     // Calcular puntuaciones
@@ -352,16 +352,16 @@ export class WebSpeechSTTService {
     );
     
     // Decisión con sesgo hacia paciente en caso de empate
-    return profScore > patientScore ? 'profesional' : 'paciente';
+    return profScore > patientScore ? "profesional" : "paciente";
   }
 
   /**
    * Mapear confidence numérico a enum
    */
   private mapConfidenceLevel(confidence: number): TranscriptionConfidence {
-    if (confidence >= 0.8) return 'entendido';
-    if (confidence >= 0.5) return 'poco_claro';
-    return 'no_reconocido';
+    if (confidence >= 0.8) return "entendido";
+    if (confidence >= 0.5) return "poco_claro";
+    return "no_reconocido";
   }
 
   /**
@@ -379,45 +379,45 @@ export class WebSpeechSTTService {
     isSupported: boolean;
     browserName: string;
     recommendedAction: string;
-  } {
+    } {
     const userAgent = navigator.userAgent;
     
-    if (userAgent.includes('Chrome')) {
+    if (userAgent.includes("Chrome")) {
       return {
         isSupported: true,
-        browserName: 'Google Chrome',
-        recommendedAction: 'Perfecto, Chrome es totalmente compatible'
+        browserName: "Google Chrome",
+        recommendedAction: "Perfecto, Chrome es totalmente compatible"
       };
     }
     
-    if (userAgent.includes('Edg')) {
+    if (userAgent.includes("Edg")) {
       return {
         isSupported: true,
-        browserName: 'Microsoft Edge',
-        recommendedAction: 'Excelente, Edge es totalmente compatible'
+        browserName: "Microsoft Edge",
+        recommendedAction: "Excelente, Edge es totalmente compatible"
       };
     }
     
-    if (userAgent.includes('Firefox')) {
+    if (userAgent.includes("Firefox")) {
       return {
         isSupported: this.isSupported(),
-        browserName: 'Mozilla Firefox',
-        recommendedAction: 'Firefox tiene soporte limitado, recomendamos Chrome o Edge'
+        browserName: "Mozilla Firefox",
+        recommendedAction: "Firefox tiene soporte limitado, recomendamos Chrome o Edge"
       };
     }
     
-    if (userAgent.includes('Safari')) {
+    if (userAgent.includes("Safari")) {
       return {
         isSupported: false,
-        browserName: 'Safari',
-        recommendedAction: 'Safari no soporta Web Speech API, usa Chrome o Edge'
+        browserName: "Safari",
+        recommendedAction: "Safari no soporta Web Speech API, usa Chrome o Edge"
       };
     }
     
     return {
       isSupported: this.isSupported(),
-      browserName: 'Navegador desconocido',
-      recommendedAction: 'Recomendamos usar Chrome o Edge para mejor compatibilidad'
+      browserName: "Navegador desconocido",
+      recommendedAction: "Recomendamos usar Chrome o Edge para mejor compatibilidad"
     };
   }
 
@@ -428,7 +428,7 @@ export class WebSpeechSTTService {
     const compatibility = this.getBrowserCompatibility();
     
     return `
-⚠️ Tu navegador (${compatibility.browserName}) ${compatibility.isSupported ? 'tiene soporte limitado' : 'no soporta'} Web Speech API.
+⚠️ Tu navegador (${compatibility.browserName}) ${compatibility.isSupported ? "tiene soporte limitado" : "no soporta"} Web Speech API.
 
 🔧 Para usar transcripción en tiempo real GRATUITA:
 
@@ -455,7 +455,7 @@ ${compatibility.recommendedAction}
     isListening: boolean;
     sessionId: string;
     language: string;
-  } {
+    } {
     return {
       isSupported: this.isSupported,
       isListening: this.isListening,
@@ -467,10 +467,10 @@ ${compatibility.recommendedAction}
   /**
    * Cambiar idioma dinámicamente
    */
-  setLanguage(language: 'es' | 'en'): void {
+  setLanguage(language: "es" | "en"): void {
     this.config.language = language;
     if (this.recognition) {
-      this.recognition.lang = language === 'es' ? 'es-ES' : 'en-US';
+      this.recognition.lang = language === "es" ? "es-ES" : "en-US";
     }
     console.log(`🌐 Idioma cambiado a: ${language}`);
   }

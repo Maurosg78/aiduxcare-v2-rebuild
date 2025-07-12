@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { AudioCaptureServiceReal, CaptureSession, CaptureStatus } from '../services/AudioCaptureServiceReal';
-import { TranscriptionSegment } from '../core/audio/AudioCaptureService';
-import { WebSpeechSTTService } from '../services/WebSpeechSTTService';
+import React, { useState, useEffect, useRef } from "react";
+import { AudioCaptureServiceReal, CaptureSession, CaptureStatus } from "../services/AudioCaptureServiceReal";
+import { TranscriptionSegment } from "../core/audio/AudioCaptureService";
+import { WebSpeechSTTService } from "../services/WebSpeechSTTService";
 
 interface RealTimeAudioCaptureProps {
   onCaptureComplete?: (segments: TranscriptionSegment[]) => void;
   onTranscriptionUpdate?: (segment: TranscriptionSegment) => void;
-  language?: 'es' | 'en';
+  language?: "es" | "en";
   className?: string;
 }
 
@@ -21,15 +21,15 @@ interface SessionStats {
 const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
   onCaptureComplete,
   onTranscriptionUpdate,
-  language = 'es',
-  className = ''
+  language = "es",
+  className = ""
 }) => {
   const [isSupported, setIsSupported] = useState<boolean>(true);
-  const [captureStatus, setCaptureStatus] = useState<CaptureStatus>('idle');
-  const [currentSession, setCurrentSession] = useState<CaptureSession | null>(null);
+  const [captureStatus, setCaptureStatus] = useState<CaptureStatus>("idle");
+  const [_currentSession, setCurrentSession] = useState<CaptureSession | null>(null);
   const [transcriptionSegments, setTranscriptionSegments] = useState<TranscriptionSegment[]>([]);
   const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>("");
   
   const audioCaptureRef = useRef<AudioCaptureServiceReal | null>(null);
   const statsIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -52,7 +52,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
       },
       onError: (error) => {
         setErrorMessage(error);
-        setCaptureStatus('error');
+        setCaptureStatus("error");
       },
       onStatusChange: (status) => {
         setCaptureStatus(status);
@@ -75,7 +75,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
 
   // Actualizar estadísticas en tiempo real
   useEffect(() => {
-    if (captureStatus === 'recording' && audioCaptureRef.current) {
+    if (captureStatus === "recording" && audioCaptureRef.current) {
       statsIntervalRef.current = setInterval(() => {
         const stats = audioCaptureRef.current?.getSessionStats();
         if (stats) {
@@ -98,16 +98,16 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
     if (!audioCaptureRef.current) return;
 
     try {
-      setErrorMessage('');
+      setErrorMessage("");
       setTranscriptionSegments([]);
       setSessionStats(null);
       
       const session = await audioCaptureRef.current.startCapture();
       setCurrentSession(session);
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMsg = error instanceof Error ? error.message : "Error desconocido";
       setErrorMessage(errorMsg);
-      setCaptureStatus('error');
+      setCaptureStatus("error");
     }
   };
 
@@ -116,7 +116,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
 
     try {
       const finalSegments = await audioCaptureRef.current.stopCapture();
-      setCurrentSession(prev => prev ? { ...prev, status: 'idle' } : null);
+      setCurrentSession(prev => prev ? { ...prev, status: "idle" } : null);
       onCaptureComplete?.(finalSegments);
       
       // Mantener estadísticas finales
@@ -125,68 +125,68 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
         setSessionStats(finalStats);
       }
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Error deteniendo captura';
+      const errorMsg = error instanceof Error ? error.message : "Error deteniendo captura";
       setErrorMessage(errorMsg);
     }
   };
 
   const getStatusIcon = () => {
     switch (captureStatus) {
-      case 'idle':
-        return '⏸️';
-      case 'requesting_permission':
-        return '🔄';
-      case 'recording':
-        return '🔴';
-      case 'stopping':
-        return '⏹️';
-      case 'error':
-        return '❌';
-      default:
-        return '❓';
+    case "idle":
+      return "⏸️";
+    case "requesting_permission":
+      return "🔄";
+    case "recording":
+      return "🔴";
+    case "stopping":
+      return "⏹️";
+    case "error":
+      return "❌";
+    default:
+      return "❓";
     }
   };
 
   const getStatusColor = () => {
     switch (captureStatus) {
-      case 'idle':
-        return 'text-gray-600';
-      case 'requesting_permission':
-        return 'text-blue-600';
-      case 'recording':
-        return 'text-red-600';
-      case 'stopping':
-        return 'text-orange-600';
-      case 'error':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
+    case "idle":
+      return "text-gray-600";
+    case "requesting_permission":
+      return "text-blue-600";
+    case "recording":
+      return "text-red-600";
+    case "stopping":
+      return "text-orange-600";
+    case "error":
+      return "text-red-600";
+    default:
+      return "text-gray-600";
     }
   };
 
   const getActorBadgeColor = (actor: string) => {
     switch (actor) {
-      case 'profesional':
-        return 'bg-blue-100 text-blue-800';
-      case 'paciente':
-        return 'bg-green-100 text-green-800';
-      case 'acompañante':
-        return 'bg-purple-100 text-purple-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    case "profesional":
+      return "bg-blue-100 text-blue-800";
+    case "paciente":
+      return "bg-green-100 text-green-800";
+    case "acompañante":
+      return "bg-purple-100 text-purple-800";
+    default:
+      return "bg-gray-100 text-gray-800";
     }
   };
 
   const getConfidenceColor = (confidence: string) => {
     switch (confidence) {
-      case 'entendido':
-        return 'text-green-600';
-      case 'poco_claro':
-        return 'text-yellow-600';
-      case 'no_reconocido':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
+    case "entendido":
+      return "text-green-600";
+    case "poco_claro":
+      return "text-yellow-600";
+    case "no_reconocido":
+      return "text-red-600";
+    default:
+      return "text-gray-600";
     }
   };
 
@@ -206,7 +206,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
             <strong>Tu navegador:</strong> {compatibility.browserName}
           </p>
           <p>
-            <strong>Estado:</strong> {compatibility.isSupported ? 'Soporte limitado' : 'No soportado'}
+            <strong>Estado:</strong> {compatibility.isSupported ? "Soporte limitado" : "No soportado"}
           </p>
           <p>
             <strong>Recomendación:</strong> {compatibility.recommendedAction}
@@ -224,6 +224,13 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
       </div>
     );
   }
+
+  // Definir constantes para evitar strings duplicados
+  const STATUS_MESSAGES = {
+    RECORDING: "Recording audio...",
+    PROCESSING: "Processing audio...",
+    READY: "Ready to record"
+  };
 
   return (
     <div className={`bg-white rounded-lg shadow-lg border border-gray-200 ${className}`}>
@@ -247,14 +254,14 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
               {getStatusIcon()}
             </span>
             <span className={`text-sm font-medium ${getStatusColor()}`}>
-              {audioCaptureRef.current?.getStatusMessage() || 'Inicializando...'}
+              {audioCaptureRef.current?.getStatusMessage() || "Inicializando..."}
             </span>
           </div>
         </div>
 
         {/* Controles de captura */}
         <div className="flex items-center space-x-3">
-          {captureStatus === 'idle' ? (
+          {captureStatus === "idle" ? (
             <button
               onClick={handleStartCapture}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
@@ -265,7 +272,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
           ) : (
             <button
               onClick={handleStopCapture}
-              disabled={captureStatus === 'stopping' || captureStatus === 'requesting_permission'}
+              disabled={captureStatus === "stopping" || captureStatus === "requesting_permission"}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               <span>⏹️</span>
@@ -276,10 +283,10 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
           <select
             value={language}
             onChange={(e) => {
-              const newLang = e.target.value as 'es' | 'en';
+              const newLang = e.target.value as "es" | "en";
               audioCaptureRef.current?.setLanguage(newLang);
             }}
-            disabled={captureStatus === 'recording'}
+            disabled={captureStatus === "recording"}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm disabled:opacity-50"
             aria-label="Seleccionar idioma de transcripción"
           >
@@ -342,7 +349,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {transcriptionSegments.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              {captureStatus === 'recording' ? (
+              {captureStatus === "recording" ? (
                 <div className="flex items-center justify-center space-x-2">
                   <span className="animate-pulse">🎤</span>
                   <span>Esperando audio...</span>
@@ -352,7 +359,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
               )}
             </div>
           ) : (
-            transcriptionSegments.map((segment, index) => (
+            transcriptionSegments.map((segment, _index) => (
               <div 
                 key={segment.id}
                 className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
@@ -382,4 +389,4 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
   );
 };
 
-export default RealTimeAudioCapture; 
+export default RealTimeAudioCapture;

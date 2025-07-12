@@ -7,11 +7,11 @@
  * con múltiples banderas rojas y generar un pipeline completo de análisis.
  */
 
-const winston = require('winston');
+const winston = require("winston");
 
 // Configurar logging
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -83,25 +83,25 @@ FISIOTERAPEUTA: Es lo correcto. Voy a escribir un informe detallado para el méd
  * Evalúa el caso clínico complejo usando AiDuxCare
  */
 async function evaluarCasoComplejo() {
-  logger.info('🎯 INICIANDO EVALUACIÓN CASO CLÍNICO COMPLEJO', {
-    caso: 'Trauma cervical con complicaciones neurológicas',
-    objetivo: 'Probar capacidad de detección de banderas rojas múltiples',
-    modeloEsperado: 'gemini-2.5-pro (por complejidad)',
+  logger.info("🎯 INICIANDO EVALUACIÓN CASO CLÍNICO COMPLEJO", {
+    caso: "Trauma cervical con complicaciones neurológicas",
+    objetivo: "Probar capacidad de detección de banderas rojas múltiples",
+    modeloEsperado: "gemini-2.5-pro (por complejidad)",
     transcriptionLength: casoClinicoComplejo.length
   });
 
   try {
     // Llamar a la Cloud Function con el caso complejo
-    const url = 'https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain';
+    const url = "https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain";
     
     const payload = {
       transcription: casoClinicoComplejo,
-      specialty: 'physiotherapy',
-      sessionType: 'initial',
+      specialty: "physiotherapy",
+      sessionType: "initial",
       enableDetailedAnalysis: true
     };
 
-    logger.info('📡 ENVIANDO CASO COMPLEJO A AIDUXCARE', {
+    logger.info("📡 ENVIANDO CASO COMPLEJO A AIDUXCARE", {
       url: url,
       payloadSize: JSON.stringify(payload).length,
       specialty: payload.specialty
@@ -183,7 +183,7 @@ async function evaluarCasoComplejo() {
     const processingTime = (Date.now() - startTime) / 1000;
 
     // Analizar la respuesta
-    logger.info('📊 ANÁLISIS COMPLETADO - EVALUACIÓN DE RESULTADOS', {
+    logger.info("📊 ANÁLISIS COMPLETADO - EVALUACIÓN DE RESULTADOS", {
       processingTime: processingTime,
       modelUsed: mockResponse.analysis_metadata.model_used,
       redFlagsDetected: mockResponse.analysis_metadata.red_flags_detected,
@@ -195,42 +195,42 @@ async function evaluarCasoComplejo() {
 
     // Evaluar calidad de detección de banderas rojas
     const banderasRojasEsperadas = [
-      'cefalea post-trauma',
-      'síntomas neurológicos',
-      'paciente anticoagulada',
-      'cambios visuales',
-      'pérdida de peso inexplicada',
-      'fiebre',
-      'trauma craneal reciente',
-      'debilidad neurológica'
+      "cefalea post-trauma",
+      "síntomas neurológicos",
+      "paciente anticoagulada",
+      "cambios visuales",
+      "pérdida de peso inexplicada",
+      "fiebre",
+      "trauma craneal reciente",
+      "debilidad neurológica"
     ];
 
     const banderasDetectadas = mockResponse.warnings.length;
     const precisionDeteccion = (banderasDetectadas / banderasRojasEsperadas.length) * 100;
 
-    logger.info('🎯 EVALUACIÓN DETECCIÓN BANDERAS ROJAS', {
+    logger.info("🎯 EVALUACIÓN DETECCIÓN BANDERAS ROJAS", {
       banderasEsperadas: banderasRojasEsperadas.length,
       banderasDetectadas: banderasDetectadas,
       precision: `${precisionDeteccion.toFixed(1)}%`,
-      criticidadMaxima: mockResponse.warnings.some(w => w.severity === 'CRITICAL'),
-      derivacionUrgente: mockResponse.warnings.some(w => w.action.includes('URGENTE'))
+      criticidadMaxima: mockResponse.warnings.some(w => w.severity === "CRITICAL"),
+      derivacionUrgente: mockResponse.warnings.some(w => w.action.includes("URGENTE"))
     });
 
     // Evaluar calidad de las recomendaciones
     const recomendacionesSeguridad = mockResponse.suggestions.filter(s => 
-      s.includes('CONTRAINDICADA') || s.includes('derivación urgente') || s.includes('evaluación médica')
+      s.includes("CONTRAINDICADA") || s.includes("derivación urgente") || s.includes("evaluación médica")
     );
 
-    logger.info('🛡️ EVALUACIÓN SEGURIDAD CLÍNICA', {
+    logger.info("🛡️ EVALUACIÓN SEGURIDAD CLÍNICA", {
       contraindicacionesClaras: recomendacionesSeguridad.length,
-      derivacionUrgenteMencionada: mockResponse.suggestions.some(s => s.includes('urgente')),
-      coordinacionCuidados: mockResponse.suggestions.some(s => s.includes('coordinar')),
-      educacionPaciente: mockResponse.suggestions.some(s => s.includes('educar'))
+      derivacionUrgenteMencionada: mockResponse.suggestions.some(s => s.includes("urgente")),
+      coordinacionCuidados: mockResponse.suggestions.some(s => s.includes("coordinar")),
+      educacionPaciente: mockResponse.suggestions.some(s => s.includes("educar"))
     });
 
     // Evaluar calidad SOAP
     const calidadSOAP = mockResponse.soap_quality;
-    logger.info('📝 EVALUACIÓN CALIDAD SOAP', {
+    logger.info("📝 EVALUACIÓN CALIDAD SOAP", {
       subjetivoCompletitud: `${calidadSOAP.subjective}%`,
       objetivoSeguridad: `${calidadSOAP.objective}%`,
       assessmentPrecision: `${calidadSOAP.assessment}%`,
@@ -241,15 +241,15 @@ async function evaluarCasoComplejo() {
     // Evaluar escalado inteligente de modelo
     const escaladoEsperado = mockResponse.analysis_metadata.red_flags_detected >= 2;
     const modeloUsado = mockResponse.analysis_metadata.model_used;
-    const escaladoCorreco = escaladoEsperado && modeloUsado === 'gemini-2.5-pro';
+    const escaladoCorreco = escaladoEsperado && modeloUsado === "gemini-2.5-pro";
 
-    logger.info('🧠 EVALUACIÓN ESCALADO INTELIGENTE', {
+    logger.info("🧠 EVALUACIÓN ESCALADO INTELIGENTE", {
       banderasDetectadas: mockResponse.analysis_metadata.red_flags_detected,
       escaladoEsperado: escaladoEsperado,
       modeloUsado: modeloUsado,
       escaladoCorrect: escaladoCorreco,
       razonEscalado: mockResponse.analysis_metadata.escalation_reason,
-      estrategia90_10: escaladoCorreco ? 'FUNCIONANDO' : 'ERROR'
+      estrategia90_10: escaladoCorreco ? "FUNCIONANDO" : "ERROR"
     });
 
     // Resumen final
@@ -260,22 +260,22 @@ async function evaluarCasoComplejo() {
       (recomendacionesSeguridad.length >= 2 ? 25 : 0)
     );
 
-    logger.info('🏆 EVALUACIÓN FINAL CASO COMPLEJO', {
+    logger.info("🏆 EVALUACIÓN FINAL CASO COMPLEJO", {
       puntajeTotal: `${puntajeFinal}/100`,
-      deteccionBanderasRojas: precisionDeteccion > 80 ? 'EXCELENTE' : 'MEJORABLE',
-      calidadSOAP: calidadSOAP.overall > 90 ? 'EXCELENTE' : 'BUENA',
-      escaladoModelo: escaladoCorreco ? 'CORRECTO' : 'ERROR',
-      seguridadClinica: recomendacionesSeguridad.length >= 2 ? 'ADECUADA' : 'INSUFICIENTE',
-      recomendacion: puntajeFinal >= 75 ? 'APTO PARA USO CLÍNICO' : 'REQUIERE MEJORAS'
+      deteccionBanderasRojas: precisionDeteccion > 80 ? "EXCELENTE" : "MEJORABLE",
+      calidadSOAP: calidadSOAP.overall > 90 ? "EXCELENTE" : "BUENA",
+      escaladoModelo: escaladoCorreco ? "CORRECTO" : "ERROR",
+      seguridadClinica: recomendacionesSeguridad.length >= 2 ? "ADECUADA" : "INSUFICIENTE",
+      recomendacion: puntajeFinal >= 75 ? "APTO PARA USO CLÍNICO" : "REQUIERE MEJORAS"
     });
 
     if (puntajeFinal >= 75) {
-      logger.info('✅ CASO COMPLEJO SUPERADO EXITOSAMENTE');
-      logger.info('🎯 AiDuxCare demostró capacidad para manejar casos críticos con múltiples banderas rojas');
-      logger.info('🚀 Sistema listo para casos complejos en práctica clínica real');
+      logger.info("✅ CASO COMPLEJO SUPERADO EXITOSAMENTE");
+      logger.info("🎯 AiDuxCare demostró capacidad para manejar casos críticos con múltiples banderas rojas");
+      logger.info("🚀 Sistema listo para casos complejos en práctica clínica real");
     } else {
-      logger.warn('⚠️ CASO COMPLEJO REQUIERE MEJORAS');
-      logger.warn('🔧 Revisar algoritmos de detección y escalado');
+      logger.warn("⚠️ CASO COMPLEJO REQUIERE MEJORAS");
+      logger.warn("🔧 Revisar algoritmos de detección y escalado");
     }
 
     return {
@@ -291,7 +291,7 @@ async function evaluarCasoComplejo() {
     };
 
   } catch (error) {
-    logger.error('❌ ERROR EN EVALUACIÓN CASO COMPLEJO', {
+    logger.error("❌ ERROR EN EVALUACIÓN CASO COMPLEJO", {
       error: error.message,
       stack: error.stack
     });
@@ -308,15 +308,15 @@ if (require.main === module) {
   evaluarCasoComplejo()
     .then(resultado => {
       if (resultado.success && resultado.score >= 75) {
-        logger.info('🎉 EVALUACIÓN CASO COMPLEJO COMPLETADA EXITOSAMENTE');
+        logger.info("🎉 EVALUACIÓN CASO COMPLEJO COMPLETADA EXITOSAMENTE");
         process.exit(0);
       } else {
-        logger.error('🚨 EVALUACIÓN CASO COMPLEJO FALLÓ');
+        logger.error("🚨 EVALUACIÓN CASO COMPLEJO FALLÓ");
         process.exit(1);
       }
     })
     .catch(error => {
-      logger.error('💥 ERROR CRÍTICO EN EVALUACIÓN:', error);
+      logger.error("💥 ERROR CRÍTICO EN EVALUACIÓN:", error);
       process.exit(1);
     });
 }

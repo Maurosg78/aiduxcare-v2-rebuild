@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
-import { TranscriptionArea } from '../components/TranscriptionArea';
-import { ActionBar } from '../components/ActionBar';
-import { AudioPipelineService } from '../services/AudioPipelineService';
+import { useState, useCallback } from "react";
+import { TranscriptionArea } from "../components/TranscriptionArea";
+import { ActionBar } from "../components/ActionBar";
+import { AudioPipelineService } from "../services/AudioPipelineService";
 
 interface TranscriptionResult {
   text: string;
@@ -18,12 +18,12 @@ interface ConsultationError {
 
 export default function ConsultationPage() {
   const [isRecording, setIsRecording] = useState(false);
-  const [transcription, setTranscription] = useState('');
+  const [transcription, setTranscription] = useState("");
   const [error, setError] = useState<ConsultationError | null>(null);
 
   const handleTranscriptionStart = useCallback(() => {
     setError(null);
-    setTranscription('');
+    setTranscription("");
   }, []);
 
   const handleTranscriptionResult = useCallback((result: TranscriptionResult) => {
@@ -55,8 +55,8 @@ export default function ConsultationPage() {
         setIsRecording(true);
       } catch (err) {
         const consultationError: ConsultationError = {
-          code: 'RECORDING_ERROR',
-          message: err instanceof Error ? err.message : 'Error al iniciar grabación'
+          code: "RECORDING_ERROR",
+          message: err instanceof Error ? err.message : "Error al iniciar grabación"
         };
         handleTranscriptionError(consultationError);
       }

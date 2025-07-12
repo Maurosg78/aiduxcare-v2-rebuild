@@ -1,8 +1,8 @@
-const { Storage } = require('@google-cloud/storage');
-const winston = require('winston');
+const { Storage } = require("@google-cloud/storage");
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -13,7 +13,7 @@ const logger = winston.createLogger({
 class KnowledgeBase {
   constructor() {
     this.storage = new Storage();
-    this.bucketName = process.env.KNOWLEDGE_BASE_BUCKET || 'aiduxcare-clinical-knowledge';
+    this.bucketName = process.env.KNOWLEDGE_BASE_BUCKET || "aiduxcare-clinical-knowledge";
     this.cache = new Map();
     this.cacheExpiry = 30 * 60 * 1000; // 30 minutos
   }
@@ -29,7 +29,7 @@ class KnowledgeBase {
     
     // Verificar cache
     if (cachedData && (Date.now() - cachedData.timestamp) < this.cacheExpiry) {
-      logger.info('Using cached knowledge base', {
+      logger.info("Using cached knowledge base", {
         specialty,
         cacheAge: Date.now() - cachedData.timestamp
       });
@@ -37,13 +37,13 @@ class KnowledgeBase {
     }
 
     try {
-      logger.info('Loading knowledge base from Cloud Storage', {
+      logger.info("Loading knowledge base from Cloud Storage", {
         specialty,
         bucket: this.bucketName
       });
 
       // Cargar configuración base
-      const baseConfig = await this.loadConfigFile('base/clinical-base.json');
+      const baseConfig = await this.loadConfigFile("base/clinical-base.json");
       
       // Cargar configuración específica de especialidad
       const specialtyConfig = await this.loadConfigFile(`specialties/${specialty}.json`);
@@ -57,7 +57,7 @@ class KnowledgeBase {
         timestamp: Date.now()
       });
 
-      logger.info('Knowledge base loaded successfully', {
+      logger.info("Knowledge base loaded successfully", {
         specialty,
         rulesCount: knowledgeBase.rules[specialty]?.length || 0,
         terminologyCount: knowledgeBase.terminology[specialty]?.length || 0
@@ -66,7 +66,7 @@ class KnowledgeBase {
       return knowledgeBase;
 
     } catch (error) {
-      logger.error('Failed to load knowledge base', {
+      logger.error("Failed to load knowledge base", {
         specialty,
         error: error.message,
         stack: error.stack
@@ -83,14 +83,14 @@ class KnowledgeBase {
       const [exists] = await file.exists();
       
       if (!exists) {
-        logger.warn('Config file not found', { filePath });
+        logger.warn("Config file not found", { filePath });
         return {};
       }
 
       const [contents] = await file.download();
       const config = JSON.parse(contents.toString());
       
-      logger.info('Config file loaded', {
+      logger.info("Config file loaded", {
         filePath,
         size: contents.length
       });
@@ -98,7 +98,7 @@ class KnowledgeBase {
       return config;
 
     } catch (error) {
-      logger.error('Failed to load config file', {
+      logger.error("Failed to load config file", {
         filePath,
         error: error.message
       });
@@ -119,7 +119,7 @@ class KnowledgeBase {
   }
 
   createFallbackKnowledgeBase(specialty) {
-    logger.warn('Creating fallback knowledge base', { specialty });
+    logger.warn("Creating fallback knowledge base", { specialty });
 
     const fallbackKnowledge = {
       rules: {},
@@ -131,88 +131,88 @@ class KnowledgeBase {
 
     // Reglas básicas por especialidad
     switch (specialty) {
-      case 'physiotherapy':
-        fallbackKnowledge.rules[specialty] = [
-          'Evaluar signos neurológicos antes de cualquier manipulación',
-          'Contraindicar ejercicios en presencia de inflamación aguda',
-          'Monitorear respuesta al dolor durante tratamiento',
-          'Verificar estabilidad articular antes de movilización'
-        ];
-        fallbackKnowledge.terminology[specialty] = [
-          { term: 'ROM', definition: 'Rango de movimiento articular' },
-          { term: 'ADL', definition: 'Actividades de la vida diaria' },
-          { term: 'PROM', definition: 'Rango de movimiento pasivo' },
-          { term: 'AROM', definition: 'Rango de movimiento activo' }
-        ];
-        fallbackKnowledge.redFlags[specialty] = [
-          'Pérdida de control de esfínteres',
-          'Debilidad progresiva en extremidades',
-          'Entumecimiento en silla de montar',
-          'Fiebre con dolor de espalda'
-        ];
-        break;
+    case "physiotherapy":
+      fallbackKnowledge.rules[specialty] = [
+        "Evaluar signos neurológicos antes de cualquier manipulación",
+        "Contraindicar ejercicios en presencia de inflamación aguda",
+        "Monitorear respuesta al dolor durante tratamiento",
+        "Verificar estabilidad articular antes de movilización"
+      ];
+      fallbackKnowledge.terminology[specialty] = [
+        { term: "ROM", definition: "Rango de movimiento articular" },
+        { term: "ADL", definition: "Actividades de la vida diaria" },
+        { term: "PROM", definition: "Rango de movimiento pasivo" },
+        { term: "AROM", definition: "Rango de movimiento activo" }
+      ];
+      fallbackKnowledge.redFlags[specialty] = [
+        "Pérdida de control de esfínteres",
+        "Debilidad progresiva en extremidades",
+        "Entumecimiento en silla de montar",
+        "Fiebre con dolor de espalda"
+      ];
+      break;
 
-      case 'psychology':
-        fallbackKnowledge.rules[specialty] = [
-          'Evaluar riesgo suicida en cada sesión',
-          'Mantener confidencialidad excepto en casos de riesgo',
-          'Documentar cambios significativos en el estado mental',
-          'Referir a psiquiatría si se sospecha psicosis'
-        ];
-        fallbackKnowledge.terminology[specialty] = [
-          { term: 'DSM-5', definition: 'Manual Diagnóstico y Estadístico de Trastornos Mentales' },
-          { term: 'GAF', definition: 'Escala de Evaluación de la Actividad Global' },
-          { term: 'PHQ-9', definition: 'Cuestionario de Salud del Paciente para Depresión' },
-          { term: 'GAD-7', definition: 'Escala de Trastorno de Ansiedad Generalizada' }
-        ];
-        fallbackKnowledge.redFlags[specialty] = [
-          'Ideación suicida activa',
-          'Alucinaciones auditivas',
-          'Delirios paranoides',
-          'Comportamiento agresivo'
-        ];
-        break;
+    case "psychology":
+      fallbackKnowledge.rules[specialty] = [
+        "Evaluar riesgo suicida en cada sesión",
+        "Mantener confidencialidad excepto en casos de riesgo",
+        "Documentar cambios significativos en el estado mental",
+        "Referir a psiquiatría si se sospecha psicosis"
+      ];
+      fallbackKnowledge.terminology[specialty] = [
+        { term: "DSM-5", definition: "Manual Diagnóstico y Estadístico de Trastornos Mentales" },
+        { term: "GAF", definition: "Escala de Evaluación de la Actividad Global" },
+        { term: "PHQ-9", definition: "Cuestionario de Salud del Paciente para Depresión" },
+        { term: "GAD-7", definition: "Escala de Trastorno de Ansiedad Generalizada" }
+      ];
+      fallbackKnowledge.redFlags[specialty] = [
+        "Ideación suicida activa",
+        "Alucinaciones auditivas",
+        "Delirios paranoides",
+        "Comportamiento agresivo"
+      ];
+      break;
 
-      case 'general':
-        fallbackKnowledge.rules[specialty] = [
-          'Evaluar signos vitales en cada consulta',
-          'Investigar síntomas de alarma',
-          'Considerar diagnóstico diferencial',
-          'Referir a especialista cuando sea necesario'
-        ];
-        fallbackKnowledge.terminology[specialty] = [
-          { term: 'HTA', definition: 'Hipertensión arterial' },
-          { term: 'DM', definition: 'Diabetes mellitus' },
-          { term: 'IMC', definition: 'Índice de masa corporal' },
-          { term: 'FC', definition: 'Frecuencia cardíaca' }
-        ];
-        fallbackKnowledge.redFlags[specialty] = [
-          'Dolor torácico con disnea',
-          'Cefalea súbita intensa',
-          'Pérdida de conciencia',
-          'Sangrado activo'
-        ];
-        break;
+    case "general":
+      fallbackKnowledge.rules[specialty] = [
+        "Evaluar signos vitales en cada consulta",
+        "Investigar síntomas de alarma",
+        "Considerar diagnóstico diferencial",
+        "Referir a especialista cuando sea necesario"
+      ];
+      fallbackKnowledge.terminology[specialty] = [
+        { term: "HTA", definition: "Hipertensión arterial" },
+        { term: "DM", definition: "Diabetes mellitus" },
+        { term: "IMC", definition: "Índice de masa corporal" },
+        { term: "FC", definition: "Frecuencia cardíaca" }
+      ];
+      fallbackKnowledge.redFlags[specialty] = [
+        "Dolor torácico con disnea",
+        "Cefalea súbita intensa",
+        "Pérdida de conciencia",
+        "Sangrado activo"
+      ];
+      break;
 
-      default:
-        fallbackKnowledge.rules[specialty] = [
-          'Seguir protocolos de seguridad del paciente',
-          'Documentar todos los hallazgos relevantes',
-          'Mantener comunicación clara con el paciente',
-          'Referir cuando exceda el alcance de práctica'
-        ];
-        fallbackKnowledge.terminology[specialty] = [
-          { term: 'Anamnesis', definition: 'Historia clínica del paciente' },
-          { term: 'Exploración', definition: 'Examen físico del paciente' },
-          { term: 'Diagnóstico', definition: 'Identificación de la condición médica' },
-          { term: 'Tratamiento', definition: 'Intervención terapéutica' }
-        ];
-        fallbackKnowledge.redFlags[specialty] = [
-          'Deterioro súbito del estado general',
-          'Signos de shock',
-          'Alteración del nivel de conciencia',
-          'Signos de infección sistémica'
-        ];
+    default:
+      fallbackKnowledge.rules[specialty] = [
+        "Seguir protocolos de seguridad del paciente",
+        "Documentar todos los hallazgos relevantes",
+        "Mantener comunicación clara con el paciente",
+        "Referir cuando exceda el alcance de práctica"
+      ];
+      fallbackKnowledge.terminology[specialty] = [
+        { term: "Anamnesis", definition: "Historia clínica del paciente" },
+        { term: "Exploración", definition: "Examen físico del paciente" },
+        { term: "Diagnóstico", definition: "Identificación de la condición médica" },
+        { term: "Tratamiento", definition: "Intervención terapéutica" }
+      ];
+      fallbackKnowledge.redFlags[specialty] = [
+        "Deterioro súbito del estado general",
+        "Signos de shock",
+        "Alteración del nivel de conciencia",
+        "Signos de infección sistémica"
+      ];
     }
 
     return fallbackKnowledge;
@@ -225,10 +225,10 @@ class KnowledgeBase {
       
       await file.save(JSON.stringify(newData, null, 2), {
         metadata: {
-          contentType: 'application/json',
+          contentType: "application/json",
           metadata: {
             updatedAt: new Date().toISOString(),
-            updatedBy: 'clinical-brain-system'
+            updatedBy: "clinical-brain-system"
           }
         }
       });
@@ -236,7 +236,7 @@ class KnowledgeBase {
       // Limpiar cache
       this.cache.delete(`knowledge_${specialty}`);
 
-      logger.info('Knowledge base updated', {
+      logger.info("Knowledge base updated", {
         specialty,
         filePath,
         timestamp: new Date().toISOString()
@@ -245,7 +245,7 @@ class KnowledgeBase {
       return true;
 
     } catch (error) {
-      logger.error('Failed to update knowledge base', {
+      logger.error("Failed to update knowledge base", {
         specialty,
         error: error.message,
         stack: error.stack
@@ -257,14 +257,14 @@ class KnowledgeBase {
   async listAvailableSpecialties() {
     try {
       const [files] = await this.storage.bucket(this.bucketName).getFiles({
-        prefix: 'specialties/'
+        prefix: "specialties/"
       });
 
       const specialties = files
-        .filter(file => file.name.endsWith('.json'))
-        .map(file => file.name.replace('specialties/', '').replace('.json', ''));
+        .filter(file => file.name.endsWith(".json"))
+        .map(file => file.name.replace("specialties/", "").replace(".json", ""));
 
-      logger.info('Available specialties retrieved', {
+      logger.info("Available specialties retrieved", {
         count: specialties.length,
         specialties
       });
@@ -272,16 +272,16 @@ class KnowledgeBase {
       return specialties;
 
     } catch (error) {
-      logger.error('Failed to list specialties', {
+      logger.error("Failed to list specialties", {
         error: error.message
       });
-      return ['physiotherapy', 'psychology', 'general']; // Fallback
+      return ["physiotherapy", "psychology", "general"]; // Fallback
     }
   }
 
   clearCache() {
     this.cache.clear();
-    logger.info('Knowledge base cache cleared');
+    logger.info("Knowledge base cache cleared");
   }
 }
 

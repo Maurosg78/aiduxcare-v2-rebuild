@@ -10,10 +10,10 @@
  * 3. 🟢 VERDE: Pipeline funcional con Status 200 → ✅ VALIDANDO
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
-describe('Google Cloud Pipeline Integration', () => {
-  const CLOUD_FUNCTION_ENDPOINT = 'https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinical-brain';
+describe("Google Cloud Pipeline Integration", () => {
+  const CLOUD_FUNCTION_ENDPOINT = "https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinical-brain";
   
   // Casos de prueba que ahora deben funcionar correctamente
   const validationTestCases = [
@@ -45,13 +45,13 @@ describe('Google Cloud Pipeline Integration', () => {
     it(`🟢 VALIDACIÓN: '${testCase.name}' debe procesarse exitosamente (Status 200)`, async () => {
       console.log(`🔍 EJECUTANDO VALIDACIÓN: ${testCase.name}`);
       console.log(`📋 Descripción: ${testCase.description}`);
-      console.log(`📊 Request data:`, {
+      console.log("📊 Request data:", {
         transcriptionLength: testCase.transcription.length,
         specialty: testCase.specialty,
         sessionType: testCase.sessionType,
-        preview: testCase.transcription.substring(0, 100) + '...'
+        preview: testCase.transcription.substring(0, 100) + "..."
       });
-      console.log(`📡 Enviando request a Cloud Function...`);
+      console.log("📡 Enviando request a Cloud Function...");
 
       const requestBody = {
         transcription: testCase.transcription,
@@ -64,14 +64,14 @@ describe('Google Cloud Pipeline Integration', () => {
 
       try {
         response = await fetch(CLOUD_FUNCTION_ENDPOINT, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(requestBody)
         });
 
-        console.log(`📡 Respuesta recibida:`, {
+        console.log("📡 Respuesta recibida:", {
           status: response.status,
           statusText: response.statusText,
           ok: response.ok,
@@ -79,13 +79,13 @@ describe('Google Cloud Pipeline Integration', () => {
         });
 
         const rawBody = await response.text();
-        console.log(`�� Raw response body:`, rawBody.substring(0, 1000) + '...');
+        console.log("�� Raw response body:", rawBody.substring(0, 1000) + "...");
 
         try {
           responseData = JSON.parse(rawBody);
-          console.log(`📋 Parsed response data keys:`, Object.keys(responseData as Record<string, unknown>));
+          console.log("📋 Parsed response data keys:", Object.keys(responseData as Record<string, unknown>));
         } catch (parseError) {
-          console.log(`❌ Error parseando JSON:`, parseError);
+          console.log("❌ Error parseando JSON:", parseError);
           throw new Error(`Response no es JSON válido: ${rawBody.substring(0, 200)}`);
         }
 
@@ -95,24 +95,24 @@ describe('Google Cloud Pipeline Integration', () => {
 
         // ✅ VALIDAR ESTRUCTURA DE RESPUESTA MÉDICA
         const data = responseData as Record<string, unknown>;
-        expect(data).toHaveProperty('warnings');
-        expect(data).toHaveProperty('suggestions');
-        expect(data).toHaveProperty('soap_analysis');
-        expect(data).toHaveProperty('session_quality');
-        expect(data).toHaveProperty('metadata');
+        expect(data).toHaveProperty("warnings");
+        expect(data).toHaveProperty("suggestions");
+        expect(data).toHaveProperty("soap_analysis");
+        expect(data).toHaveProperty("session_quality");
+        expect(data).toHaveProperty("metadata");
 
         // ✅ VALIDAR METADATOS DE PROCESAMIENTO
         const metadata = data.metadata as Record<string, unknown>;
-        expect(metadata).toHaveProperty('processingTime');
-        expect(metadata).toHaveProperty('modelUsed');
-        expect(metadata).toHaveProperty('costOptimization');
-        expect(metadata.version).toBe('2.0-optimized');
+        expect(metadata).toHaveProperty("processingTime");
+        expect(metadata).toHaveProperty("modelUsed");
+        expect(metadata).toHaveProperty("costOptimization");
+        expect(metadata.version).toBe("2.0-optimized");
 
         // ✅ VALIDAR ARRAYS MÉDICOS
         expect(Array.isArray(data.warnings)).toBe(true);
         expect(Array.isArray(data.suggestions)).toBe(true);
 
-        console.log(`🟢 VALIDACIÓN EXITOSA:`, {
+        console.log("🟢 VALIDACIÓN EXITOSA:", {
           status: response.status,
           processingTime: metadata.processingTime,
           modelUsed: metadata.modelUsed,
@@ -122,24 +122,24 @@ describe('Google Cloud Pipeline Integration', () => {
         });
 
       } catch (networkError: unknown) {
-        console.log(`❌ ERROR DE RED:`, networkError instanceof Error ? networkError.message : 'Error desconocido');
+        console.log("❌ ERROR DE RED:", networkError instanceof Error ? networkError.message : "Error desconocido");
         
         // Si hay error de red, no es el Error 500 que estábamos reparando
-        throw new Error(`Error de red inesperado: ${networkError instanceof Error ? networkError.message : 'Error desconocido'}`);
+        throw new Error(`Error de red inesperado: ${networkError instanceof Error ? networkError.message : "Error desconocido"}`);
       }
     }, { timeout: 60000 }); // 60 segundos timeout para procesamiento médico
   });
 
   // Test de disponibilidad del endpoint
-  it('🔍 VALIDACIÓN: Verificar disponibilidad del endpoint', async () => {
-    console.log('🔍 VERIFICANDO DISPONIBILIDAD DEL ENDPOINT');
+  it("🔍 VALIDACIÓN: Verificar disponibilidad del endpoint", async () => {
+    console.log("🔍 VERIFICANDO DISPONIBILIDAD DEL ENDPOINT");
     
     try {
       const healthResponse = await fetch(CLOUD_FUNCTION_ENDPOINT, {
-        method: 'GET'
+        method: "GET"
       });
       
-      console.log('🏥 Health check response:', { 
+      console.log("🏥 Health check response:", { 
         status: healthResponse.status, 
         statusText: healthResponse.statusText, 
         ok: healthResponse.ok 
@@ -149,30 +149,30 @@ describe('Google Cloud Pipeline Integration', () => {
       expect([200, 405].includes(healthResponse.status)).toBe(true);
       
     } catch (error: unknown) {
-      console.log('⚠️ Endpoint no disponible:', error instanceof Error ? error.message : 'Error desconocido');
-      throw new Error(`Endpoint no disponible: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      console.log("⚠️ Endpoint no disponible:", error instanceof Error ? error.message : "Error desconocido");
+      throw new Error(`Endpoint no disponible: ${error instanceof Error ? error.message : "Error desconocido"}`);
     }
   });
 
   // Test de validación de formato de request
-  it('🔍 VALIDACIÓN: Verificar manejo de request inválido', async () => {
-    console.log('🔍 VALIDANDO MANEJO DE REQUEST INVÁLIDO');
+  it("🔍 VALIDACIÓN: Verificar manejo de request inválido", async () => {
+    console.log("🔍 VALIDANDO MANEJO DE REQUEST INVÁLIDO");
     
     const invalidRequest = {
       // Transcripción faltante intencionalmente
-      specialty: 'physiotherapy',
-      sessionType: 'initial'
+      specialty: "physiotherapy",
+      sessionType: "initial"
     };
 
     const response = await fetch(CLOUD_FUNCTION_ENDPOINT, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(invalidRequest)
     });
 
-    console.log('📡 Response para request inválido:', { 
+    console.log("📡 Response para request inválido:", { 
       status: response.status, 
       statusText: response.statusText 
     });

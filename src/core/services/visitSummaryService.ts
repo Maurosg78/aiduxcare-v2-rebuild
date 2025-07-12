@@ -1,5 +1,5 @@
-import supabase from '@/core/auth/supabaseClient';
-import { AuditLogger } from '@/core/audit/AuditLogger';
+import supabase from "@/core/auth/supabaseClient";
+import { AuditLogger } from "@/core/audit/AuditLogger";
 
 interface SaveVisitSummaryParams {
   visitId: string;
@@ -20,16 +20,16 @@ export async function saveVisitSummary({
   try {
     // Verificar si ya existe un resumen para esta visita
     const { data: existingSummary } = await supabase
-      .from('visit_summaries')
-      .select('id')
-      .eq('visit_id', visitId)
+      .from("visit_summaries")
+      .select("id")
+      .eq("visit_id", visitId)
       .single();
 
     const now = new Date().toISOString();
     const summaryData = {
       visit_id: visitId,
       summary_text: summaryText,
-      generated_by: 'ai-agent',
+      generated_by: "ai-agent",
       saved_by: userId,
       updated_at: now
     };
@@ -39,15 +39,15 @@ export async function saveVisitSummary({
     if (existingSummary) {
       // Actualizar resumen existente
       const { error: updateError } = await supabase
-        .from('visit_summaries')
+        .from("visit_summaries")
         .update(summaryData)
-        .eq('visit_id', visitId);
+        .eq("visit_id", visitId);
 
       error = updateError;
     } else {
       // Crear nuevo resumen
       const { error: insertError } = await supabase
-        .from('visit_summaries')
+        .from("visit_summaries")
         .insert([{
           ...summaryData,
           created_at: now
@@ -61,18 +61,18 @@ export async function saveVisitSummary({
     }
 
     // Registrar evento en Langfuse
-    AuditLogger.log('summary.saved', {
+    AuditLogger.log("summary.saved", {
       visitId,
       userId,
-      patientId: 'unknown',
+      patientId: "unknown",
       timestamp: now,
-      action: existingSummary ? 'update' : 'create'
+      action: existingSummary ? "update" : "create"
     });
 
     return true;
 
   } catch (error) {
-    console.error('Error en saveVisitSummary:', error);
-    throw new Error('No se pudo guardar el resumen. Intente nuevamente.');
+    console.error("Error en saveVisitSummary:", error);
+    throw new Error("No se pudo guardar el resumen. Intente nuevamente.");
   }
 } 

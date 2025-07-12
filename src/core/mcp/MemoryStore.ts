@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 /**
  * Clase para gestionar el almacenamiento y recuperación de diferentes tipos de memoria en el MCP
  */
@@ -11,13 +11,13 @@ export class MemoryStore {
   getContextualMemory(visitId: string) {
     // Simulación de datos de memoria contextual
     return {
-      source: 'mock',
+      source: "mock",
       data: [
         {
           id: `ctx-${visitId}`,
           timestamp: new Date().toISOString(),
-          type: 'contextual',
-          content: 'Información contextual de la visita actual'
+          type: "contextual",
+          content: "Información contextual de la visita actual"
         }
       ]
     };
@@ -31,13 +31,13 @@ export class MemoryStore {
   getPersistentMemory(userId: string) {
     // Simulación de datos de memoria persistente
     return {
-      source: 'mock',
+      source: "mock",
       data: [
         {
           id: `per-${userId}`,
           timestamp: new Date().toISOString(),
-          type: 'persistent',
-          content: 'Historial médico persistente del paciente'
+          type: "persistent",
+          content: "Historial médico persistente del paciente"
         }
       ]
     };
@@ -51,13 +51,13 @@ export class MemoryStore {
   getSemanticMemory(userId: string) {
     // Simulación de datos de memoria semántica
     return {
-      source: 'mock',
+      source: "mock",
       data: [
         {
           id: `sem-${userId}`,
           timestamp: new Date().toISOString(),
-          type: 'semantic',
-          content: 'Conocimiento médico general aplicable al caso'
+          type: "semantic",
+          content: "Conocimiento médico general aplicable al caso"
         }
       ]
     };

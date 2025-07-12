@@ -5,20 +5,20 @@
  * escala correctamente al modelo Pro cuando se detectan riesgos HIGH.
  */
 
-const ModelSelector = require('../src/services/ModelSelector');
+const ModelSelector = require("../src/services/ModelSelector");
 
 // Mock del VertexAIClient
 const mockVertexClient = {
   processWithModel: jest.fn()
 };
 
-const winston = require('winston');
+const winston = require("winston");
 winston.configure({
-  level: 'error', // Silenciar logs en tests
+  level: "error", // Silenciar logs en tests
   transports: []
 });
 
-describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
+describe("ModelSelector - Escalamiento de Seguridad Crítico", () => {
   let modelSelector;
 
   beforeEach(() => {
@@ -26,9 +26,9 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
     jest.clearAllMocks();
   });
 
-  describe('🔥 TESTS CRÍTICOS DE ESCALAMIENTO DE SEGURIDAD', () => {
+  describe("🔥 TESTS CRÍTICOS DE ESCALAMIENTO DE SEGURIDAD", () => {
     
-    test('CRÍTICO: Debe escalar a Pro cuando riskLevel es HIGH', async () => {
+    test("CRÍTICO: Debe escalar a Pro cuando riskLevel es HIGH", async () => {
       // ARRANGE - Simular respuesta de triaje con riesgo HIGH
       const triageResponseWithHighRisk = {
         redFlags: ["dolor nocturno severo", "pérdida de peso inexplicada"],
@@ -43,15 +43,15 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
       const result = await modelSelector.selectModel("Transcripción de prueba con dolor nocturno y pérdida de peso");
 
       // ASSERT - VERIFICACIÓN CRÍTICA
-      expect(result.selectedModel).toBe('gemini-2.5-pro');
-      expect(result.triageResult.riskLevel).toBe('HIGH');
+      expect(result.selectedModel).toBe("gemini-2.5-pro");
+      expect(result.triageResult.riskLevel).toBe("HIGH");
       expect(result.triageResult.redFlags).toHaveLength(2);
-      expect(result.reasoning).toContain('Banderas rojas detectadas');
-      expect(result.reasoning).toContain('modelo Pro');
-      expect(result.costOptimization).toContain('seguridad clínica');
+      expect(result.reasoning).toContain("Banderas rojas detectadas");
+      expect(result.reasoning).toContain("modelo Pro");
+      expect(result.costOptimization).toContain("seguridad clínica");
     });
 
-    test('CRÍTICO: Debe escalar a Pro cuando hay 1+ banderas rojas (incluso con riskLevel LOW)', async () => {
+    test("CRÍTICO: Debe escalar a Pro cuando hay 1+ banderas rojas (incluso con riskLevel LOW)", async () => {
       // ARRANGE - Caso edge: bandera roja presente pero riskLevel inconsistente  
       const triageResponseWithRedFlag = {
         redFlags: ["dolor nocturno severo"],
@@ -66,12 +66,12 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
       const result = await modelSelector.selectModel("Transcripción con dolor nocturno");
 
       // ASSERT - Debe escalar por presencia de bandera roja
-      expect(result.selectedModel).toBe('gemini-2.5-pro');
+      expect(result.selectedModel).toBe("gemini-2.5-pro");
       expect(result.triageResult.redFlags).toHaveLength(1);
-      expect(result.reasoning).toContain('Banderas rojas detectadas');
+      expect(result.reasoning).toContain("Banderas rojas detectadas");
     });
 
-    test('SEGURIDAD: Debe usar Flash cuando no hay banderas rojas ni riesgo HIGH', async () => {
+    test("SEGURIDAD: Debe usar Flash cuando no hay banderas rojas ni riesgo HIGH", async () => {
       // ARRANGE - Caso estándar sin riesgos
       const triageResponseLowRisk = {
         redFlags: [],
@@ -86,14 +86,14 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
       const result = await modelSelector.selectModel("Transcripción de dolor mecánico leve");
 
       // ASSERT
-      expect(result.selectedModel).toBe('gemini-2.5-flash');
-      expect(result.triageResult.riskLevel).toBe('LOW');
+      expect(result.selectedModel).toBe("gemini-2.5-flash");
+      expect(result.triageResult.riskLevel).toBe("LOW");
       expect(result.triageResult.redFlags).toHaveLength(0);
-      expect(result.reasoning).toContain('Flash');
-      expect(result.costOptimization.savingsVsPro).toContain('88% ahorro');
+      expect(result.reasoning).toContain("Flash");
+      expect(result.costOptimization.savingsVsPro).toContain("88% ahorro");
     });
 
-    test('ESCALAMIENTO PREVENTIVO: Debe escalar a Pro con riesgo MEDIUM y baja confianza', async () => {
+    test("ESCALAMIENTO PREVENTIVO: Debe escalar a Pro con riesgo MEDIUM y baja confianza", async () => {
       // ARRANGE - Caso de escalamiento preventivo
       const triageResponseMediumRisk = {
         redFlags: [],
@@ -108,12 +108,12 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
       const result = await modelSelector.selectModel("Transcripción ambigua");
 
       // ASSERT
-      expect(result.selectedModel).toBe('gemini-2.5-pro');
-      expect(result.triageResult.riskLevel).toBe('MEDIUM');
-      expect(result.reasoning).toContain('Escalado preventivo');
+      expect(result.selectedModel).toBe("gemini-2.5-pro");
+      expect(result.triageResult.riskLevel).toBe("MEDIUM");
+      expect(result.reasoning).toContain("Escalado preventivo");
     });
 
-    test('PARSING SEGURO: Debe manejar respuestas ya parseadas como objeto', () => {
+    test("PARSING SEGURO: Debe manejar respuestas ya parseadas como objeto", () => {
       // ARRANGE - Simular respuesta que ya viene como objeto (caso actual)
       const objectResponse = {
         redFlags: ["dolor nocturno severo"],
@@ -132,7 +132,7 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
       expect(result.confidence).toBe(0.98);
     });
 
-    test('PARSING SEGURO: Debe manejar respuestas string con markdown', () => {
+    test("PARSING SEGURO: Debe manejar respuestas string con markdown", () => {
       // ARRANGE - Simular respuesta string con markdown
       const stringResponse = `\`\`\`json
 {
@@ -153,7 +153,7 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
       expect(result.confidence).toBe(0.92);
     });
 
-    test('FALLBACK SEGURO: Debe usar fallback LOW en caso de parsing error', () => {
+    test("FALLBACK SEGURO: Debe usar fallback LOW en caso de parsing error", () => {
       // ARRANGE - Simular respuesta malformada
       const malformedResponse = "respuesta inválida no JSON";
 
@@ -168,28 +168,28 @@ describe('ModelSelector - Escalamiento de Seguridad Crítico', () => {
     });
   });
 
-  describe('🔧 TESTS DE FUNCIONALIDAD ADICIONAL', () => {
+  describe("🔧 TESTS DE FUNCIONALIDAD ADICIONAL", () => {
     
-    test('Debe devolver estadísticas de optimización correctas', () => {
+    test("Debe devolver estadísticas de optimización correctas", () => {
       const stats = modelSelector.getOptimizationStats();
       
-      expect(stats.triageModel).toBe('gemini-2.5-flash');
-      expect(stats.premiumModel).toBe('gemini-2.5-pro');
-      expect(stats.clinicalSafety).toBe('100% - triaje con IA real');
+      expect(stats.triageModel).toBe("gemini-2.5-flash");
+      expect(stats.premiumModel).toBe("gemini-2.5-pro");
+      expect(stats.clinicalSafety).toBe("100% - triaje con IA real");
     });
 
-    test('Debe permitir forzar modelo específico para testing', () => {
-      const result = modelSelector.forceModel('gemini-2.5-pro');
+    test("Debe permitir forzar modelo específico para testing", () => {
+      const result = modelSelector.forceModel("gemini-2.5-pro");
       
-      expect(result.selectedModel).toBe('gemini-2.5-pro');
+      expect(result.selectedModel).toBe("gemini-2.5-pro");
       expect(result.forced).toBe(true);
-      expect(result.reasoning).toContain('forzado por configuración');
+      expect(result.reasoning).toContain("forzado por configuración");
     });
 
-    test('Debe rechazar modelos no disponibles', () => {
+    test("Debe rechazar modelos no disponibles", () => {
       expect(() => {
-        modelSelector.forceModel('modelo-inexistente');
-      }).toThrow('Modelo no disponible');
+        modelSelector.forceModel("modelo-inexistente");
+      }).toThrow("Modelo no disponible");
     });
   });
 });

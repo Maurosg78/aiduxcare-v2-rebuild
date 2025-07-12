@@ -1,5 +1,5 @@
-import React, { createContext, useContext, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import React, { createContext, useContext, ReactNode } from "react";
+import { User, Session } from "@supabase/supabase-js";
 
 // Definición mínima necesaria para tipo de usuario y perfil
 interface UserProfile {
@@ -8,7 +8,7 @@ interface UserProfile {
   full_name: string;
 }
 
-type RoleType = 'admin' | 'professional' | 'patient';
+type RoleType = "admin" | "professional" | "patient";
 
 interface UserContextType {
   user: User | null;
@@ -57,7 +57,7 @@ export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   
   if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error("useUser must be used within a UserProvider");
   }
   
   return context;

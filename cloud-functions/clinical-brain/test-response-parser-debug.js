@@ -3,16 +3,16 @@
  * Test unitario para diagnosticar por qué las respuestas están vacías
  */
 
-const ResponseParser = require('./src/services/ResponseParser');
+const ResponseParser = require("./src/services/ResponseParser");
 
-console.log('🧪 INICIANDO TEST DE DEBUGGING DEL RESPONSEPARSER');
-console.log('================================================\n');
+console.log("🧪 INICIANDO TEST DE DEBUGGING DEL RESPONSEPARSER");
+console.log("================================================\n");
 
 // Crear instancia del parser
 const parser = new ResponseParser();
 
 // 🔍 CASO 1: Respuesta JSON válida de Vertex AI
-console.log('📋 CASO 1: JSON VÁLIDO DE VERTEX AI');
+console.log("📋 CASO 1: JSON VÁLIDO DE VERTEX AI");
 const respuestaValidaVertexAI = `{
   "warnings": [
     {
@@ -53,21 +53,21 @@ const respuestaValidaVertexAI = `{
 }`;
 
 try {
-  const resultado1 = parser.parse(respuestaValidaVertexAI, 'general');
-  console.log('✅ RESULTADO CASO 1:', {
+  const resultado1 = parser.parse(respuestaValidaVertexAI, "general");
+  console.log("✅ RESULTADO CASO 1:", {
     success: true,
     warningsCount: resultado1.warnings?.length || 0,
     suggestionsCount: resultado1.suggestions?.length || 0,
     overallQuality: resultado1.soap_analysis?.overall_quality
   });
 } catch (error) {
-  console.log('❌ ERROR CASO 1:', error.message);
+  console.log("❌ ERROR CASO 1:", error.message);
 }
 
-console.log('\n' + '='.repeat(60) + '\n');
+console.log("\n" + "=".repeat(60) + "\n");
 
 // 🔍 CASO 2: Respuesta con JSON en bloque de código (formato común de Vertex AI)
-console.log('📋 CASO 2: JSON EN BLOQUE DE CÓDIGO (FORMATO VERTEX AI)');
+console.log("📋 CASO 2: JSON EN BLOQUE DE CÓDIGO (FORMATO VERTEX AI)");
 const respuestaConBloque = `Análisis completado. Aquí está el resultado:
 
 \`\`\`json
@@ -114,21 +114,21 @@ const respuestaConBloque = `Análisis completado. Aquí está el resultado:
 Este análisis se basa en la transcripción proporcionada.`;
 
 try {
-  const resultado2 = parser.parse(respuestaConBloque, 'physiotherapy');
-  console.log('✅ RESULTADO CASO 2:', {
+  const resultado2 = parser.parse(respuestaConBloque, "physiotherapy");
+  console.log("✅ RESULTADO CASO 2:", {
     success: true,
     warningsCount: resultado2.warnings?.length || 0,
     suggestionsCount: resultado2.suggestions?.length || 0,
     overallQuality: resultado2.soap_analysis?.overall_quality
   });
 } catch (error) {
-  console.log('❌ ERROR CASO 2:', error.message);
+  console.log("❌ ERROR CASO 2:", error.message);
 }
 
-console.log('\n' + '='.repeat(60) + '\n');
+console.log("\n" + "=".repeat(60) + "\n");
 
 // 🔍 CASO 3: Respuesta problemática (JSON malformado)
-console.log('📋 CASO 3: JSON MALFORMADO (PROBLEMA TÍPICO)');
+console.log("📋 CASO 3: JSON MALFORMADO (PROBLEMA TÍPICO)");
 const respuestaMalformada = `{
   "warnings": [
     {
@@ -150,39 +150,39 @@ const respuestaMalformada = `{
 }`;
 
 try {
-  const resultado3 = parser.parse(respuestaMalformada, 'general');
-  console.log('✅ RESULTADO CASO 3 (REPARADO):', {
+  const resultado3 = parser.parse(respuestaMalformada, "general");
+  console.log("✅ RESULTADO CASO 3 (REPARADO):", {
     success: true,
     warningsCount: resultado3.warnings?.length || 0,
     suggestionsCount: resultado3.suggestions?.length || 0,
     overallQuality: resultado3.soap_analysis?.overall_quality
   });
 } catch (error) {
-  console.log('❌ ERROR CASO 3:', error.message);
+  console.log("❌ ERROR CASO 3:", error.message);
 }
 
-console.log('\n' + '='.repeat(60) + '\n');
+console.log("\n" + "=".repeat(60) + "\n");
 
 // 🔍 CASO 4: Respuesta completamente vacía (problema reportado por Mauricio)
-console.log('📋 CASO 4: RESPUESTA VACÍA (PROBLEMA REAL)');
-const respuestaVacia = '';
+console.log("📋 CASO 4: RESPUESTA VACÍA (PROBLEMA REAL)");
+const respuestaVacia = "";
 
 try {
-  const resultado4 = parser.parse(respuestaVacia, 'general');
-  console.log('✅ RESULTADO CASO 4 (FALLBACK):', {
+  const resultado4 = parser.parse(respuestaVacia, "general");
+  console.log("✅ RESULTADO CASO 4 (FALLBACK):", {
     success: true,
     warningsCount: resultado4.warnings?.length || 0,
     suggestionsCount: resultado4.suggestions?.length || 0,
     isFallback: true
   });
 } catch (error) {
-  console.log('❌ ERROR CASO 4:', error.message);
+  console.log("❌ ERROR CASO 4:", error.message);
 }
 
-console.log('\n' + '='.repeat(60) + '\n');
+console.log("\n" + "=".repeat(60) + "\n");
 
 // 🔍 CASO 5: Respuesta con texto pero sin JSON (Vertex AI negándose a responder)
-console.log('📋 CASO 5: VERTEX AI SE NIEGA A RESPONDER');
+console.log("📋 CASO 5: VERTEX AI SE NIEGA A RESPONDER");
 const respuestaNegativa = `Lo siento, no puedo proporcionar un análisis médico específico basado en la transcripción proporcionada. 
 
 Como modelo de IA, no estoy autorizado para realizar diagnósticos médicos o proporcionar recomendaciones clínicas específicas que podrían influir en decisiones de atención médica.
@@ -190,25 +190,25 @@ Como modelo de IA, no estoy autorizado para realizar diagnósticos médicos o pr
 Para un análisis médico adecuado, recomiendo consultar con un profesional de la salud calificado que pueda evaluar el caso completo.`;
 
 try {
-  const resultado5 = parser.parse(respuestaNegativa, 'psychology');
-  console.log('✅ RESULTADO CASO 5 (FALLBACK):', {
+  const resultado5 = parser.parse(respuestaNegativa, "psychology");
+  console.log("✅ RESULTADO CASO 5 (FALLBACK):", {
     success: true,
     warningsCount: resultado5.warnings?.length || 0,
     suggestionsCount: resultado5.suggestions?.length || 0,
     isFallback: true
   });
 } catch (error) {
-  console.log('❌ ERROR CASO 5:', error.message);
+  console.log("❌ ERROR CASO 5:", error.message);
 }
 
-console.log('\n' + '='.repeat(60) + '\n');
+console.log("\n" + "=".repeat(60) + "\n");
 
-console.log('🔍 CONCLUSIÓN DEL TEST DE DEBUGGING:');
-console.log('1. ✅ ResponseParser maneja JSON válido correctamente');
-console.log('2. ✅ ResponseParser extrae JSON de bloques de código');
-console.log('3. ✅ ResponseParser repara JSON malformado');
-console.log('4. ✅ ResponseParser maneja respuestas vacías con fallback');
-console.log('5. ✅ ResponseParser maneja negativas de Vertex AI con fallback');
-console.log('\n🎯 EL PROBLEMA NO ESTÁ EN EL RESPONSEPARSER');
-console.log('   El problema está en QUÉ respuesta está devolviendo Vertex AI');
-console.log('   Necesitamos ver los logs de la Cloud Function con las respuestas CRUDAS'); 
+console.log("🔍 CONCLUSIÓN DEL TEST DE DEBUGGING:");
+console.log("1. ✅ ResponseParser maneja JSON válido correctamente");
+console.log("2. ✅ ResponseParser extrae JSON de bloques de código");
+console.log("3. ✅ ResponseParser repara JSON malformado");
+console.log("4. ✅ ResponseParser maneja respuestas vacías con fallback");
+console.log("5. ✅ ResponseParser maneja negativas de Vertex AI con fallback");
+console.log("\n🎯 EL PROBLEMA NO ESTÁ EN EL RESPONSEPARSER");
+console.log("   El problema está en QUÉ respuesta está devolviendo Vertex AI");
+console.log("   Necesitamos ver los logs de la Cloud Function con las respuestas CRUDAS"); 

@@ -7,12 +7,12 @@
  * según la estrategia 90/10 de AiDuxCare.
  */
 
-const { VertexAI } = require('@google-cloud/vertexai');
-const winston = require('winston');
+const { VertexAI } = require("@google-cloud/vertexai");
+const winston = require("winston");
 
 // Configurar logging
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -21,8 +21,8 @@ const logger = winston.createLogger({
 });
 
 // Configuración del proyecto
-const projectId = 'aiduxcare-stt-20250706';
-const location = 'us-east1';
+const projectId = "aiduxcare-stt-20250706";
+const location = "us-east1";
 
 // Inicializar Vertex AI
 const vertexAI = new VertexAI({
@@ -42,11 +42,11 @@ Dolor que mejora con actividad física y empeora con reposo.
  * Prueba modelo gemini-2.5-flash
  */
 async function probarGeminiFlash() {
-  logger.info('🔍 PROBANDO GEMINI-2.5-FLASH');
+  logger.info("🔍 PROBANDO GEMINI-2.5-FLASH");
   
   try {
     const model = vertexAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       generationConfig: {
         temperature: 0.2,
         topK: 32,
@@ -74,8 +74,8 @@ RESPONDE EN JSON:
 
     const responseText = result.response.candidates[0].content.parts[0].text;
     
-    logger.info('✅ GEMINI-2.5-FLASH FUNCIONANDO CORRECTAMENTE', {
-      modelo: 'gemini-2.5-flash',
+    logger.info("✅ GEMINI-2.5-FLASH FUNCIONANDO CORRECTAMENTE", {
+      modelo: "gemini-2.5-flash",
       tiempoProcesamiento: `${processingTime}s`,
       longitudRespuesta: responseText.length,
       respuestaCompleta: responseText
@@ -83,13 +83,13 @@ RESPONDE EN JSON:
 
     return {
       success: true,
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       processingTime: processingTime,
       response: responseText
     };
 
   } catch (error) {
-    logger.error('❌ ERROR EN GEMINI-2.5-FLASH', {
+    logger.error("❌ ERROR EN GEMINI-2.5-FLASH", {
       error: error.message,
       code: error.code,
       details: error.details
@@ -97,7 +97,7 @@ RESPONDE EN JSON:
 
     return {
       success: false,
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       error: error.message
     };
   }
@@ -107,11 +107,11 @@ RESPONDE EN JSON:
  * Prueba modelo gemini-2.5-pro
  */
 async function probarGeminiPro() {
-  logger.info('🔍 PROBANDO GEMINI-2.5-PRO');
+  logger.info("🔍 PROBANDO GEMINI-2.5-PRO");
   
   try {
     const model = vertexAI.getGenerativeModel({
-      model: 'gemini-2.5-pro',
+      model: "gemini-2.5-pro",
       generationConfig: {
         temperature: 0.1,
         topK: 40,
@@ -145,8 +145,8 @@ RESPONDE EN JSON:
 
     const responseText = result.response.candidates[0].content.parts[0].text;
     
-    logger.info('✅ GEMINI-2.5-PRO FUNCIONANDO CORRECTAMENTE', {
-      modelo: 'gemini-2.5-pro',
+    logger.info("✅ GEMINI-2.5-PRO FUNCIONANDO CORRECTAMENTE", {
+      modelo: "gemini-2.5-pro",
       tiempoProcesamiento: `${processingTime}s`,
       longitudRespuesta: responseText.length,
       respuestaCompleta: responseText
@@ -154,13 +154,13 @@ RESPONDE EN JSON:
 
     return {
       success: true,
-      model: 'gemini-2.5-pro',
+      model: "gemini-2.5-pro",
       processingTime: processingTime,
       response: responseText
     };
 
   } catch (error) {
-    logger.error('❌ ERROR EN GEMINI-2.5-PRO', {
+    logger.error("❌ ERROR EN GEMINI-2.5-PRO", {
       error: error.message,
       code: error.code,
       details: error.details
@@ -168,7 +168,7 @@ RESPONDE EN JSON:
 
     return {
       success: false,
-      model: 'gemini-2.5-pro',
+      model: "gemini-2.5-pro",
       error: error.message
     };
   }
@@ -178,10 +178,10 @@ RESPONDE EN JSON:
  * Función principal de prueba
  */
 async function ejecutarPruebas() {
-  logger.info('🚀 INICIANDO PRUEBAS DE MODELOS ESTABLES 2025', {
+  logger.info("🚀 INICIANDO PRUEBAS DE MODELOS ESTABLES 2025", {
     proyecto: projectId,
     region: location,
-    estrategia: 'Verificación gemini-2.5-flash + gemini-2.5-pro'
+    estrategia: "Verificación gemini-2.5-flash + gemini-2.5-pro"
   });
 
   const resultados = [];
@@ -201,12 +201,12 @@ async function ejecutarPruebas() {
   const exitosos = resultados.filter(r => r.success).length;
   const fallidos = resultados.filter(r => !r.success).length;
 
-  logger.info('📊 RESUMEN FINAL DE PRUEBAS', {
+  logger.info("📊 RESUMEN FINAL DE PRUEBAS", {
     modelosProbados: resultados.length,
     exitosos: exitosos,
     fallidos: fallidos,
     porcentajeExito: `${(exitosos/resultados.length)*100}%`,
-    estado: exitosos === resultados.length ? 'TODOS LOS MODELOS FUNCIONANDO' : 'ALGUNOS MODELOS FALLARON'
+    estado: exitosos === resultados.length ? "TODOS LOS MODELOS FUNCIONANDO" : "ALGUNOS MODELOS FALLARON"
   });
 
   // Mostrar resultados detallados
@@ -219,10 +219,10 @@ async function ejecutarPruebas() {
   });
 
   if (exitosos === resultados.length) {
-    logger.info('🎉 CORRECCIÓN EXITOSA: Los modelos estables 2025 están funcionando correctamente');
-    logger.info('📈 PRÓXIMOS PASOS: Desplegar correcciones en producción');
+    logger.info("🎉 CORRECCIÓN EXITOSA: Los modelos estables 2025 están funcionando correctamente");
+    logger.info("📈 PRÓXIMOS PASOS: Desplegar correcciones en producción");
   } else {
-    logger.error('⚠️ ATENCIÓN: Algunos modelos aún presentan problemas');
+    logger.error("⚠️ ATENCIÓN: Algunos modelos aún presentan problemas");
   }
 
   return {
@@ -243,7 +243,7 @@ if (require.main === module) {
       process.exit(resultado.success ? 0 : 1);
     })
     .catch(error => {
-      logger.error('💥 ERROR CRÍTICO EN PRUEBAS:', error);
+      logger.error("💥 ERROR CRÍTICO EN PRUEBAS:", error);
       process.exit(1);
     });
 }

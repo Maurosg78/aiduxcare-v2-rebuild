@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from '../UI/Button';
-import { track } from '../../utils/analytics';
+import React from "react";
+import { Button } from "../UI/Button";
+import { track } from "../../utils/analytics";
 
 interface AgentSuggestionFeedbackActionsProps {
   visitId: string;
@@ -23,12 +23,12 @@ const AgentSuggestionFeedbackActions: React.FC<AgentSuggestionFeedbackActionsPro
   isIntegrated
 }) => {
   const handleAccept = () => {
-    track('suggestion_accepted', { visitId, userId, suggestionId: suggestion.id });
+    track("suggestion_accepted", { visitId, userId, suggestionId: suggestion.id });
     onAccept();
   };
 
   const handleReject = () => {
-    track('suggestion_rejected', { visitId, userId, suggestionId: suggestion.id });
+    track("suggestion_rejected", { visitId, userId, suggestionId: suggestion.id });
     onReject();
   };
 

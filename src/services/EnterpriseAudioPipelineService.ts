@@ -4,12 +4,12 @@
  * Pipeline: Grabación → Google Cloud STT → Clinical Brain → Resultado SOAP
  */
 
-import { GoogleCloudSTTService, TranscriptionResponse } from './GoogleCloudSTTService';
-import { GoogleCloudAudioService, ClinicalAnalysisRequest, ClinicalAnalysisResponse } from './GoogleCloudAudioService';
+import { GoogleCloudSTTService, TranscriptionResponse } from "./GoogleCloudSTTService";
+import { GoogleCloudAudioService, ClinicalAnalysisRequest, ClinicalAnalysisResponse } from "./GoogleCloudAudioService";
 
 export interface PipelineOptions {
-  specialty?: 'physiotherapy' | 'psychology' | 'general';
-  sessionType?: 'initial' | 'followup';
+  specialty?: "physiotherapy" | "psychology" | "general";
+  sessionType?: "initial" | "followup";
   enableRealTimeUpdates?: boolean;
 }
 
@@ -41,7 +41,7 @@ export class EnterpriseAudioPipelineService {
   private progressCallback: ((stage: string, progress: number) => void) | null = null;
   
   constructor() {
-    console.log('🏢 EnterpriseAudioPipelineService inicializado - Google Cloud STT + Clinical Brain');
+    console.log("🏢 EnterpriseAudioPipelineService inicializado - Google Cloud STT + Clinical Brain");
     this.sttService = new GoogleCloudSTTService();
     this.clinicalService = new GoogleCloudAudioService();
   }
@@ -52,13 +52,13 @@ export class EnterpriseAudioPipelineService {
   async isServiceSupported(): Promise<boolean> {
     const hasMediaDevices = !!(
       navigator.mediaDevices && 
-      'getUserMedia' in navigator.mediaDevices && 
-      typeof MediaRecorder !== 'undefined'
+      "getUserMedia" in navigator.mediaDevices && 
+      typeof MediaRecorder !== "undefined"
     );
     
     const sttAvailable = await this.sttService.isServiceAvailable();
     
-    console.log('🔍 Verificación de servicios enterprise:', {
+    console.log("🔍 Verificación de servicios enterprise:", {
       mediaDevices: hasMediaDevices,
       googleCloudSTT: sttAvailable
     });
@@ -76,24 +76,24 @@ export class EnterpriseAudioPipelineService {
   ): Promise<void> {
     
     if (this.isRecording) {
-      console.warn('⚠️ Ya se está grabando audio');
+      console.warn("⚠️ Ya se está grabando audio");
       return;
     }
 
     const defaultOptions: PipelineOptions = {
-      specialty: 'physiotherapy',
-      sessionType: 'initial',
+      specialty: "physiotherapy",
+      sessionType: "initial",
       enableRealTimeUpdates: true,
       ...options
     };
 
-    console.log('🎤 Iniciando pipeline enterprise:', defaultOptions);
+    console.log("🎤 Iniciando pipeline enterprise:", defaultOptions);
 
     try {
       // Verificar servicios
       const serviceAvailable = await this.isServiceSupported();
       if (!serviceAvailable) {
-        throw new Error('Servicios enterprise no disponibles. Verifique conexión a internet.');
+        throw new Error("Servicios enterprise no disponibles. Verifique conexión a internet.");
       }
 
       // Solicitar permisos de micrófono con configuración enterprise
@@ -107,7 +107,7 @@ export class EnterpriseAudioPipelineService {
         } 
       });
 
-      console.log('✅ Permisos concedidos, configurando pipeline enterprise...');
+      console.log("✅ Permisos concedidos, configurando pipeline enterprise...");
       
       this.realtimeCallback = realtimeCallback;
       this.progressCallback = progressCallback;
@@ -120,28 +120,28 @@ export class EnterpriseAudioPipelineService {
       
       // Feedback inmediato
       if (this.progressCallback) {
-        this.progressCallback('recording', 0);
+        this.progressCallback("recording", 0);
       }
       
       if (this.realtimeCallback) {
-        this.realtimeCallback('🎙️ Grabando audio con calidad enterprise...', false);
+        this.realtimeCallback("🎙️ Grabando audio con calidad enterprise...", false);
       }
 
-      console.log('🏢 Pipeline enterprise activo');
+      console.log("🏢 Pipeline enterprise activo");
 
     } catch (error) {
-      console.error('❌ Error en pipeline enterprise:', error);
+      console.error("❌ Error en pipeline enterprise:", error);
       this.isRecording = false;
       
       if (error instanceof DOMException) {
-        if (error.name === 'NotAllowedError') {
-          throw new Error('Permisos de micrófono denegados. Por favor, permite el acceso al micrófono.');
-        } else if (error.name === 'NotFoundError') {
-          throw new Error('No se encontró micrófono. Verifica que tu dispositivo tenga un micrófono conectado.');
+        if (error.name === "NotAllowedError") {
+          throw new Error("Permisos de micrófono denegados. Por favor, permite el acceso al micrófono.");
+        } else if (error.name === "NotFoundError") {
+          throw new Error("No se encontró micrófono. Verifica que tu dispositivo tenga un micrófono conectado.");
         }
       }
       
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
       throw new Error(`Error en pipeline enterprise: ${errorMessage}`);
     }
   }
@@ -151,14 +151,14 @@ export class EnterpriseAudioPipelineService {
    */
   async stopRecording(options: PipelineOptions = {}): Promise<PipelineResult> {
     if (!this.isRecording) {
-      console.warn('⚠️ No se está grabando audio');
+      console.warn("⚠️ No se está grabando audio");
       return {
         success: false,
-        error: 'No hay grabación activa'
+        error: "No hay grabación activa"
       };
     }
 
-    console.log('🛑 Deteniendo grabación y procesando con pipeline enterprise...');
+    console.log("🛑 Deteniendo grabación y procesando con pipeline enterprise...");
     
     const startTime = Date.now();
     const stages = {
@@ -170,12 +170,12 @@ export class EnterpriseAudioPipelineService {
     try {
       // ETAPA 1: Finalizar grabación
       if (this.progressCallback) {
-        this.progressCallback('finalizing', 25);
+        this.progressCallback("finalizing", 25);
       }
       
       this.isRecording = false;
       
-      if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
         this.mediaRecorder.stop();
       }
       
@@ -192,14 +192,14 @@ export class EnterpriseAudioPipelineService {
       if (this.audioChunks.length === 0) {
         return {
           success: false,
-          error: 'No se capturó audio. Verifica tu micrófono.',
+          error: "No se capturó audio. Verifica tu micrófono.",
           stages,
           processingTime: Date.now() - startTime
         };
       }
 
-      const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-      console.log('✅ Audio capturado:', {
+      const audioBlob = new Blob(this.audioChunks, { type: "audio/webm" });
+      console.log("✅ Audio capturado:", {
         size: audioBlob.size,
         type: audioBlob.type,
         chunks: this.audioChunks.length
@@ -207,16 +207,16 @@ export class EnterpriseAudioPipelineService {
 
       // ETAPA 2: Transcripción con Google Cloud STT
       if (this.progressCallback) {
-        this.progressCallback('transcription', 50);
+        this.progressCallback("transcription", 50);
       }
       
       if (this.realtimeCallback) {
-        this.realtimeCallback('🌐 Transcribiendo con Google Cloud Speech-to-Text...', false);
+        this.realtimeCallback("🌐 Transcribiendo con Google Cloud Speech-to-Text...", false);
       }
 
       const transcriptionResult: TranscriptionResponse = await this.sttService.transcribeAudio(audioBlob, {
         enableSpeakerDiarization: true,
-        language: 'es-ES',
+        language: "es-ES",
         medicalContext: true,
         sampleRate: 48000
       });
@@ -224,7 +224,7 @@ export class EnterpriseAudioPipelineService {
       if (!transcriptionResult.success || !transcriptionResult.transcription) {
         return {
           success: false,
-          error: transcriptionResult.error || 'Error en transcripción',
+          error: transcriptionResult.error || "Error en transcripción",
           stages,
           processingTime: Date.now() - startTime
         };
@@ -232,7 +232,7 @@ export class EnterpriseAudioPipelineService {
 
       stages.transcription = true;
       
-      console.log('✅ Transcripción enterprise completada:', {
+      console.log("✅ Transcripción enterprise completada:", {
         length: transcriptionResult.transcription.length,
         confidence: transcriptionResult.confidence,
         speakers: transcriptionResult.totalSpeakers
@@ -240,18 +240,18 @@ export class EnterpriseAudioPipelineService {
 
       // ETAPA 3: Análisis clínico con Clinical Brain
       if (this.progressCallback) {
-        this.progressCallback('analysis', 75);
+        this.progressCallback("analysis", 75);
       }
       
       if (this.realtimeCallback) {
         this.realtimeCallback(`📋 Transcripción: ${transcriptionResult.transcription.substring(0, 200)}...`, false);
-        this.realtimeCallback('🧠 Analizando con Cerebro Clínico...', false);
+        this.realtimeCallback("🧠 Analizando con Cerebro Clínico...", false);
       }
 
       const analysisRequest: ClinicalAnalysisRequest = {
         transcription: transcriptionResult.transcription,
-        specialty: options.specialty || 'physiotherapy',
-        sessionType: options.sessionType || 'initial'
+        specialty: options.specialty || "physiotherapy",
+        sessionType: options.sessionType || "initial"
       };
 
       const analysisResult: ClinicalAnalysisResponse = await this.clinicalService.analyzeClinicalTranscription(analysisRequest);
@@ -259,12 +259,12 @@ export class EnterpriseAudioPipelineService {
 
       // RESULTADO FINAL
       if (this.progressCallback) {
-        this.progressCallback('complete', 100);
+        this.progressCallback("complete", 100);
       }
 
       const processingTime = Date.now() - startTime;
       
-      console.log('🎉 Pipeline enterprise completado exitosamente:', {
+      console.log("🎉 Pipeline enterprise completado exitosamente:", {
         transcriptionLength: transcriptionResult.transcription.length,
         analysisSuccess: analysisResult.success,
         totalTime: processingTime
@@ -283,9 +283,9 @@ export class EnterpriseAudioPipelineService {
       };
 
     } catch (error) {
-      console.error('❌ Error en pipeline enterprise:', error);
+      console.error("❌ Error en pipeline enterprise:", error);
       
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
       
       return {
         success: false,
@@ -307,7 +307,7 @@ export class EnterpriseAudioPipelineService {
    * Información del servicio
    */
   getServiceInfo(): string {
-    return 'EnterpriseAudioPipelineService: Google Cloud STT + Clinical Brain + Speaker Diarization';
+    return "EnterpriseAudioPipelineService: Google Cloud STT + Clinical Brain + Speaker Diarization";
   }
 
   /**
@@ -328,7 +328,7 @@ export class EnterpriseAudioPipelineService {
       this.stream = null;
     }
     
-    console.log('🧹 Pipeline enterprise limpiado');
+    console.log("🧹 Pipeline enterprise limpiado");
   }
 
   /**
@@ -339,13 +339,13 @@ export class EnterpriseAudioPipelineService {
 
     // Formatos enterprise priorizados
     const enterpriseFormats = [
-      'audio/wav',
-      'audio/webm;codecs=opus',
-      'audio/mp4',
-      'audio/webm'
+      "audio/wav",
+      "audio/webm;codecs=opus",
+      "audio/mp4",
+      "audio/webm"
     ];
 
-    let selectedFormat = 'audio/webm';
+    let selectedFormat = "audio/webm";
     
     for (const format of enterpriseFormats) {
       if (MediaRecorder.isTypeSupported(format)) {
@@ -359,15 +359,15 @@ export class EnterpriseAudioPipelineService {
     // Configuración enterprise
     const enterpriseOptions = {
       mimeType: selectedFormat,
-      audioBitsPerSecond: selectedFormat.includes('wav') ? 128000 : 
-                         selectedFormat.includes('opus') ? 64000 : 96000
+      audioBitsPerSecond: selectedFormat.includes("wav") ? 128000 : 
+        selectedFormat.includes("opus") ? 64000 : 96000
     };
 
     try {
       this.mediaRecorder = new MediaRecorder(this.stream, enterpriseOptions);
-      console.log('✅ MediaRecorder enterprise configurado:', enterpriseOptions);
+      console.log("✅ MediaRecorder enterprise configurado:", enterpriseOptions);
     } catch (error) {
-      console.warn('⚠️ Fallback a configuración básica:', error);
+      console.warn("⚠️ Fallback a configuración básica:", error);
       this.mediaRecorder = new MediaRecorder(this.stream);
     }
 
@@ -380,17 +380,17 @@ export class EnterpriseAudioPipelineService {
         // Progreso de grabación
         if (this.progressCallback) {
           const progress = Math.min((this.audioChunks.length * 2), 20); // Max 20% para grabación
-          this.progressCallback('recording', progress);
+          this.progressCallback("recording", progress);
         }
       }
     };
 
     this.mediaRecorder.onstop = () => {
-      console.log('🛑 Grabación enterprise finalizada');
+      console.log("🛑 Grabación enterprise finalizada");
     };
 
     this.mediaRecorder.onerror = (event) => {
-      console.error('❌ Error en MediaRecorder enterprise:', event);
+      console.error("❌ Error en MediaRecorder enterprise:", event);
     };
 
     // Iniciar con chunks cada 1 segundo
@@ -407,19 +407,19 @@ export class EnterpriseAudioPipelineService {
         return;
       }
 
-      if (this.mediaRecorder.state === 'inactive') {
+      if (this.mediaRecorder.state === "inactive") {
         resolve();
         return;
       }
 
       this.mediaRecorder.onstop = () => {
-        console.log('✅ Grabación completamente finalizada');
+        console.log("✅ Grabación completamente finalizada");
         resolve();
       };
 
       // Timeout de seguridad
       setTimeout(() => {
-        console.log('⏰ Timeout de grabación - continuando');
+        console.log("⏰ Timeout de grabación - continuando");
         resolve();
       }, 3000);
     });

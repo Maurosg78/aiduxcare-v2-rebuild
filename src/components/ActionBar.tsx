@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ActionBarProps {
   isRecording: boolean;
@@ -9,10 +9,10 @@ export function ActionBar({ isRecording, onAction }: ActionBarProps) {
   return (
     <div className="action-bar">
       <button 
-        className={`record-button ${isRecording ? 'recording' : ''}`}
+        className={`record-button ${isRecording ? "recording" : ""}`}
         onClick={onAction}
       >
-        {isRecording ? 'Detener' : 'Grabar'}
+        {isRecording ? "Detener" : "Grabar"}
       </button>
     </div>
   );

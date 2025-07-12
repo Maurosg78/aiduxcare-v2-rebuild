@@ -35,15 +35,15 @@ export function generateMockResponse(transcription: string): MockClinicalBrainRe
   const lowerTranscription = transcription.toLowerCase();
   
   // Detectar banderas rojas cardíacas
-  const hasChestPain = lowerTranscription.includes('dolor') && (
-    lowerTranscription.includes('pecho') || 
-    lowerTranscription.includes('torácico') ||
-    lowerTranscription.includes('torax')
+  const hasChestPain = lowerTranscription.includes("dolor") && (
+    lowerTranscription.includes("pecho") || 
+    lowerTranscription.includes("torácico") ||
+    lowerTranscription.includes("torax")
   );
   
-  const hasArmPain = lowerTranscription.includes('brazo izquierdo');
-  const hasBreathing = lowerTranscription.includes('respirar') || lowerTranscription.includes('aire');
-  const hasSweating = lowerTranscription.includes('sudor') || lowerTranscription.includes('sudar');
+  const hasArmPain = lowerTranscription.includes("brazo izquierdo");
+  const hasBreathing = lowerTranscription.includes("respirar") || lowerTranscription.includes("aire");
+  const hasSweating = lowerTranscription.includes("sudor") || lowerTranscription.includes("sudar");
   
   const isCardiacEmergency = hasChestPain && (hasArmPain || hasBreathing || hasSweating);
   
@@ -129,11 +129,11 @@ export async function mockClinicalBrainAPI(request: {
   
   // Validar entrada
   if (!request.transcription || request.transcription.trim().length === 0) {
-    throw new Error('Transcripción requerida');
+    throw new Error("Transcripción requerida");
   }
   
   if (request.transcription.trim().length < 10) {
-    throw new Error('Transcripción muy corta');
+    throw new Error("Transcripción muy corta");
   }
   
   return generateMockResponse(request.transcription);

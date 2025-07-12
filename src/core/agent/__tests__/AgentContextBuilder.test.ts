@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { buildAgentContext } from '../AgentContextBuilder';
-import { AgentContext, MemoryBlock } from '../../../types/agent';
-import supabase from '../../../core/auth/supabaseClient';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { buildAgentContext } from "../AgentContextBuilder";
+import { AgentContext, MemoryBlock } from "../../../types/agent";
+import supabase from "../../../core/auth/supabaseClient";
 
 // Mock de supabase
-vi.mock('../../../core/auth/supabaseClient', () => ({
+vi.mock("../../../core/auth/supabaseClient", () => ({
   default: {
     from: vi.fn()
   }
@@ -14,29 +14,29 @@ vi.mock('../../../core/auth/supabaseClient', () => ({
  
 type PostgrestMock = any;
 
-describe('AgentContextBuilder', () => {
+describe("AgentContextBuilder", () => {
   // Datos de prueba
-  const mockDate = new Date('2023-06-15T10:00:00Z');
-  const visitId = 'test-visit-123';
+  const mockDate = new Date("2023-06-15T10:00:00Z");
+  const visitId = "test-visit-123";
   
   const mockMemoryBlocks: MemoryBlock[] = [
     {
-      id: 'block-1',
-      type: 'contextual',
-      content: 'Paciente presenta dolor abdominal intenso',
-      created_at: '2023-05-15T10:30:00Z'
+      id: "block-1",
+      type: "contextual",
+      content: "Paciente presenta dolor abdominal intenso",
+      created_at: "2023-05-15T10:30:00Z"
     },
     {
-      id: 'block-2',
-      type: 'persistent',
-      content: 'Historial de hipertensión arterial',
-      created_at: '2023-05-10T08:15:00Z'
+      id: "block-2",
+      type: "persistent",
+      content: "Historial de hipertensión arterial",
+      created_at: "2023-05-10T08:15:00Z"
     },
     {
-      id: 'block-3',
-      type: 'semantic',
-      content: 'Dolor abdominal puede indicar apendicitis',
-      created_at: '2023-05-15T10:35:00Z'
+      id: "block-3",
+      type: "semantic",
+      content: "Dolor abdominal puede indicar apendicitis",
+      created_at: "2023-05-15T10:35:00Z"
     }
   ];
 
@@ -63,7 +63,7 @@ describe('AgentContextBuilder', () => {
     vi.useRealTimers();
   });
 
-  it('debe construir un contexto válido con bloques de memoria', async () => {
+  it("debe construir un contexto válido con bloques de memoria", async () => {
     const result = await buildAgentContext(visitId);
     
     expect(result).toEqual({
@@ -75,11 +75,11 @@ describe('AgentContextBuilder', () => {
       }
     });
     
-    expect(supabase.from).toHaveBeenCalledWith('memory_blocks');
+    expect(supabase.from).toHaveBeenCalledWith("memory_blocks");
   });
 
-  it('debe manejar errores de la base de datos correctamente', async () => {
-    const mockError = new Error('Error de base de datos');
+  it("debe manejar errores de la base de datos correctamente", async () => {
+    const mockError = new Error("Error de base de datos");
     
     const mockErrorQuery = {
       select: vi.fn().mockReturnThis(),
@@ -95,7 +95,7 @@ describe('AgentContextBuilder', () => {
     await expect(buildAgentContext(visitId)).rejects.toThrow(mockError);
   });
 
-  it('debe manejar el caso cuando no hay bloques de memoria', async () => {
+  it("debe manejar el caso cuando no hay bloques de memoria", async () => {
     const mockEmptyQuery = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
@@ -119,8 +119,8 @@ describe('AgentContextBuilder', () => {
     });
   });
 
-  it('debe rechazar con un error si falla la consulta', async () => {
-    const dbError = new Error('Error de conexión');
+  it("debe rechazar con un error si falla la consulta", async () => {
+    const dbError = new Error("Error de conexión");
     
     vi.mocked(supabase.from).mockImplementationOnce(() => {
       throw dbError;
@@ -129,12 +129,12 @@ describe('AgentContextBuilder', () => {
     await expect(buildAgentContext(visitId)).rejects.toThrow(dbError);
   });
 
-  it('debe cumplir con el tipo AgentContext', async () => {
+  it("debe cumplir con el tipo AgentContext", async () => {
     const result = await buildAgentContext(visitId);
     
     const validateAgentContext = (context: AgentContext): boolean => {
       return (
-        typeof context.visitId === 'string' &&
+        typeof context.visitId === "string" &&
         Array.isArray(context.blocks) &&
         context.metadata &&
         context.metadata.createdAt instanceof Date &&
@@ -145,19 +145,19 @@ describe('AgentContextBuilder', () => {
     expect(validateAgentContext(result)).toBe(true);
     
     result.blocks.forEach(block => {
-      expect(block).toHaveProperty('id');
-      expect(block).toHaveProperty('type');
-      expect(block).toHaveProperty('content');
-      expect(block).toHaveProperty('created_at');
+      expect(block).toHaveProperty("id");
+      expect(block).toHaveProperty("type");
+      expect(block).toHaveProperty("content");
+      expect(block).toHaveProperty("created_at");
     });
   });
 
   // Nuevos tests para validar casos especiales
-  it('debe filtrar bloques de memoria con datos incompletos', async () => {
+  it("debe filtrar bloques de memoria con datos incompletos", async () => {
     const invalidBlocks = [
-      { id: 'block-1', type: 'contextual' }, // Falta content y created_at
-      { id: 'block-2', content: 'Contenido sin tipo' }, // Falta type y created_at
-      { id: 'block-3', type: 'semantic', created_at: '2023-05-15T10:35:00Z' }, // Falta content
+      { id: "block-1", type: "contextual" }, // Falta content y created_at
+      { id: "block-2", content: "Contenido sin tipo" }, // Falta type y created_at
+      { id: "block-3", type: "semantic", created_at: "2023-05-15T10:35:00Z" }, // Falta content
       ...mockMemoryBlocks // Bloques válidos
     ];
 
@@ -179,25 +179,25 @@ describe('AgentContextBuilder', () => {
     expect(result.blocks.length).toBe(mockMemoryBlocks.length);
   });
 
-  it('debe manejar correctamente diferentes formatos de fecha en created_at', async () => {
+  it("debe manejar correctamente diferentes formatos de fecha en created_at", async () => {
     const blocksWithDifferentDateFormats = [
       {
-        id: 'block-1',
-        type: 'contextual',
-        content: 'Contenido con fecha ISO',
-        created_at: '2023-05-15T10:30:00Z'
+        id: "block-1",
+        type: "contextual",
+        content: "Contenido con fecha ISO",
+        created_at: "2023-05-15T10:30:00Z"
       },
       {
-        id: 'block-2',
-        type: 'persistent',
-        content: 'Contenido con fecha Unix',
-        created_at: '1684155000000'
+        id: "block-2",
+        type: "persistent",
+        content: "Contenido con fecha Unix",
+        created_at: "1684155000000"
       },
       {
-        id: 'block-3',
-        type: 'semantic',
-        content: 'Contenido con fecha local',
-        created_at: '2023-05-15 10:30:00'
+        id: "block-3",
+        type: "semantic",
+        content: "Contenido con fecha local",
+        created_at: "2023-05-15 10:30:00"
       }
     ];
 
@@ -216,23 +216,23 @@ describe('AgentContextBuilder', () => {
     
     // Verificar que todos los bloques tienen una fecha válida
     result.blocks.forEach(block => {
-      expect(new Date(block.created_at).toString()).not.toBe('Invalid Date');
+      expect(new Date(block.created_at).toString()).not.toBe("Invalid Date");
     });
   });
 
-  it('debe manejar correctamente bloques con contenido vacío', async () => {
+  it("debe manejar correctamente bloques con contenido vacío", async () => {
     const blocksWithEmptyContent = [
       {
-        id: 'block-1',
-        type: 'contextual',
-        content: '',
-        created_at: '2023-05-15T10:30:00Z'
+        id: "block-1",
+        type: "contextual",
+        content: "",
+        created_at: "2023-05-15T10:30:00Z"
       },
       {
-        id: 'block-2',
-        type: 'persistent',
-        content: '   ', // Solo espacios en blanco
-        created_at: '2023-05-10T08:15:00Z'
+        id: "block-2",
+        type: "persistent",
+        content: "   ", // Solo espacios en blanco
+        created_at: "2023-05-10T08:15:00Z"
       },
       ...mockMemoryBlocks // Bloques válidos
     ];
@@ -255,7 +255,7 @@ describe('AgentContextBuilder', () => {
     expect(result.blocks.length).toBe(mockMemoryBlocks.length);
   });
 
-  it('debe validar que los metadatos de fecha sean consistentes', async () => {
+  it("debe validar que los metadatos de fecha sean consistentes", async () => {
     const result = await buildAgentContext(visitId);
     
     // Verificar que las fechas de metadata son instancias de Date

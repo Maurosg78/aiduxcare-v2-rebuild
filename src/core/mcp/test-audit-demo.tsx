@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import AuditLogViewer from '@/shared/components/Audit/AuditLogViewer';
-import { AuditLogger } from '@/core/audit/AuditLogger';
-import { createTestAuditLogs } from './test-audit-logs';
+import React, { useEffect } from "react";
+import AuditLogViewer from "@/shared/components/Audit/AuditLogViewer";
+import { AuditLogger } from "@/core/audit/AuditLogger";
+import { createTestAuditLogs } from "./test-audit-logs";
 
 /**
  * Componente de demostración para probar AuditLogViewer
@@ -24,12 +24,12 @@ const AuditLogDemo: React.FC = () => {
   // Contar logs para cada visita
   const testVisitLogCount = allLogs.filter(log => 
     (log.details && log.details.visit_id === testVisitId) || 
-    ('visit_id' in log && log.visit_id === testVisitId)
+    ("visit_id" in log && log.visit_id === testVisitId)
   ).length;
   
   const otherVisitLogCount = allLogs.filter(log => 
     (log.details && log.details.visit_id === otherVisitId) || 
-    ('visit_id' in log && log.visit_id === otherVisitId)
+    ("visit_id" in log && log.visit_id === otherVisitId)
   ).length;
   
   return (

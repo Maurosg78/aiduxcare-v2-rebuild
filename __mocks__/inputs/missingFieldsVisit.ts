@@ -3,7 +3,7 @@
  * Este mock contiene datos incompletos para probar el manejo de errores del builder.
  */
 
-import { MCPMemoryBlock } from '../../src/core/mcp/schema';
+import { MCPMemoryBlock } from "../../src/core/mcp/schema";
 
 // Timestamp común para todos los registros
 const NOW = new Date().toISOString();
@@ -13,21 +13,21 @@ const NOW = new Date().toISOString();
  */
 export const missingFieldsContextualMemory: MCPMemoryBlock[] = [
   {
-    id: 'missing-ctx-001',
+    id: "missing-ctx-001",
     created_at: NOW,
-    type: 'contextual',
-    content: 'Paciente masculino con dolor abdominal de inicio súbito',
+    type: "contextual",
+    content: "Paciente masculino con dolor abdominal de inicio súbito",
     // visit_id está intencionalmente ausente
-    patient_id: 'patient-9876',
-    tags: ['dolor', 'abdominal']
+    patient_id: "patient-9876",
+    tags: ["dolor", "abdominal"]
   },
   {
-    id: 'missing-ctx-002',
+    id: "missing-ctx-002",
     created_at: NOW,
-    type: 'contextual',
-    content: 'Signos vitales: TA 110/70 mmHg, FC 95 lpm, FR 20 rpm',
+    type: "contextual",
+    content: "Signos vitales: TA 110/70 mmHg, FC 95 lpm, FR 20 rpm",
     // visit_id está intencionalmente ausente
-    patient_id: 'patient-9876'
+    patient_id: "patient-9876"
     // tags intencionalmente ausentes
   }
 ];
@@ -37,19 +37,19 @@ export const missingFieldsContextualMemory: MCPMemoryBlock[] = [
  */
 export const missingFieldsPersistentMemory: MCPMemoryBlock[] = [
   {
-    id: 'missing-per-001',
+    id: "missing-per-001",
     created_at: NOW,
-    type: 'persistent',
-    content: 'Antecedentes: Apendicectomía a los 15 años',
+    type: "persistent",
+    content: "Antecedentes: Apendicectomía a los 15 años",
     // patient_id intencionalmente ausente
-    tags: ['antecedentes', 'quirúrgicos']
+    tags: ["antecedentes", "quirúrgicos"]
   },
   {
-    id: 'missing-per-002',
+    id: "missing-per-002",
     created_at: NOW,
-    type: 'persistent',
-    content: 'Alergias: No conocidas',
-    patient_id: 'patient-9876'
+    type: "persistent",
+    content: "Alergias: No conocidas",
+    patient_id: "patient-9876"
   }
 ];
 
@@ -58,11 +58,11 @@ export const missingFieldsPersistentMemory: MCPMemoryBlock[] = [
  */
 export const missingFieldsSemanticMemory: MCPMemoryBlock[] = [
   {
-    id: 'missing-sem-001',
+    id: "missing-sem-001",
     created_at: NOW,
-    type: 'semantic',
-    content: 'El dolor abdominal agudo puede ser indicativo de patología abdominal que requiere intervención quirúrgica urgente',
-    tags: ['conocimiento_médico', 'dolor_abdominal']
+    type: "semantic",
+    content: "El dolor abdominal agudo puede ser indicativo de patología abdominal que requiere intervención quirúrgica urgente",
+    tags: ["conocimiento_médico", "dolor_abdominal"]
   }
 ];
 

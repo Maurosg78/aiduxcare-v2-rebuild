@@ -1,10 +1,10 @@
-import { z } from 'zod';
-import { VisitSchema } from '../domain/visitType';
+import { z } from "zod";
+import { VisitSchema } from "../domain/visitType";
 
 /**
  * Tipos de memoria en el MCP
  */
-const MemoryTypeEnum = z.enum(['contextual', 'persistent', 'semantic']);
+const MemoryTypeEnum = z.enum(["contextual", "persistent", "semantic"]);
 
 /**
  * Esquema para un bloque de memoria recuperado de fuentes de datos
@@ -78,19 +78,19 @@ const MemoryItemSchema = z.object({
   validated: z.boolean().optional()
 })
 // Transformar los datos para agregar timestamp si no existe pero hay created_at
-.transform(data => {
-  if (!data.timestamp && data.created_at) {
-    return {
-      ...data,
-      timestamp: data.created_at
-    };
-  }
-  return data;
-})
+  .transform(data => {
+    if (!data.timestamp && data.created_at) {
+      return {
+        ...data,
+        timestamp: data.created_at
+      };
+    }
+    return data;
+  })
 // Refinamiento para asegurar que hay al menos timestamp o created_at
-.refine(data => data.timestamp || data.created_at, {
-  message: "Debe existir al menos 'timestamp' o 'created_at'"
-});
+  .refine(data => data.timestamp || data.created_at, {
+    message: "Debe existir al menos 'timestamp' o 'created_at'"
+  });
 
 /**
  * Esquema para un conjunto de datos de memoria

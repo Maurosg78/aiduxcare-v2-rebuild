@@ -1,5 +1,5 @@
-import React from 'react';
-import { AgentSuggestion } from '@/types/agent';
+import React from "react";
+import { AgentSuggestion } from "@/types/agent";
 
 interface SuggestionContextOriginProps {
   suggestion: AgentSuggestion;

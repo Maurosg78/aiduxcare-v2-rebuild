@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Enumeración para género
 export enum PatientGender {
-  MALE = 'male',
-  FEMALE = 'female',
-  OTHER = 'other',
-  UNSPECIFIED = 'unspecified'
+  MALE = "male",
+  FEMALE = "female",
+  OTHER = "other",
+  UNSPECIFIED = "unspecified"
 }
 
 // Esquema de validación para Paciente

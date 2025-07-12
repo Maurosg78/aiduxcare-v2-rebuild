@@ -7,7 +7,7 @@
  * la función de parsing mejorado
  */
 
-const ClinicalInsightService = require('./src/services/ClinicalInsightService');
+const ClinicalInsightService = require("./src/services/ClinicalInsightService");
 
 // Usar el contenido REAL exacto que genera el sistema
 const realGeneratedContent = `\`\`\`json
@@ -39,94 +39,94 @@ const realGeneratedContent = `\`\`\`json
 \`\`\``;
 
 async function testParsingRealData() {
-  console.log('🧪 INICIANDO TEST PARSING CON DATOS REALES');
-  console.log('==================================================');
+  console.log("🧪 INICIANDO TEST PARSING CON DATOS REALES");
+  console.log("==================================================");
   
   // Inicializar el servicio
   const clinicalService = new ClinicalInsightService();
   
-  console.log('\n📝 CONTENIDO REAL A PARSEAR:');
+  console.log("\n📝 CONTENIDO REAL A PARSEAR:");
   console.log(`Longitud: ${realGeneratedContent.length}`);
   console.log(`Primeros 200 caracteres: ${realGeneratedContent.substring(0, 200)}`);
   console.log(`Últimos 100 caracteres: ${realGeneratedContent.substring(realGeneratedContent.length - 100)}`);
   
-  console.log('\n🔍 INICIANDO PROCESO DE PARSING...');
+  console.log("\n🔍 INICIANDO PROCESO DE PARSING...");
   
   let resultado;
   
   // Probar la función de parsing CON LOGGING DETALLADO
   try {
-    console.log('🔍 Llamando a processFinalAnalysisResult...');
+    console.log("🔍 Llamando a processFinalAnalysisResult...");
     resultado = clinicalService.processFinalAnalysisResult(realGeneratedContent);
-    console.log('✅ Función completada, analizando resultado...');
+    console.log("✅ Función completada, analizando resultado...");
     
     // Logging detallado del resultado
-    console.log('🎯 RESULTADO RAW:', JSON.stringify(resultado, null, 2));
+    console.log("🎯 RESULTADO RAW:", JSON.stringify(resultado, null, 2));
     
   } catch (error) {
-    console.error('❌ ERROR EN PARSING:', error);
-    console.error('Stack trace:', error.stack);
+    console.error("❌ ERROR EN PARSING:", error);
+    console.error("Stack trace:", error.stack);
     return;
   }
   
-  console.log('\n✅ RESULTADO DEL PARSING:');
-  console.log('========================================');
+  console.log("\n✅ RESULTADO DEL PARSING:");
+  console.log("========================================");
   
   // Mostrar estructura resultante
-  console.log('\n📊 ESTRUCTURA RESULTANTE:');
-  console.log(`- Warnings: ${resultado.warnings ? resultado.warnings.length : 'N/A'}`);
-  console.log(`- Suggestions: ${resultado.suggestions ? resultado.suggestions.length : 'N/A'}`);
-  console.log(`- Functional Goals: ${resultado.functional_goals ? resultado.functional_goals.length : 'N/A'}`);
-  console.log(`- Treatment Techniques: ${resultado.treatment_techniques ? resultado.treatment_techniques.length : 'N/A'}`);
+  console.log("\n📊 ESTRUCTURA RESULTANTE:");
+  console.log(`- Warnings: ${resultado.warnings ? resultado.warnings.length : "N/A"}`);
+  console.log(`- Suggestions: ${resultado.suggestions ? resultado.suggestions.length : "N/A"}`);
+  console.log(`- Functional Goals: ${resultado.functional_goals ? resultado.functional_goals.length : "N/A"}`);
+  console.log(`- Treatment Techniques: ${resultado.treatment_techniques ? resultado.treatment_techniques.length : "N/A"}`);
   console.log(`- SOAP Complete: ${!!(resultado.soap_note && resultado.soap_note.subjective && resultado.soap_note.objective)}`);
-  console.log(`- Parsing Status: ${resultado.model_info ? resultado.model_info.parsing_status : 'N/A'}`);
-  console.log(`- Content Length: ${resultado.model_info ? resultado.model_info.content_length : 'N/A'}`);
-  console.log(`- SOAP Quality: ${resultado.soap_quality ? resultado.soap_quality.overall : 'N/A'}`);
+  console.log(`- Parsing Status: ${resultado.model_info ? resultado.model_info.parsing_status : "N/A"}`);
+  console.log(`- Content Length: ${resultado.model_info ? resultado.model_info.content_length : "N/A"}`);
+  console.log(`- SOAP Quality: ${resultado.soap_quality ? resultado.soap_quality.overall : "N/A"}`);
   
   // Continuar con el resto del análisis...
   
   // Mostrar SOAP
-  console.log('\n📋 CONTENIDO SOAP:');
+  console.log("\n📋 CONTENIDO SOAP:");
   if (resultado.soap_note) {
-    console.log(`   📝 Subjective: ${resultado.soap_note.subjective ? resultado.soap_note.subjective.substring(0, 100) + '...' : 'N/A'}`);
-    console.log(`   👀 Objective: ${resultado.soap_note.objective ? resultado.soap_note.objective.substring(0, 100) + '...' : 'N/A'}`);
-    console.log(`   🎯 Assessment: ${resultado.soap_note.assessment ? resultado.soap_note.assessment.substring(0, 100) + '...' : 'N/A'}`);
-    console.log(`   📋 Plan: ${resultado.soap_note.plan ? resultado.soap_note.plan.substring(0, 100) + '...' : 'N/A'}`);
+    console.log(`   📝 Subjective: ${resultado.soap_note.subjective ? resultado.soap_note.subjective.substring(0, 100) + "..." : "N/A"}`);
+    console.log(`   👀 Objective: ${resultado.soap_note.objective ? resultado.soap_note.objective.substring(0, 100) + "..." : "N/A"}`);
+    console.log(`   🎯 Assessment: ${resultado.soap_note.assessment ? resultado.soap_note.assessment.substring(0, 100) + "..." : "N/A"}`);
+    console.log(`   📋 Plan: ${resultado.soap_note.plan ? resultado.soap_note.plan.substring(0, 100) + "..." : "N/A"}`);
   }
   
   // Mostrar objetivos funcionales
-  console.log('\n🎯 FUNCTIONAL GOALS:');
+  console.log("\n🎯 FUNCTIONAL GOALS:");
   if (resultado.functional_goals && resultado.functional_goals.length > 0) {
     resultado.functional_goals.forEach((goal, index) => {
       console.log(`   ${index + 1}. ${goal.substring(0, 100)}...`);
     });
   } else {
-    console.log('   ❌ No se extrajeron objetivos funcionales');
+    console.log("   ❌ No se extrajeron objetivos funcionales");
   }
   
   // Mostrar técnicas de tratamiento
-  console.log('\n🔧 TREATMENT TECHNIQUES:');
+  console.log("\n🔧 TREATMENT TECHNIQUES:");
   if (resultado.treatment_techniques && resultado.treatment_techniques.length > 0) {
     resultado.treatment_techniques.forEach((technique, index) => {
       console.log(`   ${index + 1}. ${technique}`);
     });
   } else {
-    console.log('   ❌ No se extrajeron técnicas de tratamiento');
+    console.log("   ❌ No se extrajeron técnicas de tratamiento");
   }
   
   // Mostrar sugerencias (si las hay)
-  console.log('\n💡 SUGGESTIONS:');
+  console.log("\n💡 SUGGESTIONS:");
   if (resultado.suggestions && resultado.suggestions.length > 0) {
     resultado.suggestions.forEach((suggestion, index) => {
       console.log(`   ${index + 1}. ${suggestion.substring(0, 100)}...`);
     });
   } else {
-    console.log('   ❌ No hay sugerencias (apropiado para este caso)');
+    console.log("   ❌ No hay sugerencias (apropiado para este caso)");
   }
   
   // Evaluación final
-  console.log('\n🧪 EVALUACIÓN DEL PARSING:');
-  console.log('========================================');
+  console.log("\n🧪 EVALUACIÓN DEL PARSING:");
+  console.log("========================================");
   
   const functionalGoalsExtracted = resultado.functional_goals ? resultado.functional_goals.length : 0;
   const treatmentTechniquesExtracted = resultado.treatment_techniques ? resultado.treatment_techniques.length : 0;
@@ -139,19 +139,19 @@ async function testParsingRealData() {
   console.log(`Puntaje parsing: ${score}/100`);
   console.log(`Functional Goals extraídos: ${functionalGoalsExtracted}/4`);
   console.log(`Treatment Techniques extraídos: ${treatmentTechniquesExtracted}/8`);
-  console.log(`SOAP completo: ${soapComplete ? 'Sí' : 'No'}`);
+  console.log(`SOAP completo: ${soapComplete ? "Sí" : "No"}`);
   
   if (score >= 95) {
-    console.log('✅ PARSING EXCELENTE - COMPLETAMENTE FUNCIONAL');
+    console.log("✅ PARSING EXCELENTE - COMPLETAMENTE FUNCIONAL");
   } else if (score >= 75) {
-    console.log('✅ PARSING BUENO - LISTO PARA USO');
+    console.log("✅ PARSING BUENO - LISTO PARA USO");
   } else if (score >= 50) {
-    console.log('⚠️ PARSING PARCIAL - REQUIERE MEJORAS');
+    console.log("⚠️ PARSING PARCIAL - REQUIERE MEJORAS");
   } else {
-    console.log('❌ PARSING DEFICIENTE - REQUIERE CORRECCIÓN CRÍTICA');
+    console.log("❌ PARSING DEFICIENTE - REQUIERE CORRECCIÓN CRÍTICA");
   }
   
-  console.log('\n🎉 TEST PARSING CON DATOS REALES COMPLETADO');
+  console.log("\n🎉 TEST PARSING CON DATOS REALES COMPLETADO");
 }
 
 // Ejecutar el test

@@ -1,50 +1,50 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
-import { AgentExecutor, AgentExecutionParams } from '../../src/core/agent/AgentExecutor';
-import { buildAgentContext } from '../../src/core/agent/AgentContextBuilder';
-import { AgentSuggestion } from '../../src/types/agent';
-import { LLMProvider } from '../../src/core/agent/LLMAdapter';
-import { validMCP } from '../../__mocks__/contexts/validMCP';
-import { emptyMCP } from '../../__mocks__/contexts/emptyMCP';
-import { partialMCP } from '../../__mocks__/contexts/partialMCP';
-import { z } from 'zod';
-import { EMRFormService } from '../../src/core/services/EMRFormService';
-import { AuditLogger } from '../../src/core/audit/AuditLogger';
-import { v4 as uuidv4 } from 'uuid';
+import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
+import { AgentExecutor, AgentExecutionParams } from "../../src/core/agent/AgentExecutor";
+import { buildAgentContext } from "../../src/core/agent/AgentContextBuilder";
+import { AgentSuggestion } from "../../src/types/agent";
+import { LLMProvider } from "../../src/core/agent/LLMAdapter";
+import { validMCP } from "../../__mocks__/contexts/validMCP";
+import { emptyMCP } from "../../__mocks__/contexts/emptyMCP";
+import { partialMCP } from "../../__mocks__/contexts/partialMCP";
+import { z } from "zod";
+import { EMRFormService } from "../../src/core/services/EMRFormService";
+import { AuditLogger } from "../../src/core/audit/AuditLogger";
+import { v4 as uuidv4 } from "uuid";
 
 // Mocks para los servicios de EMR y auditoría
-vi.mock('../../src/core/services/EMRFormService');
-vi.mock('../../src/core/audit/AuditLogger');
+vi.mock("../../src/core/services/EMRFormService");
+vi.mock("../../src/core/audit/AuditLogger");
 
 // Definir un esquema Zod para validar la estructura de las sugerencias del agente
 const AgentSuggestionSchema = z.object({
   id: z.string().uuid(),
   sourceBlockId: z.string(),
-  type: z.enum(['recommendation', 'warning', 'info']),
+  type: z.enum(["recommendation", "warning", "info"]),
   content: z.string().min(1)
 });
 
 // Mock para sendToLLM para evitar llamadas reales a servicios externos
-vi.mock('../../src/core/agent/LLMAdapter', () => ({
+vi.mock("../../src/core/agent/LLMAdapter", () => ({
   sendToLLM: vi.fn().mockImplementation((context, provider) => {
     // Si el contexto es vacío, simular respuesta vacía
     if (context && Array.isArray(context.blocks) && context.blocks.length === 0) {
-      return Promise.resolve({ suggestions: [], explanation: 'Sin datos' });
+      return Promise.resolve({ suggestions: [], explanation: "Sin datos" });
     }
     // Simular otros escenarios según el contenido de los bloques
-    if (context && context.blocks && context.blocks.some(b => b.content.includes('malestar general'))) {
+    if (context && context.blocks && context.blocks.some(b => b.content.includes("malestar general"))) {
       return Promise.resolve({
         suggestions: [
           {
             id: uuidv4(),
-            type: 'warning' as const,
-            field: 'plan' as const,
-            content: 'Considerar evaluación adicional por malestar general inespecífico',
-            sourceBlockId: context.blocks[0]?.id || 'default',
+            type: "warning" as const,
+            field: "plan" as const,
+            content: "Considerar evaluación adicional por malestar general inespecífico",
+            sourceBlockId: context.blocks[0]?.id || "default",
             createdAt: new Date(),
             updatedAt: new Date()
           }
         ],
-        explanation: 'Respuesta para contexto parcial.'
+        explanation: "Respuesta para contexto parcial."
       });
     }
     // Respuesta genérica con múltiples sugerencias
@@ -52,68 +52,68 @@ vi.mock('../../src/core/agent/LLMAdapter', () => ({
       suggestions: [
         {
           id: uuidv4(),
-          type: 'recommendation' as const,
-          field: 'diagnosis' as const,
-          content: 'Considerar realizar radiografía de tórax',
-          sourceBlockId: context.blocks[0]?.id || 'default',
+          type: "recommendation" as const,
+          field: "diagnosis" as const,
+          content: "Considerar realizar radiografía de tórax",
+          sourceBlockId: context.blocks[0]?.id || "default",
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
           id: uuidv4(),
-          type: 'warning' as const,
-          field: 'plan' as const,
-          content: 'Vigilar signos de dificultad respiratoria',
-          sourceBlockId: context.blocks[1]?.id || 'default',
+          type: "warning" as const,
+          field: "plan" as const,
+          content: "Vigilar signos de dificultad respiratoria",
+          sourceBlockId: context.blocks[1]?.id || "default",
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
           id: uuidv4(),
-          type: 'info' as const,
-          field: 'notes' as const,
-          content: 'Considerar antecedente de asma en evaluación',
-          sourceBlockId: context.blocks[1]?.id || 'default',
+          type: "info" as const,
+          field: "notes" as const,
+          content: "Considerar antecedente de asma en evaluación",
+          sourceBlockId: context.blocks[1]?.id || "default",
           createdAt: new Date(),
           updatedAt: new Date()
         }
       ],
-      explanation: 'Respuesta generada por mock.'
+      explanation: "Respuesta generada por mock."
     });
   })
 }));
 
-vi.mock('../../src/core/agent/ClinicalAgent', () => ({
+vi.mock("../../src/core/agent/ClinicalAgent", () => ({
   ClinicalAgent: {
     create: vi.fn().mockImplementation(async (visitId: string) => {
       // Si el visitId es 'empty-visit', retornar contexto vacío
-      if (visitId === 'empty-visit') {
+      if (visitId === "empty-visit") {
         return {
-      getContext: vi.fn().mockResolvedValue({
-        visitId,
-        blocks: [],
-        metadata: {}
-      }),
-      getSuggestions: vi.fn().mockReturnValue([]),
-      addSuggestion: vi.fn()
+          getContext: vi.fn().mockResolvedValue({
+            visitId,
+            blocks: [],
+            metadata: {}
+          }),
+          getSuggestions: vi.fn().mockReturnValue([]),
+          addSuggestion: vi.fn()
         };
       }
       // Si el visitId es 'visit-partial', retornar contexto parcial
-      if (visitId === 'visit-partial') {
+      if (visitId === "visit-partial") {
         return {
           getContext: vi.fn().mockResolvedValue({
             visitId,
             blocks: [
               {
-                id: 'block-1',
-                type: 'contextual',
-                content: 'Paciente refiere malestar general',
+                id: "block-1",
+                type: "contextual",
+                content: "Paciente refiere malestar general",
                 timestamp: new Date().toISOString(),
-                patient_id: 'patient-123'
+                patient_id: "patient-123"
               }
             ],
             metadata: {
-              patientId: 'patient-123'
+              patientId: "patient-123"
             }
           }),
           getSuggestions: vi.fn().mockReturnValue([]),
@@ -126,22 +126,22 @@ vi.mock('../../src/core/agent/ClinicalAgent', () => ({
           visitId,
           blocks: [
             {
-              id: 'block-1',
-              type: 'contextual',
-              content: 'Paciente presenta fiebre de 38.5°C y tos seca',
+              id: "block-1",
+              type: "contextual",
+              content: "Paciente presenta fiebre de 38.5°C y tos seca",
               timestamp: new Date().toISOString(),
-              patient_id: 'patient-123'
+              patient_id: "patient-123"
             },
             {
-              id: 'block-2',
-              type: 'persistent',
-              content: 'Historial de asma bronquial',
+              id: "block-2",
+              type: "persistent",
+              content: "Historial de asma bronquial",
               timestamp: new Date().toISOString(),
-              patient_id: 'patient-123'
+              patient_id: "patient-123"
             }
           ],
           metadata: {
-            patientId: 'patient-123'
+            patientId: "patient-123"
           }
         }),
         getSuggestions: vi.fn().mockReturnValue([]),
@@ -161,7 +161,7 @@ vi.mock('../../src/core/agent/ClinicalAgent', () => ({
  * 4. Contexto parcialmente válido → debe limpiar/validar lo que pueda y continuar
  * 5. Integración de sugerencias → debe integrarse correctamente al EMR
  */
-describe('AgentExecutor EVAL', () => {
+describe("AgentExecutor EVAL", () => {
   // Configurar el entorno de pruebas
   beforeAll(() => {
     vi.useFakeTimers();
@@ -178,10 +178,10 @@ describe('AgentExecutor EVAL', () => {
    * El ejecutor debe generar sugerencias relevantes basadas en la información
    * del contexto, siguiendo la estructura definida por AgentSuggestion
    */
-  describe('Caso 1: Contexto MCP completo y válido', () => {
-    it('debe generar sugerencias estructuradas cuando se proporciona un contexto completo', async () => {
+  describe("Caso 1: Contexto MCP completo y válido", () => {
+    it("debe generar sugerencias estructuradas cuando se proporciona un contexto completo", async () => {
       // Crear el executor usando el método estático y ejecutar el agente
-      const executor = await AgentExecutor.create('visit-123', 'openai');
+      const executor = await AgentExecutor.create("visit-123", "openai");
       const suggestions = await executor.execute();
       
       // Verificaciones
@@ -198,8 +198,8 @@ describe('AgentExecutor EVAL', () => {
       // Verificar que las sugerencias contienen tipos variados 
       // (al menos una recommendation y una warning/info)
       const types = suggestions.map(s => s.type);
-      const hasRecommendation = types.includes('recommendation');
-      const hasWarningOrInfo = types.includes('warning') || types.includes('info');
+      const hasRecommendation = types.includes("recommendation");
+      const hasWarningOrInfo = types.includes("warning") || types.includes("info");
       
       // Solo uno de estos debería ser verdadero, dependiendo de la implementación
       expect(hasRecommendation || hasWarningOrInfo).toBe(true);
@@ -216,10 +216,10 @@ describe('AgentExecutor EVAL', () => {
    * El ejecutor debe manejar correctamente un contexto vacío,
    * evitando errores y devolviendo un array de sugerencias vacío
    */
-  describe('Caso 2: Contexto MCP nulo o vacío', () => {
-    it('debe manejar correctamente un contexto vacío sin errores', async () => {
+  describe("Caso 2: Contexto MCP nulo o vacío", () => {
+    it("debe manejar correctamente un contexto vacío sin errores", async () => {
       // Crear el executor usando el método estático y ejecutar el agente
-      const executor = await AgentExecutor.create('empty-visit', 'openai');
+      const executor = await AgentExecutor.create("empty-visit", "openai");
       const suggestions = await executor.execute();
       
       // Verificar que se devuelve un array (posiblemente vacío), pero sin errores
@@ -235,11 +235,11 @@ describe('AgentExecutor EVAL', () => {
       }
     });
     
-    it('debe rechazar un contexto nulo con un error apropiado', async () => {
+    it("debe rechazar un contexto nulo con un error apropiado", async () => {
       // Intentar crear el executor con un visitId inválido
-      await expect(AgentExecutor.create(null as any, 'openai'))
+      await expect(AgentExecutor.create(null as any, "openai"))
         .rejects
-        .toThrow('El ID de visita es requerido para crear el ejecutor del agente');
+        .toThrow("El ID de visita es requerido para crear el ejecutor del agente");
     });
   });
 
@@ -249,10 +249,10 @@ describe('AgentExecutor EVAL', () => {
    * El ejecutor debe identificar cuando no hay información útil
    * en el contexto y devolver un resultado apropiado
    */
-  describe('Caso 3: Contexto sin información accionable', () => {
-    it('debe devolver un array vacío o sugerencias limitadas cuando no hay info accionable', async () => {
+  describe("Caso 3: Contexto sin información accionable", () => {
+    it("debe devolver un array vacío o sugerencias limitadas cuando no hay info accionable", async () => {
       // Crear el executor usando el método estático y ejecutar el agente
-      const executor = await AgentExecutor.create('visit-empty-structure', 'openai');
+      const executor = await AgentExecutor.create("visit-empty-structure", "openai");
       const suggestions = await executor.execute();
       
       // Verificar el resultado - podría ser un array vacío o con sugerencias genéricas
@@ -276,10 +276,10 @@ describe('AgentExecutor EVAL', () => {
    * El ejecutor debe limpiar y validar datos parciales,
    * generando las mejores sugerencias posibles con la información disponible
    */
-  describe('Caso 4: Contexto parcialmente válido', () => {
-    it('debe limpiar datos parciales y generar sugerencias razonables', async () => {
+  describe("Caso 4: Contexto parcialmente válido", () => {
+    it("debe limpiar datos parciales y generar sugerencias razonables", async () => {
       // Crear el executor usando el método estático y ejecutar el agente
-      const executor = await AgentExecutor.create('visit-partial', 'openai');
+      const executor = await AgentExecutor.create("visit-partial", "openai");
       const suggestions = await executor.execute();
       
       // Verificaciones
@@ -297,7 +297,7 @@ describe('AgentExecutor EVAL', () => {
         const sourceBlockIds = suggestions.map(s => s.sourceBlockId).filter(id => id != null);
         
         // Obtener los IDs de bloques del contexto real usado
-        const context = await executor['agent'].getContext();
+        const context = await executor["agent"].getContext();
         const actualBlockIds = context.blocks.map(b => b.id);
         
         // Verificar que todos los sourceBlockIds existen en el contexto real
@@ -313,15 +313,15 @@ describe('AgentExecutor EVAL', () => {
    * Prueba que verifica que las sugerencias aprobadas se integran
    * correctamente en el EMR y se registran en el sistema de auditoría
    */
-  describe('Caso 5: Integración de sugerencias al EMR', () => {
-    it('debe integrar una sugerencia aprobada en el EMR y registrar el evento', async () => {
+  describe("Caso 5: Integración de sugerencias al EMR", () => {
+    it("debe integrar una sugerencia aprobada en el EMR y registrar el evento", async () => {
       // Crear una sugerencia de prueba
       const mockSuggestion = {
         id: uuidv4(),
-        sourceBlockId: 'block-1',
-        type: 'recommendation' as const,
-        content: 'Mock content',
-        field: 'diagnosis' as const,
+        sourceBlockId: "block-1",
+        type: "recommendation" as const,
+        content: "Mock content",
+        field: "diagnosis" as const,
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -329,13 +329,13 @@ describe('AgentExecutor EVAL', () => {
       // Configurar mocks
       const mockInsertSuggestion = vi.fn().mockImplementation(async () => {
         // Simular el logging interno que ocurre después de una inserción exitosa
-        await AuditLogger.log('suggestions.approved', {
-          visitId: 'visit-test-123',
-          userId: 'user-test-456',
-          patientId: 'patient-test-789',
-          field: 'plan',
+        await AuditLogger.log("suggestions.approved", {
+          visitId: "visit-test-123",
+          userId: "user-test-456",
+          patientId: "patient-test-789",
+          field: "plan",
           content: mockSuggestion.content,
-          source: 'agent',
+          source: "agent",
           suggestionId: mockSuggestion.id,
           timestamp: new Date().toISOString()
         });
@@ -346,12 +346,12 @@ describe('AgentExecutor EVAL', () => {
       
       // Asignar los mocks a los métodos
       vi.mocked(EMRFormService).insertSuggestion = mockInsertSuggestion;
-      vi.mocked(EMRFormService).mapSuggestionTypeToEMRSection = vi.fn().mockReturnValue('plan');
+      vi.mocked(EMRFormService).mapSuggestionTypeToEMRSection = vi.fn().mockReturnValue("plan");
       vi.mocked(AuditLogger).log = mockLog;
       
       // Datos de prueba
-      const visitId = 'visit-test-123';
-      const userId = 'user-test-456';
+      const visitId = "visit-test-123";
+      const userId = "user-test-456";
       
       // Simular una aprobación de sugerencia
       await EMRFormService.insertSuggestion(
@@ -362,7 +362,7 @@ describe('AgentExecutor EVAL', () => {
           sourceBlockId: mockSuggestion.sourceBlockId
         },
         visitId,
-        'patient-test-789',
+        "patient-test-789",
         userId
       );
       
@@ -375,15 +375,15 @@ describe('AgentExecutor EVAL', () => {
           sourceBlockId: mockSuggestion.sourceBlockId
         },
         visitId,
-        'patient-test-789',
+        "patient-test-789",
         userId
       );
       
       // Verificar que se registró el evento en el sistema de auditoría
-      expect(mockLog).toHaveBeenCalledWith('suggestions.approved', expect.objectContaining({
+      expect(mockLog).toHaveBeenCalledWith("suggestions.approved", expect.objectContaining({
         visitId,
-        field: 'plan',
-          content: mockSuggestion.content,
+        field: "plan",
+        content: mockSuggestion.content,
         suggestionId: mockSuggestion.id
       }));
     });

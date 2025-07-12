@@ -1,7 +1,7 @@
-const winston = require('winston');
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -15,7 +15,7 @@ class PromptFactory {
   }
 
   // 🚀 PROMPTS ESTRUCTURADOS V2 - OPTIMIZACIÓN CRÍTICA PARA EVITAR TIMEOUT
-  generatePrompt(transcription, specialty = 'physiotherapy', sessionType = 'initial') {
+  generatePrompt(transcription, specialty = "physiotherapy", sessionType = "initial") {
     // Obtener conocimiento específico de la knowledge base
     const redFlags = this.getRedFlagsForSpecialty(specialty);
     const contraindicaciones = this.getContraindicationsForSpecialty(specialty);
@@ -72,7 +72,7 @@ RESPONDE SOLO CON JSON:
   }
 }`;
 
-    logger.info('🚀 PROMPT FISIOTERAPÉUTICO V2 CALIBRADO:', {
+    logger.info("🚀 PROMPT FISIOTERAPÉUTICO V2 CALIBRADO:", {
       specialty,
       sessionType,
       transcriptionLength: transcription.length,
@@ -92,16 +92,16 @@ RESPONDE SOLO CON JSON:
       const redFlags = this.knowledgeBase.redFlags[specialty];
       // Seleccionar las más críticas para mantener prompt conciso
       const criticalRedFlags = redFlags.slice(0, 8); // Top 8 más críticas
-      return criticalRedFlags.map(flag => `- ${flag}`).join('\n');
+      return criticalRedFlags.map(flag => `- ${flag}`).join("\n");
     }
     
     // Fallback si no hay knowledge base
     const fallbackRedFlags = {
-      'physiotherapy': '- Dolor nocturno que no cede con cambios de postura\n- Pérdida de sensibilidad en silla de montar\n- Disfunción de esfínteres\n- Signos neurológicos progresivos\n- Síntomas de arteria vertebral\n- Debilidad progresiva en extremidades',
-      'psychology': '- Ideación suicida/homicida\n- Psicosis activa\n- Episodio maníaco severo\n- Autolesiones\n- Comportamiento agresivo',
-      'general': '- Dolor torácico cardíaco\n- Disnea severa\n- Síntomas neurológicos focales\n- Sepsis\n- Pérdida de conciencia'
+      "physiotherapy": "- Dolor nocturno que no cede con cambios de postura\n- Pérdida de sensibilidad en silla de montar\n- Disfunción de esfínteres\n- Signos neurológicos progresivos\n- Síntomas de arteria vertebral\n- Debilidad progresiva en extremidades",
+      "psychology": "- Ideación suicida/homicida\n- Psicosis activa\n- Episodio maníaco severo\n- Autolesiones\n- Comportamiento agresivo",
+      "general": "- Dolor torácico cardíaco\n- Disnea severa\n- Síntomas neurológicos focales\n- Sepsis\n- Pérdida de conciencia"
     };
-    return fallbackRedFlags[specialty] || fallbackRedFlags['general'];
+    return fallbackRedFlags[specialty] || fallbackRedFlags["general"];
   }
 
   // Obtener contraindicaciones específicas de la knowledge base
@@ -110,11 +110,11 @@ RESPONDE SOLO CON JSON:
       const contraindications = this.knowledgeBase.contraindications.absolute;
       // Seleccionar las más relevantes para fisioterapia
       const criticalContraindications = contraindications.slice(0, 6);
-      return criticalContraindications.map(contra => `- ${contra}`).join('\n');
+      return criticalContraindications.map(contra => `- ${contra}`).join("\n");
     }
     
     // Fallback
-    return '- Fractura no consolidada\n- Síndrome de cauda equina\n- Manipulación con inestabilidad articular\n- Crisis inflamatoria aguda\n- Sospecha de tumor maligno\n- Mielopatía cervical progresiva';
+    return "- Fractura no consolidada\n- Síndrome de cauda equina\n- Manipulación con inestabilidad articular\n- Crisis inflamatoria aguda\n- Sospecha de tumor maligno\n- Mielopatía cervical progresiva";
   }
 
   // Obtener terminología esencial de la knowledge base
@@ -123,11 +123,11 @@ RESPONDE SOLO CON JSON:
       const terminology = this.knowledgeBase.terminology[specialty];
       // Seleccionar términos más relevantes para mantener prompt conciso
       const essentialTerms = terminology.slice(0, 6);
-      return essentialTerms.map(term => `- ${term.term}: ${term.definition}`).join('\n');
+      return essentialTerms.map(term => `- ${term.term}: ${term.definition}`).join("\n");
     }
     
     // Fallback
-    return '- ROM: Rango de movimiento articular\n- Test de Lasègue: Prueba neurológica ciática\n- Control motor: Coordinación del movimiento\n- Puntos gatillo: Nódulos miofasciales\n- Dolor mecánico: Empeora con actividad\n- Dolor inflamatorio: Rigidez matutina';
+    return "- ROM: Rango de movimiento articular\n- Test de Lasègue: Prueba neurológica ciática\n- Control motor: Coordinación del movimiento\n- Puntos gatillo: Nódulos miofasciales\n- Dolor mecánico: Empeora con actividad\n- Dolor inflamatorio: Rigidez matutina";
   }
 
   // Métricas para logging
@@ -176,7 +176,7 @@ JSON REQUERIDO:
   }
 }`;
 
-    logger.info('🚀 CHUNK FISIOTERAPÉUTICO V2:', {
+    logger.info("🚀 CHUNK FISIOTERAPÉUTICO V2:", {
       chunkNumber,
       totalChunks,
       chunkLength: chunkText.length,
@@ -190,7 +190,7 @@ JSON REQUERIDO:
 
   // MÉTODOS LEGACY MANTENIDOS PARA COMPATIBILIDAD
   getBasePrompt() {
-    return 'Asistente clínico AiDuxCare - análisis fisioterapéutico especializado';
+    return "Asistente clínico AiDuxCare - análisis fisioterapéutico especializado";
   }
 
   getSpecialtyPrompt(specialty) {
@@ -204,7 +204,7 @@ JSON REQUERIDO:
   getKnowledgePrompt(specialty) {
     if (this.knowledgeBase && this.knowledgeBase.rules && this.knowledgeBase.rules[specialty]) {
       const rules = this.knowledgeBase.rules[specialty];
-      return `Reglas clínicas ${specialty}: ${rules.slice(0, 3).join(', ')}`;
+      return `Reglas clínicas ${specialty}: ${rules.slice(0, 3).join(", ")}`;
     }
     return `Conocimiento clínico: ${specialty}`;
   }
@@ -214,12 +214,12 @@ JSON REQUERIDO:
   }
 
   getOutputFormatPrompt() {
-    return 'Formato: JSON estructurado fisioterapéutico';
+    return "Formato: JSON estructurado fisioterapéutico";
   }
 
   // 🚀 MÉTODOS PARA FLUJO COMPLETO - 3 FASES DE CONSULTA
   
-  generateInitialAnalysisPrompt(transcription, specialty = 'physiotherapy') {
+  generateInitialAnalysisPrompt(transcription, specialty = "physiotherapy") {
     const redFlags = this.getRedFlagsForSpecialty(specialty);
     const contraindicaciones = this.getContraindicationsForSpecialty(specialty);
     
@@ -271,7 +271,7 @@ RESPONDE SOLO CON JSON:
 }`;
   }
 
-  generateIntegrationPrompt(transcription, specialty = 'physiotherapy', previousAnalysis, additionalInfo) {
+  generateIntegrationPrompt(transcription, specialty = "physiotherapy", previousAnalysis, additionalInfo) {
     return `FASE 2: INTEGRACIÓN DE INFORMACIÓN ADICIONAL
 Integra la información adicional obtenida con el análisis previo:
 
@@ -320,7 +320,7 @@ RESPONDE SOLO CON JSON:
 }`;
   }
 
-  generateSOAPPrompt(transcription, specialty = 'physiotherapy', previousAnalysis, clinicalIntegration) {
+  generateSOAPPrompt(transcription, specialty = "physiotherapy", previousAnalysis, clinicalIntegration) {
     return `FASE 3: GENERACIÓN SOAP FINAL ESTRUCTURADO
 Genera un SOAP profesional y completo basado en toda la información integrada:
 

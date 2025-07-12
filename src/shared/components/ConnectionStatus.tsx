@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import supabase from '@/core/auth/supabaseClient';
+import { useState, useEffect } from "react";
+import supabase from "@/core/auth/supabaseClient";
 // import { testDirectConnection } from '@/core/auth/directClient';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient } from "@supabase/supabase-js";
 
 interface ErrorWithMessage {
   message?: string;
@@ -10,39 +10,39 @@ interface ErrorWithMessage {
 
 // Componente simplificado para comprobar la conexión a Supabase
 export const ConnectionStatus = () => {
-  const [status, setStatus] = useState<'checking' | 'connected' | 'error'>('checking');
+  const [status, setStatus] = useState<"checking" | "connected" | "error">("checking");
   const [errorInfo, setErrorInfo] = useState<string | null>(null);
   const [details, setDetails] = useState<string | null>(null);
 
   useEffect(() => {
     // Función para comprobar la conexión con varios métodos
     const checkConnection = async () => {
-      console.log('Iniciando diagnóstico de conexión a Supabase...');
+      console.log("Iniciando diagnóstico de conexión a Supabase...");
       
       try {
         // 1. Primero intentar con el cliente Singleton oficial
-        console.log('MÉTODO 1: Probando conexión con cliente Singleton...');
-        const singletonTest = await supabase.from('patients').select('id').limit(1);
+        console.log("MÉTODO 1: Probando conexión con cliente Singleton...");
+        const singletonTest = await supabase.from("patients").select("id").limit(1);
         
         if (!singletonTest.error) {
-          setStatus('connected');
+          setStatus("connected");
           setErrorInfo(null);
-          setDetails('✅ Conexión exitosa con cliente Singleton');
-          console.log('✅ Cliente Singleton funcionando');
+          setDetails("✅ Conexión exitosa con cliente Singleton");
+          console.log("✅ Cliente Singleton funcionando");
           return;
         } 
         
-        console.log('❌ Cliente Singleton falló:', singletonTest.error);
+        console.log("❌ Cliente Singleton falló:", singletonTest.error);
         
         // 2. Si falló el método directo, intentar con el cliente oficial
-        console.log('MÉTODO 2: Probando con el cliente oficial de Supabase...');
+        console.log("MÉTODO 2: Probando con el cliente oficial de Supabase...");
         const client = supabase as SupabaseClient;
         if (!client) {
-          throw new Error('Cliente Supabase no disponible');
+          throw new Error("Cliente Supabase no disponible");
         }
         
         // Lista de tablas para probar
-        const tablesToTry = ['health_check', 'contextual_memory', 'persistent_memory'];
+        const tablesToTry = ["health_check", "contextual_memory", "persistent_memory"];
         let successfulTable = null;
         let lastError: ErrorWithMessage | null = null;
         
@@ -52,7 +52,7 @@ export const ConnectionStatus = () => {
             console.log(`Probando tabla ${table} con cliente oficial...`);
             const { data, error } = await client
               .from(table)
-              .select('*')
+              .select("*")
               .limit(1);
               
             if (error) {
@@ -71,23 +71,23 @@ export const ConnectionStatus = () => {
         
         // Evaluar resultados del segundo método
         if (successfulTable) {
-          setStatus('connected');
+          setStatus("connected");
           setErrorInfo(null);
           setDetails(`Conexión establecida con cliente oficial a través de tabla: ${successfulTable}`);
         } else {
           // Si ambos métodos fallaron, mostrar error
-          setStatus('error');
+          setStatus("error");
           
           if (singletonTest.error) {
             const singletonError = singletonTest.error as ErrorWithMessage;
-            const message = singletonError.message || 'Error desconocido';
-            const hint = singletonError.hint || '';
-            setErrorInfo(`${message}${hint ? ` (${hint})` : ''}`);
+            const message = singletonError.message || "Error desconocido";
+            const hint = singletonError.hint || "";
+            setErrorInfo(`${message}${hint ? ` (${hint})` : ""}`);
           } else if (lastError) {
-            const message = lastError.message || 'Error desconocido';
+            const message = lastError.message || "Error desconocido";
             setErrorInfo(message);
           } else {
-            setErrorInfo('No se pudo conectar a Supabase por ningún método');
+            setErrorInfo("No se pudo conectar a Supabase por ningún método");
           }
           
           // Detalles técnicos completos
@@ -97,9 +97,9 @@ export const ConnectionStatus = () => {
           }, null, 2));
         }
       } catch (err) {
-        console.error('Error general al verificar conexión:', err);
-        setStatus('error');
-        setErrorInfo(err instanceof Error ? err.message : 'Error desconocido');
+        console.error("Error general al verificar conexión:", err);
+        setStatus("error");
+        setErrorInfo(err instanceof Error ? err.message : "Error desconocido");
       }
     };
     
@@ -112,20 +112,20 @@ export const ConnectionStatus = () => {
     <div className="connection-status p-4 border rounded">
       <h2 className="text-lg font-bold mb-2">Estado de conexión a Supabase</h2>
       
-      {status === 'checking' && (
+      {status === "checking" && (
         <div className="checking">
           <p className="text-blue-600">⌛ Comprobando conexión con Supabase...</p>
         </div>
       )}
       
-      {status === 'connected' && (
+      {status === "connected" && (
         <div className="connected">
           <p className="text-green-600">✅ Conexión a Supabase activa</p>
           {details && <p className="text-sm text-gray-600">{details}</p>}
         </div>
       )}
       
-      {status === 'error' && (
+      {status === "error" && (
         <div className="error">
           <p className="text-red-600">❌ Error en la conexión a Supabase</p>
           {errorInfo && <p className="text-sm text-red-500">{errorInfo}</p>}

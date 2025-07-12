@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { TranscriptionSegment, audioCaptureService } from '@/core/audio/AudioCaptureService';
-import { trackMetric } from '@/services/UsageAnalyticsService';
-import { AuditLogger } from '@/core/audit/AuditLogger';
+import React, { useState } from "react";
+import { TranscriptionSegment, audioCaptureService } from "@/core/audio/AudioCaptureService";
+import { trackMetric } from "@/services/UsageAnalyticsService";
+import { AuditLogger } from "@/core/audit/AuditLogger";
 
 interface AudioReviewChecklistProps {
   transcription: TranscriptionSegment[];
@@ -23,7 +23,7 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
 }) => {
   const [segments, setSegments] = useState<TranscriptionSegment[]>(transcription);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState<string>('');
+  const [editContent, setEditContent] = useState<string>("");
   const [approvedCount, setApprovedCount] = useState(0);
   
   // Manejar la edición de un segmento
@@ -67,10 +67,10 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
     onApproveSegment(segment.content);
     
     // Registrar evento en el log de auditoría
-    AuditLogger.log('audio.validated', {
+    AuditLogger.log("audio.validated", {
       userId,
       visitId,
-      patientId: 'unknown',
+      patientId: "unknown",
       segmentId: segment.id,
       actor: segment.actor,
       content: segment.content,
@@ -79,11 +79,11 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
     
     // Registrar métrica
     trackMetric(
-      'suggestions_accepted',
+      "suggestions_accepted",
       {
         suggestionId: segment.id,
-        suggestionType: 'recommendation',
-        suggestionField: 'audio'
+        suggestionType: "recommendation",
+        suggestionField: "audio"
       },
       userId,
       visitId
@@ -112,10 +112,10 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
     onApproveSegment(content);
     
     // Registrar en auditoría
-    AuditLogger.log('audio.summary.integrated', {
+    AuditLogger.log("audio.summary.integrated", {
       userId,
       visitId,
-      patientId: 'unknown',
+      patientId: "unknown",
       segmentsCount: approvedSegments.length,
       contentLength: content.length
     });
@@ -127,56 +127,56 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
   // Obtener el color de fondo según el tipo de actor
   const getActorBgColor = (actor: string): string => {
     switch (actor) {
-      case 'profesional':
-        return 'bg-blue-50 border-blue-100';
-      case 'paciente':
-        return 'bg-green-50 border-green-100';
-      case 'acompañante':
-        return 'bg-purple-50 border-purple-100';
-      default:
-        return 'bg-gray-50 border-gray-100';
+    case "profesional":
+      return "bg-blue-50 border-blue-100";
+    case "paciente":
+      return "bg-green-50 border-green-100";
+    case "acompañante":
+      return "bg-purple-50 border-purple-100";
+    default:
+      return "bg-gray-50 border-gray-100";
     }
   };
   
   // Obtener el color de texto según el tipo de actor
   const getActorTextColor = (actor: string): string => {
     switch (actor) {
-      case 'profesional':
-        return 'text-blue-800';
-      case 'paciente':
-        return 'text-green-800';
-      case 'acompañante':
-        return 'text-purple-800';
-      default:
-        return 'text-gray-800';
+    case "profesional":
+      return "text-blue-800";
+    case "paciente":
+      return "text-green-800";
+    case "acompañante":
+      return "text-purple-800";
+    default:
+      return "text-gray-800";
     }
   };
   
   // Obtener el label para el tipo de actor
   const getActorLabel = (actor: string): string => {
     switch (actor) {
-      case 'profesional':
-        return 'Profesional';
-      case 'paciente':
-        return 'Paciente';
-      case 'acompañante':
-        return 'Acompañante';
-      default:
-        return 'Desconocido';
+    case "profesional":
+      return "Profesional";
+    case "paciente":
+      return "Paciente";
+    case "acompañante":
+      return "Acompañante";
+    default:
+      return "Desconocido";
     }
   };
   
   // Obtener el color y el texto según el nivel de confianza
   const getConfidenceInfo = (confidence: string): { color: string; text: string } => {
     switch (confidence) {
-      case 'entendido':
-        return { color: 'text-green-600', text: 'Alta confianza' };
-      case 'poco_claro':
-        return { color: 'text-yellow-600', text: 'Confianza media' };
-      case 'no_reconocido':
-        return { color: 'text-red-600', text: 'Baja confianza' };
-      default:
-        return { color: 'text-gray-600', text: 'Desconocido' };
+    case "entendido":
+      return { color: "text-green-600", text: "Alta confianza" };
+    case "poco_claro":
+      return { color: "text-yellow-600", text: "Confianza media" };
+    case "no_reconocido":
+      return { color: "text-red-600", text: "Baja confianza" };
+    default:
+      return { color: "text-gray-600", text: "Desconocido" };
     }
   };
 
@@ -207,9 +207,9 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
               className={`p-4 border rounded-md ${getActorBgColor(segment.actor)} ${
                 segment.approved !== undefined
                   ? segment.approved
-                    ? 'ring-2 ring-green-400'
-                    : 'opacity-50'
-                  : ''
+                    ? "ring-2 ring-green-400"
+                    : "opacity-50"
+                  : ""
               }`}
             >
               <div className="flex justify-between items-start mb-2">
@@ -268,7 +268,7 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
                 </div>
               ) : (
                 <div className="mt-2">
-                  <p className={`text-sm ${segment.confidence === 'no_reconocido' ? 'text-red-600 font-medium' : 'text-gray-700'}`}>
+                  <p className={`text-sm ${segment.confidence === "no_reconocido" ? "text-red-600 font-medium" : "text-gray-700"}`}>
                     {segment.content}
                   </p>
                   
@@ -308,8 +308,8 @@ const AudioReviewChecklist: React.FC<AudioReviewChecklistProps> = ({
           disabled={approvedCount === 0}
           className={`px-4 py-2 text-white rounded-md ${
             approvedCount > 0
-              ? 'bg-green-600 hover:bg-green-700'
-              : 'bg-gray-400 cursor-not-allowed'
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-gray-400 cursor-not-allowed"
           }`}
         >
           Generar Resumen e Integrar

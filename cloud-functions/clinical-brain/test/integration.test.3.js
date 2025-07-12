@@ -1,19 +1,19 @@
-const request = require('supertest');
-const express = require('express');
-const { clinicalBrain } = require('../index');
+const request = require("supertest");
+const express = require("express");
+const { clinicalBrain } = require("../index");
 
 // Mock de las dependencias para testing
-jest.mock('@google-cloud/aiplatform');
-jest.mock('@google-cloud/storage');
+jest.mock("@google-cloud/aiplatform");
+jest.mock("@google-cloud/storage");
 
-describe('Clinical Brain Integration Tests', () => {
+describe("Clinical Brain Integration Tests", () => {
   let app;
 
   beforeAll(() => {
     // Configurar Express app para testing
     app = express();
     app.use(express.json());
-    app.use('/', clinicalBrain);
+    app.use("/", clinicalBrain);
   });
 
   beforeEach(() => {
@@ -21,36 +21,36 @@ describe('Clinical Brain Integration Tests', () => {
     jest.clearAllMocks();
   });
 
-  describe('Health Check', () => {
-    test('should return healthy status', async () => {
+  describe("Health Check", () => {
+    test("should return healthy status", async () => {
       const response = await request(app)
-        .get('/health')
+        .get("/health")
         .expect(200);
 
       expect(response.body).toEqual({
-        status: 'healthy',
-        service: 'clinical-brain',
+        status: "healthy",
+        service: "clinical-brain",
         timestamp: expect.any(String),
-        version: '1.0.0'
+        version: "1.0.0"
       });
     });
   });
 
-  describe('Clinical Analysis', () => {
-    test('should validate required fields', async () => {
+  describe("Clinical Analysis", () => {
+    test("should validate required fields", async () => {
       const response = await request(app)
-        .post('/analyze')
+        .post("/analyze")
         .send({})
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Missing required fields',
-        required: ['transcription', 'specialty'],
+        error: "Missing required fields",
+        required: ["transcription", "specialty"],
         received: []
       });
     });
 
-    test('should accept valid analysis request', async () => {
+    test("should accept valid analysis request", async () => {
       // Mock successful Vertex AI response
       const mockVertexResponse = {
         warnings: [],
@@ -90,7 +90,7 @@ describe('Clinical Brain Integration Tests', () => {
             exists: jest.fn().mockResolvedValue([true]),
             download: jest.fn().mockResolvedValue([
               JSON.stringify({
-                rules: { physiotherapy: ['Test rule'] },
+                rules: { physiotherapy: ["Test rule"] },
                 terminology: { physiotherapy: [] }
               })
             ])
@@ -105,7 +105,7 @@ describe('Clinical Brain Integration Tests', () => {
       };
 
       const response = await request(app)
-        .post('/analyze')
+        .post("/analyze")
         .send(validRequest)
         .expect(200);
 
@@ -131,20 +131,20 @@ describe('Clinical Brain Integration Tests', () => {
           })
         }),
         metadata: expect.objectContaining({
-          specialty: 'physiotherapy',
-          sessionType: 'initial',
+          specialty: "physiotherapy",
+          sessionType: "initial",
           processingTimeMs: expect.any(Number),
           timestamp: expect.any(String),
-          version: '1.0.0'
+          version: "1.0.0"
         })
       });
     });
 
-    test('should handle analysis errors gracefully', async () => {
+    test("should handle analysis errors gracefully", async () => {
       // Mock error en Vertex AI
       const mockVertexAI = {
         getGenerativeModel: jest.fn().mockReturnValue({
-          generateContent: jest.fn().mockRejectedValue(new Error('Vertex AI error'))
+          generateContent: jest.fn().mockRejectedValue(new Error("Vertex AI error"))
         })
       };
 
@@ -154,13 +154,13 @@ describe('Clinical Brain Integration Tests', () => {
       };
 
       const response = await request(app)
-        .post('/analyze')
+        .post("/analyze")
         .send(validRequest)
         .expect(500);
 
       expect(response.body).toEqual({
         success: false,
-        error: 'Clinical analysis failed',
+        error: "Clinical analysis failed",
         message: expect.any(String),
         metadata: expect.objectContaining({
           processingTimeMs: expect.any(Number),
@@ -170,44 +170,44 @@ describe('Clinical Brain Integration Tests', () => {
     });
   });
 
-  describe('CORS Configuration', () => {
-    test('should handle OPTIONS preflight request', async () => {
+  describe("CORS Configuration", () => {
+    test("should handle OPTIONS preflight request", async () => {
       const response = await request(app)
-        .options('/analyze')
+        .options("/analyze")
         .expect(200);
 
-      expect(response.headers['access-control-allow-origin']).toBeDefined();
-      expect(response.headers['access-control-allow-methods']).toBeDefined();
-      expect(response.headers['access-control-allow-headers']).toBeDefined();
+      expect(response.headers["access-control-allow-origin"]).toBeDefined();
+      expect(response.headers["access-control-allow-methods"]).toBeDefined();
+      expect(response.headers["access-control-allow-headers"]).toBeDefined();
     });
 
-    test('should include CORS headers in responses', async () => {
+    test("should include CORS headers in responses", async () => {
       const response = await request(app)
-        .get('/health')
+        .get("/health")
         .expect(200);
 
-      expect(response.headers['access-control-allow-origin']).toBeDefined();
-      expect(response.headers['access-control-allow-methods']).toBeDefined();
-      expect(response.headers['access-control-allow-headers']).toBeDefined();
+      expect(response.headers["access-control-allow-origin"]).toBeDefined();
+      expect(response.headers["access-control-allow-methods"]).toBeDefined();
+      expect(response.headers["access-control-allow-headers"]).toBeDefined();
     });
   });
 
-  describe('Error Handling', () => {
-    test('should return 404 for unknown endpoints', async () => {
+  describe("Error Handling", () => {
+    test("should return 404 for unknown endpoints", async () => {
       const response = await request(app)
-        .get('/unknown-endpoint')
+        .get("/unknown-endpoint")
         .expect(404);
 
       expect(response.body).toEqual({
-        error: 'Endpoint not found',
-        availableEndpoints: ['/analyze', '/health']
+        error: "Endpoint not found",
+        availableEndpoints: ["/analyze", "/health"]
       });
     });
 
-    test('should handle malformed JSON gracefully', async () => {
+    test("should handle malformed JSON gracefully", async () => {
       const response = await request(app)
-        .post('/analyze')
-        .send('invalid json')
+        .post("/analyze")
+        .send("invalid json")
         .expect(400);
 
       expect(response.body.error).toBeDefined();
@@ -216,46 +216,46 @@ describe('Clinical Brain Integration Tests', () => {
 });
 
 // Tests unitarios de componentes individuales
-describe('Unit Tests', () => {
-  describe('PromptFactory', () => {
-    const PromptFactory = require('../src/services/PromptFactory');
+describe("Unit Tests", () => {
+  describe("PromptFactory", () => {
+    const PromptFactory = require("../src/services/PromptFactory");
 
-    test('should generate valid prompt for physiotherapy', () => {
+    test("should generate valid prompt for physiotherapy", () => {
       const knowledgeBase = {
-        rules: { physiotherapy: ['Test rule'] },
+        rules: { physiotherapy: ["Test rule"] },
         terminology: { physiotherapy: [] }
       };
 
       const factory = new PromptFactory(knowledgeBase);
       const prompt = factory.generatePrompt(
-        'Test transcription',
-        'physiotherapy',
-        'initial'
+        "Test transcription",
+        "physiotherapy",
+        "initial"
       );
 
-      expect(prompt).toContain('ESPECIALIZACIÓN: FISIOTERAPIA');
-      expect(prompt).toContain('TIPO DE SESIÓN: EVALUACIÓN INICIAL');
-      expect(prompt).toContain('Test transcription');
-      expect(prompt).toContain('FORMATO DE RESPUESTA REQUERIDO');
+      expect(prompt).toContain("ESPECIALIZACIÓN: FISIOTERAPIA");
+      expect(prompt).toContain("TIPO DE SESIÓN: EVALUACIÓN INICIAL");
+      expect(prompt).toContain("Test transcription");
+      expect(prompt).toContain("FORMATO DE RESPUESTA REQUERIDO");
     });
 
-    test('should handle missing knowledge base gracefully', () => {
+    test("should handle missing knowledge base gracefully", () => {
       const factory = new PromptFactory(null);
       const prompt = factory.generatePrompt(
-        'Test transcription',
-        'physiotherapy',
-        'initial'
+        "Test transcription",
+        "physiotherapy",
+        "initial"
       );
 
-      expect(prompt).toContain('Base de conocimiento no disponible');
-      expect(prompt).toContain('Test transcription');
+      expect(prompt).toContain("Base de conocimiento no disponible");
+      expect(prompt).toContain("Test transcription");
     });
   });
 
-  describe('ResponseParser', () => {
-    const ResponseParser = require('../src/services/ResponseParser');
+  describe("ResponseParser", () => {
+    const ResponseParser = require("../src/services/ResponseParser");
 
-    test('should parse valid JSON response', () => {
+    test("should parse valid JSON response", () => {
       const parser = new ResponseParser({});
       const validResponse = {
         warnings: [],
@@ -277,7 +277,7 @@ describe('Unit Tests', () => {
         }
       };
 
-      const result = parser.parse(JSON.stringify(validResponse), 'physiotherapy');
+      const result = parser.parse(JSON.stringify(validResponse), "physiotherapy");
 
       expect(result).toEqual(expect.objectContaining({
         warnings: expect.any(Array),
@@ -287,22 +287,22 @@ describe('Unit Tests', () => {
       }));
     });
 
-    test('should create fallback response on parse error', () => {
+    test("should create fallback response on parse error", () => {
       const parser = new ResponseParser({});
-      const result = parser.parse('invalid json', 'physiotherapy');
+      const result = parser.parse("invalid json", "physiotherapy");
 
       expect(result).toEqual(expect.objectContaining({
         warnings: expect.arrayContaining([
           expect.objectContaining({
-            id: 'fallback_warning_001',
-            severity: 'MEDIUM',
-            category: 'clinical_alert'
+            id: "fallback_warning_001",
+            severity: "MEDIUM",
+            category: "clinical_alert"
           })
         ]),
         suggestions: expect.arrayContaining([
           expect.objectContaining({
-            id: 'fallback_suggestion_001',
-            type: 'additional_evaluation'
+            id: "fallback_suggestion_001",
+            type: "additional_evaluation"
           })
         ])
       }));
@@ -311,8 +311,8 @@ describe('Unit Tests', () => {
 });
 
 // Tests de performance
-describe('Performance Tests', () => {
-  test('should process analysis within acceptable time', async () => {
+describe("Performance Tests", () => {
+  test("should process analysis within acceptable time", async () => {
     const startTime = Date.now();
     
     // Mock rápido para test de performance
@@ -342,7 +342,7 @@ describe('Performance Tests', () => {
     };
 
     const response = await request(app)
-      .post('/analyze')
+      .post("/analyze")
       .send(validRequest);
 
     const processingTime = Date.now() - startTime;

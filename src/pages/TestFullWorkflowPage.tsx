@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface AnalysisResult {
   phase: string;
@@ -22,7 +22,7 @@ interface AnalysisResult {
 export default function TestFullWorkflowPage() {
   const [results, setResults] = useState<AnalysisResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState('');
+  const [currentPhase, setCurrentPhase] = useState("");
 
   // Historia desordenada con banderas rojas para fisioterapia
   const testTranscription = `
@@ -48,18 +48,18 @@ export default function TestFullWorkflowPage() {
     
     try {
       // FASE 1: Análisis inicial
-      setCurrentPhase('Fase 1: Análisis inicial - Detección de banderas rojas');
+      setCurrentPhase("Fase 1: Análisis inicial - Detección de banderas rojas");
       const phase1Start = Date.now();
       
-      const phase1Response = await fetch('https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain', {
-        method: 'POST',
+      const phase1Response = await fetch("https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           transcription: testTranscription,
-          specialty: 'physiotherapy',
-          phase: 'initial_analysis'
+          specialty: "physiotherapy",
+          phase: "initial_analysis"
         }),
       });
       
@@ -67,28 +67,28 @@ export default function TestFullWorkflowPage() {
       const phase1Time = Date.now() - phase1Start;
       
       setResults(prev => [...prev, {
-        phase: 'Fase 1: Análisis Inicial',
+        phase: "Fase 1: Análisis Inicial",
         result: phase1Result,
         timestamp: new Date().toISOString(),
         processingTime: phase1Time
       }]);
 
       // FASE 2: Integración de advertencias y preguntas sugeridas
-      setCurrentPhase('Fase 2: Integración de advertencias - Información adicional');
+      setCurrentPhase("Fase 2: Integración de advertencias - Información adicional");
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const phase2Start = Date.now();
-      const phase2Response = await fetch('https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain', {
-        method: 'POST',
+      const phase2Response = await fetch("https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           transcription: testTranscription,
-          specialty: 'physiotherapy',
-          phase: 'integration_analysis',
+          specialty: "physiotherapy",
+          phase: "integration_analysis",
           previousAnalysis: phase1Result,
-          additionalInfo: 'Paciente confirma dolor inflamatorio nocturno, rigidez matutina >1h, antecedente psoriasis cutánea, historia de uveítis anterior'
+          additionalInfo: "Paciente confirma dolor inflamatorio nocturno, rigidez matutina >1h, antecedente psoriasis cutánea, historia de uveítis anterior"
         }),
       });
       
@@ -96,26 +96,26 @@ export default function TestFullWorkflowPage() {
       const phase2Time = Date.now() - phase2Start;
       
       setResults(prev => [...prev, {
-        phase: 'Fase 2: Integración de Advertencias',
+        phase: "Fase 2: Integración de Advertencias",
         result: phase2Result,
         timestamp: new Date().toISOString(),
         processingTime: phase2Time
       }]);
 
       // FASE 3: Generación SOAP final
-      setCurrentPhase('Fase 3: Generación SOAP final - Estructuración profesional');
+      setCurrentPhase("Fase 3: Generación SOAP final - Estructuración profesional");
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const phase3Start = Date.now();
-      const phase3Response = await fetch('https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain', {
-        method: 'POST',
+      const phase3Response = await fetch("https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/clinicalBrain", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           transcription: testTranscription,
-          specialty: 'physiotherapy',
-          phase: 'soap_generation',
+          specialty: "physiotherapy",
+          phase: "soap_generation",
           previousAnalysis: phase2Result,
           clinicalIntegration: true
         }),
@@ -125,19 +125,19 @@ export default function TestFullWorkflowPage() {
       const phase3Time = Date.now() - phase3Start;
       
       setResults(prev => [...prev, {
-        phase: 'Fase 3: SOAP Final',
+        phase: "Fase 3: SOAP Final",
         result: phase3Result,
         timestamp: new Date().toISOString(),
         processingTime: phase3Time
       }]);
 
-      setCurrentPhase('Flujo completo finalizado');
+      setCurrentPhase("Flujo completo finalizado");
       
     } catch (error) {
-      console.error('Error en el flujo completo:', error);
+      console.error("Error en el flujo completo:", error);
       setResults(prev => [...prev, {
-        phase: 'Error',
-        result: { error: error instanceof Error ? error.message : 'Error desconocido' },
+        phase: "Error",
+        result: { error: error instanceof Error ? error.message : "Error desconocido" },
         timestamp: new Date().toISOString(),
         processingTime: 0
       }]);
@@ -185,7 +185,7 @@ export default function TestFullWorkflowPage() {
               disabled={isLoading}
               className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400"
             >
-              {isLoading ? 'Ejecutando Flujo...' : 'Ejecutar Flujo Completo (3 Consultas)'}
+              {isLoading ? "Ejecutando Flujo..." : "Ejecutar Flujo Completo (3 Consultas)"}
             </button>
           </div>
 

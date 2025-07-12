@@ -1,12 +1,12 @@
 /**
  * Tipo para el actor en la transcripción
  */
-export type TranscriptionActor = 'profesional' | 'paciente' | 'acompañante';
+export type TranscriptionActor = "profesional" | "paciente" | "acompañante";
 
 /**
  * Estado de confianza en la transcripción
  */
-export type TranscriptionConfidence = 'entendido' | 'poco_claro' | 'no_reconocido';
+export type TranscriptionConfidence = "entendido" | "poco_claro" | "no_reconocido";
 
 /**
  * Interfaz para un segmento de transcripción
@@ -41,7 +41,7 @@ export class AudioCaptureService {
     this.captureStartTime = Date.now();
     this.transcriptionSegments = [];
     
-    console.log('AudioCaptureService: Captura de audio iniciada');
+    console.log("AudioCaptureService: Captura de audio iniciada");
   }
 
   /**
@@ -54,7 +54,7 @@ export class AudioCaptureService {
     
     this.isCapturing = false;
     this.captureStartTime = null;
-    console.log('AudioCaptureService: Captura de audio detenida');
+    console.log("AudioCaptureService: Captura de audio detenida");
     
     // Simular una demora para imitar el procesamiento de audio
     // En una implementación real, esto sería asíncrono con una API real
@@ -77,33 +77,33 @@ export class AudioCaptureService {
    */
   public generateClinicalContent(approvedSegments: TranscriptionSegment[]): string {
     if (approvedSegments.length === 0) {
-      return '';
+      return "";
     }
 
-    const profesionalSegments = approvedSegments.filter(s => s.actor === 'profesional');
-    const pacienteSegments = approvedSegments.filter(s => s.actor === 'paciente');
-    const acompañanteSegments = approvedSegments.filter(s => s.actor === 'acompañante');
+    const profesionalSegments = approvedSegments.filter(s => s.actor === "profesional");
+    const pacienteSegments = approvedSegments.filter(s => s.actor === "paciente");
+    const acompañanteSegments = approvedSegments.filter(s => s.actor === "acompañante");
 
-    let content = '🔊 **Resumen de consulta (transcripción asistida)**\n\n';
+    let content = "🔊 **Resumen de consulta (transcripción asistida)**\n\n";
 
     if (profesionalSegments.length > 0) {
-      content += '**Profesional sanitario:**\n';
+      content += "**Profesional sanitario:**\n";
       profesionalSegments.forEach(s => {
         content += `- ${s.content}\n`;
       });
-      content += '\n';
+      content += "\n";
     }
 
     if (pacienteSegments.length > 0) {
-      content += '**Paciente:**\n';
+      content += "**Paciente:**\n";
       pacienteSegments.forEach(s => {
         content += `- ${s.content}\n`;
       });
-      content += '\n';
+      content += "\n";
     }
 
     if (acompañanteSegments.length > 0) {
-      content += '**Acompañante:**\n';
+      content += "**Acompañante:**\n";
       acompañanteSegments.forEach(s => {
         content += `- ${s.content}\n`;
       });

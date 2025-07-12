@@ -1,4 +1,4 @@
-import { onCLS, onINP, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
+import { onCLS, onINP, onFCP, onLCP, onTTFB, type Metric } from "web-vitals";
 
 /**
  * Interfaz para métricas de performance
@@ -6,7 +6,7 @@ import { onCLS, onINP, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
 export interface PerformanceMetric {
   name: string;
   value: number;
-  rating: 'good' | 'needs-improvement' | 'poor';
+  rating: "good" | "needs-improvement" | "poor";
   timestamp: number;
   url: string;
   id: string;
@@ -91,8 +91,8 @@ export class WebVitalsService {
     summary: Record<string, { average: number; latest: number; rating: string }>;
     metrics: PerformanceMetric[];
     timestamp: number;
-  } {
-    const metricsNames = ['CLS', 'INP', 'FCP', 'LCP', 'TTFB'];
+    } {
+    const metricsNames = ["CLS", "INP", "FCP", "LCP", "TTFB"];
     const summary: Record<string, { average: number; latest: number; rating: string }> = {};
 
     metricsNames.forEach(name => {
@@ -102,7 +102,7 @@ export class WebVitalsService {
       summary[name] = {
         average: Math.round(this.getAverageMetric(name)),
         latest: latest ? Math.round(latest.value) : 0,
-        rating: latest?.rating || 'unknown'
+        rating: latest?.rating || "unknown"
       };
     });
 
@@ -124,14 +124,14 @@ export class WebVitalsService {
    * Evalúa si la performance general es buena
    */
   public isPerformanceGood(): boolean {
-    const latestMetrics = ['CLS', 'INP', 'FCP', 'LCP', 'TTFB'].map(name => {
+    const latestMetrics = ["CLS", "INP", "FCP", "LCP", "TTFB"].map(name => {
       const metrics = this.getMetricsByName(name);
       return metrics[metrics.length - 1];
     }).filter(Boolean);
 
     if (latestMetrics.length === 0) return true;
 
-    const goodMetrics = latestMetrics.filter(metric => metric.rating === 'good');
+    const goodMetrics = latestMetrics.filter(metric => metric.rating === "good");
     return goodMetrics.length / latestMetrics.length >= 0.8;
   }
 }

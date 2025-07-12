@@ -1,11 +1,11 @@
-const VertexAIClient = require('./src/services/VertexAIClient');
-const ModelSelector = require('./src/services/ModelSelector');
-const PromptFactory = require('./src/services/PromptFactory');
-const winston = require('winston');
+const VertexAIClient = require("./src/services/VertexAIClient");
+const ModelSelector = require("./src/services/ModelSelector");
+const PromptFactory = require("./src/services/PromptFactory");
+const winston = require("winston");
 
 // Configurar logger
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -24,7 +24,7 @@ const testCases = {
       Dolor moderado que aumenta con movimiento. 
       Sin trauma previo. Trabaja en oficina.
     `,
-    expectedModel: 'gemini-2.0-flash',
+    expectedModel: "gemini-2.0-flash",
     description: "Caso simple con pocos síntomas y términos básicos"
   },
   
@@ -41,7 +41,7 @@ const testCases = {
       Tratamiento previo: fisioterapia, AINES, relajantes musculares.
       Requiere evaluación postural y ergonómica del puesto de trabajo.
     `,
-    expectedModel: 'gemini-2.5-flash',
+    expectedModel: "gemini-2.5-flash",
     description: "Caso moderado con múltiples síntomas y términos especializados"
   },
   
@@ -82,14 +82,14 @@ const testCases = {
       Pronóstico: reservado, requiere abordaje integral y seguimiento prolongado.
       Posible indicación quirúrgica si falla tratamiento conservador.
     `,
-    expectedModel: 'gemini-2.5-pro',
+    expectedModel: "gemini-2.5-pro",
     description: "Caso complejo con múltiples especialidades y análisis exhaustivo"
   }
 };
 
 async function testCostOptimization() {
-  console.log('💰 INICIANDO TEST DE OPTIMIZACIÓN DE COSTOS');
-  console.log('=' * 60);
+  console.log("💰 INICIANDO TEST DE OPTIMIZACIÓN DE COSTOS");
+  console.log("=" * 60);
   
   try {
     // Inicializar servicios
@@ -97,10 +97,10 @@ async function testCostOptimization() {
     const modelSelector = new ModelSelector();
     const promptFactory = new PromptFactory();
     
-    console.log('\n📊 CONFIGURACIÓN INICIAL:');
-    console.log('- Modelos disponibles:', Object.keys(modelSelector.getAvailableModels()));
-    console.log('- Optimización habilitada: SÍ');
-    console.log('- Estrategia: Selección automática basada en complejidad');
+    console.log("\n📊 CONFIGURACIÓN INICIAL:");
+    console.log("- Modelos disponibles:", Object.keys(modelSelector.getAvailableModels()));
+    console.log("- Optimización habilitada: SÍ");
+    console.log("- Estrategia: Selección automática basada en complejidad");
     
     // Estadísticas generales
     const stats = {
@@ -113,22 +113,22 @@ async function testCostOptimization() {
     // Ejecutar tests para cada caso
     for (const [caseKey, testCase] of Object.entries(testCases)) {
       console.log(`\n🧪 EJECUTANDO: ${testCase.name}`);
-      console.log('-' * 50);
+      console.log("-" * 50);
       
       try {
         // PASO 1: Análisis de selección de modelo
-        console.log('📋 Analizando complejidad...');
+        console.log("📋 Analizando complejidad...");
         const modelSelection = modelSelector.selectOptimalModel(testCase.transcription);
         
-        console.log('✅ Modelo seleccionado:', modelSelection.selectedModel);
-        console.log('📊 Complejidad total:', modelSelection.complexity.total);
-        console.log('💡 Razonamiento:', modelSelection.reasoning);
-        console.log('💰 Ahorro estimado:', modelSelection.costAnalysis.savingsVsPro);
+        console.log("✅ Modelo seleccionado:", modelSelection.selectedModel);
+        console.log("📊 Complejidad total:", modelSelection.complexity.total);
+        console.log("💡 Razonamiento:", modelSelection.reasoning);
+        console.log("💰 Ahorro estimado:", modelSelection.costAnalysis.savingsVsPro);
         
         // Verificar predicción
         const isCorrectPrediction = modelSelection.selectedModel === testCase.expectedModel;
         if (isCorrectPrediction) {
-          console.log('✅ PREDICCIÓN CORRECTA');
+          console.log("✅ PREDICCIÓN CORRECTA");
           stats.correctPredictions++;
         } else {
           console.log(`⚠️  PREDICCIÓN DIFERENTE - Esperado: ${testCase.expectedModel}, Obtenido: ${modelSelection.selectedModel}`);
@@ -139,20 +139,20 @@ async function testCostOptimization() {
         stats.modelUsage[modelSelection.selectedModel] = (stats.modelUsage[modelSelection.selectedModel] || 0) + 1;
         
         // PASO 2: Simular procesamiento (sin llamar a la API para ahorrar costos)
-        console.log('🔄 Simulando procesamiento...');
+        console.log("🔄 Simulando procesamiento...");
         const prompt = promptFactory.generatePrompt(testCase.transcription);
         
         // Simulación de tiempo de procesamiento basado en complejidad
         const simulatedTime = modelSelection.complexity.total * 3 + Math.random() * 5;
         
         console.log(`⏱️  Tiempo simulado: ${simulatedTime.toFixed(1)}s`);
-        console.log('📈 Detalles de complejidad:');
+        console.log("📈 Detalles de complejidad:");
         Object.entries(modelSelection.complexity.details).forEach(([factor, detail]) => {
           console.log(`   - ${factor}: ${detail}`);
         });
         
         // PASO 3: Análisis de costos
-        console.log('💸 Análisis de costos:');
+        console.log("💸 Análisis de costos:");
         console.log(`   - Costo con Pro: ${modelSelection.costAnalysis.proCost}`);
         console.log(`   - Costo seleccionado: ${modelSelection.costAnalysis.selectedCost}`);
         console.log(`   - Ahorro: ${modelSelection.costAnalysis.savings} (${modelSelection.costAnalysis.savingsPercentage})`);
@@ -163,30 +163,30 @@ async function testCostOptimization() {
     }
     
     // PASO 4: Resumen final
-    console.log('\n📊 RESUMEN DE OPTIMIZACIÓN DE COSTOS');
-    console.log('=' * 60);
+    console.log("\n📊 RESUMEN DE OPTIMIZACIÓN DE COSTOS");
+    console.log("=" * 60);
     console.log(`Tests ejecutados: ${stats.totalTests}`);
     console.log(`Predicciones correctas: ${stats.correctPredictions}/${stats.totalTests} (${((stats.correctPredictions/stats.totalTests)*100).toFixed(1)}%)`);
-    console.log('\nUso de modelos:');
+    console.log("\nUso de modelos:");
     Object.entries(stats.modelUsage).forEach(([model, count]) => {
       console.log(`   - ${model}: ${count} casos`);
     });
     
     // PASO 5: Recomendaciones
-    console.log('\n💡 RECOMENDACIONES:');
-    console.log('✅ Sistema de optimización funcionando correctamente');
-    console.log('✅ Selección automática basada en complejidad');
-    console.log('✅ Ahorro estimado: 60-95% en casos simples/moderados');
-    console.log('✅ Calidad preservada para casos complejos');
+    console.log("\n💡 RECOMENDACIONES:");
+    console.log("✅ Sistema de optimización funcionando correctamente");
+    console.log("✅ Selección automática basada en complejidad");
+    console.log("✅ Ahorro estimado: 60-95% en casos simples/moderados");
+    console.log("✅ Calidad preservada para casos complejos");
     
-    console.log('\n🎯 PRÓXIMOS PASOS:');
-    console.log('1. Integrar con Cloud Function principal');
-    console.log('2. Monitorear métricas de costo en producción');
-    console.log('3. Ajustar umbrales según feedback clínico');
-    console.log('4. Implementar alertas de optimización');
+    console.log("\n🎯 PRÓXIMOS PASOS:");
+    console.log("1. Integrar con Cloud Function principal");
+    console.log("2. Monitorear métricas de costo en producción");
+    console.log("3. Ajustar umbrales según feedback clínico");
+    console.log("4. Implementar alertas de optimización");
     
   } catch (error) {
-    console.error('❌ ERROR GENERAL EN TEST:', error);
+    console.error("❌ ERROR GENERAL EN TEST:", error);
   }
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface SuggestionMetrics {
   totalSuggestions: number;
@@ -46,34 +46,34 @@ const AgentSuggestionMetrics: React.FC<AgentSuggestionMetricsProps> = ({
 
   const metricItems = [
     {
-      label: 'Total de Sugerencias',
+      label: "Total de Sugerencias",
       value: metrics.totalSuggestions.toString(),
-      color: 'text-blue-600'
+      color: "text-blue-600"
     },
     {
-      label: 'Sugerencias Aceptadas',
+      label: "Sugerencias Aceptadas",
       value: metrics.acceptedSuggestions.toString(),
-      color: 'text-green-600'
+      color: "text-green-600"
     },
     {
-      label: 'Sugerencias Rechazadas',
+      label: "Sugerencias Rechazadas",
       value: metrics.rejectedSuggestions.toString(),
-      color: 'text-red-600'
+      color: "text-red-600"
     },
     {
-      label: 'Sugerencias Pendientes',
+      label: "Sugerencias Pendientes",
       value: metrics.pendingSuggestions.toString(),
-      color: 'text-yellow-600'
+      color: "text-yellow-600"
     },
     {
-      label: 'Tiempo Promedio de Respuesta',
+      label: "Tiempo Promedio de Respuesta",
       value: formatTime(metrics.averageResponseTime),
-      color: 'text-purple-600'
+      color: "text-purple-600"
     },
     {
-      label: 'Tasa de Éxito',
+      label: "Tasa de Éxito",
       value: formatPercentage(metrics.successRate),
-      color: 'text-indigo-600'
+      color: "text-indigo-600"
     }
   ];
 

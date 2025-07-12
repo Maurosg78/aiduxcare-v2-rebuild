@@ -1,7 +1,7 @@
-const winston = require('winston');
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -14,7 +14,7 @@ class PromptFactory {
     this.knowledgeBase = knowledgeBase;
   }
 
-  generatePrompt(transcription, specialty, sessionType = 'initial') {
+  generatePrompt(transcription, specialty, sessionType = "initial") {
     const basePrompt = this.getBasePrompt();
     const specialtyPrompt = this.getSpecialtyPrompt(specialty);
     const sessionPrompt = this.getSessionTypePrompt(sessionType);
@@ -36,7 +36,7 @@ ${transcription}
 
 ${outputPrompt}`;
 
-    logger.info('Prompt generated', {
+    logger.info("Prompt generated", {
       specialty,
       sessionType,
       transcriptionLength: transcription.length,
@@ -67,7 +67,7 @@ PRINCIPIOS FUNDAMENTALES:
 
   getSpecialtyPrompt(specialty) {
     const specialtyPrompts = {
-      'physiotherapy': `ESPECIALIZACIÓN: FISIOTERAPIA
+      "physiotherapy": `ESPECIALIZACIÓN: FISIOTERAPIA
 
 ENFOQUE CLÍNICO:
 - Evaluación biomecánica y funcional
@@ -91,7 +91,7 @@ CONTRAINDICACIONES ABSOLUTAS:
 - Movilización con sospecha de fractura
 - Técnicas de alta velocidad en osteoporosis severa`,
 
-      'psychology': `ESPECIALIZACIÓN: PSICOLOGÍA CLÍNICA
+      "psychology": `ESPECIALIZACIÓN: PSICOLOGÍA CLÍNICA
 
 ENFOQUE CLÍNICO:
 - Evaluación del estado mental y emocional
@@ -115,7 +115,7 @@ CONTRAINDICACIONES ABSOLUTAS:
 - Técnicas de activación conductual en depresión severa sin supervisión
 - Intervenciones que puedan aumentar la ansiedad en trastornos de pánico graves`,
 
-      'general': `ESPECIALIZACIÓN: MEDICINA GENERAL
+      "general": `ESPECIALIZACIÓN: MEDICINA GENERAL
 
 ENFOQUE CLÍNICO:
 - Evaluación integral de síntomas
@@ -139,12 +139,12 @@ CONTRAINDICACIONES ABSOLUTAS:
 - Tratamientos que puedan agravar condiciones existentes`
     };
 
-    return specialtyPrompts[specialty] || specialtyPrompts['general'];
+    return specialtyPrompts[specialty] || specialtyPrompts["general"];
   }
 
   getSessionTypePrompt(sessionType) {
     const sessionPrompts = {
-      'initial': `TIPO DE SESIÓN: EVALUACIÓN INICIAL
+      "initial": `TIPO DE SESIÓN: EVALUACIÓN INICIAL
 
 ENFOQUE ESPECÍFICO:
 - Recopilación completa de la historia clínica
@@ -159,7 +159,7 @@ PRIORIDADES DE ANÁLISIS:
 3. Establecimiento de diagnóstico diferencial
 4. Planificación terapéutica apropiada`,
 
-      'followup': `TIPO DE SESIÓN: SEGUIMIENTO
+      "followup": `TIPO DE SESIÓN: SEGUIMIENTO
 
 ENFOQUE ESPECÍFICO:
 - Evaluación de progreso terapéutico
@@ -175,12 +175,12 @@ PRIORIDADES DE ANÁLISIS:
 4. Aparición de nuevas complicaciones`
     };
 
-    return sessionPrompts[sessionType] || sessionPrompts['initial'];
+    return sessionPrompts[sessionType] || sessionPrompts["initial"];
   }
 
   getKnowledgePrompt(specialty) {
     if (!this.knowledgeBase || !this.knowledgeBase.rules) {
-      return `CONOCIMIENTO CLÍNICO: Base de conocimiento no disponible, aplicando estándares clínicos generales.`;
+      return "CONOCIMIENTO CLÍNICO: Base de conocimiento no disponible, aplicando estándares clínicos generales.";
     }
 
     const rules = this.knowledgeBase.rules[specialty] || [];
@@ -189,10 +189,10 @@ PRIORIDADES DE ANÁLISIS:
     return `CONOCIMIENTO CLÍNICO ESPECIALIZADO:
 
 REGLAS CLÍNICAS:
-${rules.map(rule => `- ${rule}`).join('\n')}
+${rules.map(rule => `- ${rule}`).join("\n")}
 
 TERMINOLOGÍA ESPECÍFICA:
-${terminology.map(term => `- ${term.term}: ${term.definition}`).join('\n')}`;
+${terminology.map(term => `- ${term.term}: ${term.definition}`).join("\n")}`;
   }
 
   generateChunkPrompt(chunkText, specialty, sessionType, chunkNumber, totalChunks) {
@@ -214,7 +214,7 @@ ${chunkText}
 
 ${outputPrompt}`;
 
-    logger.info('Chunk prompt generated', {
+    logger.info("Chunk prompt generated", {
       specialty,
       sessionType,
       chunkNumber,

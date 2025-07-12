@@ -3,10 +3,10 @@
  * Implementación profesional usando Firestore
  */
 
-import { SOAPData } from './AudioToSOAPBridge';
-import { EncryptedData, CryptoService } from './CryptoService';
-import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { SOAPData } from "./AudioToSOAPBridge";
+import { EncryptedData, CryptoService } from "./CryptoService";
+import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 export interface SavedNote {
   id: string;
@@ -19,7 +19,7 @@ export interface SavedNote {
 }
 
 export class PersistenceService {
-  private static readonly COLLECTION_NAME = 'consultations';
+  private static readonly COLLECTION_NAME = "consultations";
 
   /**
    * Obtiene el ID del usuario actual autenticado
@@ -27,7 +27,7 @@ export class PersistenceService {
   private static getCurrentUserId(): string {
     const user = auth.currentUser;
     if (!user) {
-      throw new Error('Usuario no autenticado');
+      throw new Error("Usuario no autenticado");
     }
     return user.uid;
   }
@@ -37,8 +37,8 @@ export class PersistenceService {
    */
   static async saveSOAPNote(
     soapData: SOAPData,
-    patientId: string = 'default-patient',
-    sessionId: string = 'default-session'
+    patientId: string = "default-patient",
+    sessionId: string = "default-session"
   ): Promise<string> {
     try {
       const userId = this.getCurrentUserId();
@@ -59,14 +59,14 @@ export class PersistenceService {
       };
 
       // Guardar en Firestore
-      const noteRef = doc(db, this.COLLECTION_NAME, userId, 'notes', noteId);
+      const noteRef = doc(db, this.COLLECTION_NAME, userId, "notes", noteId);
       await setDoc(noteRef, savedNote);
       
       console.log(`✅ Nota SOAP guardada con ID: ${noteId}`);
       return noteId;
     } catch (error) {
-      console.error('Error guardando nota SOAP:', error);
-      throw new Error('Error al guardar la nota en la base de datos');
+      console.error("Error guardando nota SOAP:", error);
+      throw new Error("Error al guardar la nota en la base de datos");
     }
   }
 
@@ -76,12 +76,12 @@ export class PersistenceService {
   static async getAllNotes(): Promise<SavedNote[]> {
     try {
       const userId = this.getCurrentUserId();
-      const notesRef = collection(db, this.COLLECTION_NAME, userId, 'notes');
+      const notesRef = collection(db, this.COLLECTION_NAME, userId, "notes");
       const snapshot = await getDocs(notesRef);
       
       return snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => doc.data() as SavedNote);
     } catch (error) {
-      console.error('Error obteniendo notas:', error);
+      console.error("Error obteniendo notas:", error);
       return [];
     }
   }
@@ -92,12 +92,12 @@ export class PersistenceService {
   static async getNoteById(noteId: string): Promise<SavedNote | null> {
     try {
       const userId = this.getCurrentUserId();
-      const noteRef = doc(db, this.COLLECTION_NAME, userId, 'notes', noteId);
+      const noteRef = doc(db, this.COLLECTION_NAME, userId, "notes", noteId);
       const snapshot = await getDoc(noteRef);
       
       return snapshot.exists() ? (snapshot.data() as SavedNote) : null;
     } catch (error) {
-      console.error('Error obteniendo nota por ID:', error);
+      console.error("Error obteniendo nota por ID:", error);
       return null;
     }
   }
@@ -108,13 +108,13 @@ export class PersistenceService {
   static async getNotesByPatient(patientId: string): Promise<SavedNote[]> {
     try {
       const userId = this.getCurrentUserId();
-      const notesRef = collection(db, this.COLLECTION_NAME, userId, 'notes');
-      const q = query(notesRef, where('patientId', '==', patientId));
+      const notesRef = collection(db, this.COLLECTION_NAME, userId, "notes");
+      const q = query(notesRef, where("patientId", "==", patientId));
       const snapshot = await getDocs(q);
       
       return snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => doc.data() as SavedNote);
     } catch (error) {
-      console.error('Error obteniendo notas por paciente:', error);
+      console.error("Error obteniendo notas por paciente:", error);
       return [];
     }
   }
@@ -133,7 +133,7 @@ export class PersistenceService {
       const decryptedData = await CryptoService.decryptMedicalData(note.encryptedData);
       return decryptedData;
     } catch (error) {
-      console.error('Error verificando/descifrando nota:', error);
+      console.error("Error verificando/descifrando nota:", error);
       return null;
     }
   }
@@ -144,13 +144,13 @@ export class PersistenceService {
   static async deleteNote(noteId: string): Promise<boolean> {
     try {
       const userId = this.getCurrentUserId();
-      const noteRef = doc(db, this.COLLECTION_NAME, userId, 'notes', noteId);
+      const noteRef = doc(db, this.COLLECTION_NAME, userId, "notes", noteId);
       await deleteDoc(noteRef);
       
       console.log(`🗑️ Nota eliminada: ${noteId}`);
       return true;
     } catch (error) {
-      console.error('Error eliminando nota:', error);
+      console.error("Error eliminando nota:", error);
       return false;
     }
   }

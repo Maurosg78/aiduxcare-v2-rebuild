@@ -3,7 +3,7 @@
  * Reemplaza completamente el Cloud Function con análisis 100% local
  */
 
-import { clinicalAnalyzer, type ClinicalAnalysis } from './ClinicalAnalyzer';
+import { clinicalAnalyzer, type ClinicalAnalysis } from "./ClinicalAnalyzer";
 
 export interface LocalAnalysisOptions {
   specialty?: string;
@@ -16,7 +16,7 @@ export interface LocalAnalysisResult {
   analysis?: ClinicalAnalysis;
   error?: string;
   processingTime: number;
-  mode: 'local' | 'enhanced' | 'fallback';
+  mode: "local" | "enhanced" | "fallback";
 }
 
 export class LocalClinicalAnalysisService {
@@ -39,27 +39,27 @@ export class LocalClinicalAnalysisService {
     const startTime = Date.now();
     
     try {
-      console.log('🧠 LOCAL CLINICAL ANALYSIS - INICIANDO:', {
+      console.log("🧠 LOCAL CLINICAL ANALYSIS - INICIANDO:", {
         transcriptionLength: transcription.length,
-        specialty: options.specialty || 'general',
-        sessionType: options.sessionType || 'initial'
+        specialty: options.specialty || "general",
+        sessionType: options.sessionType || "initial"
       });
 
       // Validación de entrada
       if (!transcription || transcription.trim().length < 10) {
-        throw new Error('Transcripción muy corta para análisis clínico');
+        throw new Error("Transcripción muy corta para análisis clínico");
       }
 
       // Análisis usando ClinicalAnalyzer local
       const analysis = await clinicalAnalyzer.analyzeTranscription(
         transcription,
-        options.specialty || 'general',
-        options.sessionType || 'initial'
+        options.specialty || "general",
+        options.sessionType || "initial"
       );
 
       const processingTime = Date.now() - startTime;
 
-      console.log('✅ ANÁLISIS LOCAL COMPLETADO:', {
+      console.log("✅ ANÁLISIS LOCAL COMPLETADO:", {
         success: analysis.success,
         warningsCount: analysis.warnings.length,
         suggestionsCount: analysis.suggestions.length,
@@ -72,19 +72,19 @@ export class LocalClinicalAnalysisService {
         success: true,
         analysis,
         processingTime,
-        mode: options.enableEnhancedMode ? 'enhanced' : 'local'
+        mode: options.enableEnhancedMode ? "enhanced" : "local"
       };
 
     } catch (error) {
       const processingTime = Date.now() - startTime;
       
-      console.error('❌ Error en análisis clínico local:', error);
+      console.error("❌ Error en análisis clínico local:", error);
       
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Error desconocido en análisis local',
+        error: error instanceof Error ? error.message : "Error desconocido en análisis local",
         processingTime,
-        mode: 'fallback'
+        mode: "fallback"
       };
     }
   }
@@ -94,8 +94,8 @@ export class LocalClinicalAnalysisService {
    */
   async processTranscriptionCompatible(
     transcription: string,
-    specialty: string = 'physiotherapy',
-    sessionType: string = 'initial'
+    specialty: string = "physiotherapy",
+    sessionType: string = "initial"
   ): Promise<{
     success: boolean;
     warnings: unknown[];
@@ -125,7 +125,7 @@ export class LocalClinicalAnalysisService {
       });
 
       if (!result.success || !result.analysis) {
-        throw new Error(result.error || 'Análisis fallido');
+        throw new Error(result.error || "Análisis fallido");
       }
 
       const analysis = result.analysis;
@@ -148,13 +148,13 @@ export class LocalClinicalAnalysisService {
         metadata: {
           specialty,
           sessionType,
-          analysisMode: 'local-clinical-analyzer',
+          analysisMode: "local-clinical-analyzer",
           timestamp: new Date().toISOString()
         }
       };
 
     } catch (error) {
-      console.error('❌ Error en processTranscriptionCompatible:', error);
+      console.error("❌ Error en processTranscriptionCompatible:", error);
       throw error;
     }
   }
@@ -165,16 +165,16 @@ export class LocalClinicalAnalysisService {
   async runDiagnosticTest(): Promise<boolean> {
     const testCases = [
       {
-        name: 'Emergencia Cardíaca',
-        transcription: 'Tengo un dolor muy fuerte en el pecho que se irradia hacia el brazo izquierdo, me siento mareado y con náuseas',
+        name: "Emergencia Cardíaca",
+        transcription: "Tengo un dolor muy fuerte en el pecho que se irradia hacia el brazo izquierdo, me siento mareado y con náuseas",
         expectedWarnings: 1,
-        expectedRisk: 'CRITICAL'
+        expectedRisk: "CRITICAL"
       },
       {
-        name: 'Dolor Crónico',
-        transcription: 'Doctor, tengo dolor en la espalda baja que me molesta desde hace varios meses, especialmente por las mañanas',
+        name: "Dolor Crónico",
+        transcription: "Doctor, tengo dolor en la espalda baja que me molesta desde hace varios meses, especialmente por las mañanas",
         expectedWarnings: 0,
-        expectedRisk: 'LOW'
+        expectedRisk: "LOW"
       }
     ];
 
@@ -188,9 +188,9 @@ export class LocalClinicalAnalysisService {
                       result.analysis &&
                       result.analysis.warnings.length >= testCase.expectedWarnings;
 
-        console.log(`🧪 Test "${testCase.name}": ${passed ? '✅ PASS' : '❌ FAIL'}`, {
+        console.log(`🧪 Test "${testCase.name}": ${passed ? "✅ PASS" : "❌ FAIL"}`, {
           warningsCount: result.analysis?.warnings.length || 0,
-          riskLevel: result.analysis?.riskLevel || 'UNKNOWN'
+          riskLevel: result.analysis?.riskLevel || "UNKNOWN"
         });
 
         if (!passed) allTestsPassed = false;

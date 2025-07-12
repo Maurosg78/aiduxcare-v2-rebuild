@@ -6,7 +6,7 @@
  * Prueba específicamente el parsing del JSON para identificar el problema
  */
 
-const ClinicalInsightService = require('./src/services/ClinicalInsightService');
+const ClinicalInsightService = require("./src/services/ClinicalInsightService");
 
 // Simular una respuesta típica de Vertex AI
 const simulatedResponse = `
@@ -38,84 +38,84 @@ const simulatedResponse = `
 `;
 
 async function testParsingMejorado() {
-  console.log('🔧 INICIANDO TEST DEBUG PARSING MEJORADO');
-  console.log('='.repeat(50));
+  console.log("🔧 INICIANDO TEST DEBUG PARSING MEJORADO");
+  console.log("=".repeat(50));
   
   try {
     const clinicalService = new ClinicalInsightService();
     
-    console.log('\n📝 CONTENIDO A PARSEAR:');
-    console.log('Longitud:', simulatedResponse.length);
-    console.log('Primeros 200 caracteres:', simulatedResponse.substring(0, 200));
-    console.log('Últimos 100 caracteres:', simulatedResponse.substring(simulatedResponse.length - 100));
+    console.log("\n📝 CONTENIDO A PARSEAR:");
+    console.log("Longitud:", simulatedResponse.length);
+    console.log("Primeros 200 caracteres:", simulatedResponse.substring(0, 200));
+    console.log("Últimos 100 caracteres:", simulatedResponse.substring(simulatedResponse.length - 100));
     
-    console.log('\n🔍 INICIANDO PROCESO DE PARSING...');
+    console.log("\n🔍 INICIANDO PROCESO DE PARSING...");
     
     // Llamar directamente a la función de parsing
     const resultado = clinicalService.processFinalAnalysisResult(simulatedResponse);
     
-    console.log('\n✅ RESULTADO DEL PARSING:');
-    console.log('='.repeat(40));
+    console.log("\n✅ RESULTADO DEL PARSING:");
+    console.log("=".repeat(40));
     
-    console.log('\n📊 ESTRUCTURA RESULTANTE:');
-    console.log('- Warnings:', resultado.warnings?.length || 0);
-    console.log('- Suggestions:', resultado.suggestions?.length || 0);
-    console.log('- Functional Goals:', resultado.functional_goals?.length || 0);
-    console.log('- Treatment Techniques:', resultado.treatment_techniques?.length || 0);
-    console.log('- SOAP Complete:', !!(resultado.soap_note?.subjective && resultado.soap_note?.objective));
-    console.log('- Parsing Status:', resultado.model_info?.parsing_status);
-    console.log('- Content Length:', resultado.model_info?.content_length);
+    console.log("\n📊 ESTRUCTURA RESULTANTE:");
+    console.log("- Warnings:", resultado.warnings?.length || 0);
+    console.log("- Suggestions:", resultado.suggestions?.length || 0);
+    console.log("- Functional Goals:", resultado.functional_goals?.length || 0);
+    console.log("- Treatment Techniques:", resultado.treatment_techniques?.length || 0);
+    console.log("- SOAP Complete:", !!(resultado.soap_note?.subjective && resultado.soap_note?.objective));
+    console.log("- Parsing Status:", resultado.model_info?.parsing_status);
+    console.log("- Content Length:", resultado.model_info?.content_length);
     
-    console.log('\n📋 CONTENIDO SOAP:');
+    console.log("\n📋 CONTENIDO SOAP:");
     if (resultado.soap_note) {
-      console.log('- Subjective length:', resultado.soap_note.subjective?.length || 0);
-      console.log('- Objective length:', resultado.soap_note.objective?.length || 0);
-      console.log('- Assessment length:', resultado.soap_note.assessment?.length || 0);
-      console.log('- Plan length:', resultado.soap_note.plan?.length || 0);
+      console.log("- Subjective length:", resultado.soap_note.subjective?.length || 0);
+      console.log("- Objective length:", resultado.soap_note.objective?.length || 0);
+      console.log("- Assessment length:", resultado.soap_note.assessment?.length || 0);
+      console.log("- Plan length:", resultado.soap_note.plan?.length || 0);
     }
     
-    console.log('\n🎯 FUNCTIONAL GOALS:');
+    console.log("\n🎯 FUNCTIONAL GOALS:");
     if (resultado.functional_goals && resultado.functional_goals.length > 0) {
       resultado.functional_goals.forEach((goal, index) => {
         console.log(`   ${index + 1}. ${goal.substring(0, 80)}...`);
       });
     } else {
-      console.log('   ❌ No se extrajeron objetivos funcionales');
+      console.log("   ❌ No se extrajeron objetivos funcionales");
     }
     
-    console.log('\n🔧 TREATMENT TECHNIQUES:');
+    console.log("\n🔧 TREATMENT TECHNIQUES:");
     if (resultado.treatment_techniques && resultado.treatment_techniques.length > 0) {
       resultado.treatment_techniques.forEach((technique, index) => {
         console.log(`   ${index + 1}. ${technique.substring(0, 80)}...`);
       });
     } else {
-      console.log('   ❌ No se extrajeron técnicas de tratamiento');
+      console.log("   ❌ No se extrajeron técnicas de tratamiento");
     }
     
-    console.log('\n💡 SUGGESTIONS:');
+    console.log("\n💡 SUGGESTIONS:");
     if (resultado.suggestions && resultado.suggestions.length > 0) {
       resultado.suggestions.forEach((suggestion, index) => {
         console.log(`   ${index + 1}. ${suggestion.substring(0, 80)}...`);
       });
     } else {
-      console.log('   ❌ No se extrajeron sugerencias');
+      console.log("   ❌ No se extrajeron sugerencias");
     }
     
     // Test específico del funcionamiento del evaluador
-    console.log('\n🧪 TEST DEL EVALUADOR INTEGRADO:');
-    console.log('='.repeat(40));
+    console.log("\n🧪 TEST DEL EVALUADOR INTEGRADO:");
+    console.log("=".repeat(40));
     
     const evaluacionSimulada = evaluarResultadoParseado(resultado);
-    console.log('Puntaje simulado:', evaluacionSimulada.puntaje);
-    console.log('Detalles:', evaluacionSimulada.detalles);
+    console.log("Puntaje simulado:", evaluacionSimulada.puntaje);
+    console.log("Detalles:", evaluacionSimulada.detalles);
     
-    console.log('\n✅ TEST COMPLETADO EXITOSAMENTE');
+    console.log("\n✅ TEST COMPLETADO EXITOSAMENTE");
     
     return resultado;
     
   } catch (error) {
-    console.error('❌ ERROR EN TEST DE PARSING:', error.message);
-    console.error('Stack:', error.stack);
+    console.error("❌ ERROR EN TEST DE PARSING:", error.message);
+    console.error("Stack:", error.stack);
     return null;
   }
 }
@@ -130,7 +130,7 @@ function evaluarResultadoParseado(resultado) {
   // Evaluar estructura básica
   if (resultado.soap_note) {
     puntaje += 20;
-    detalles.push('✅ Estructura SOAP presente');
+    detalles.push("✅ Estructura SOAP presente");
   }
   
   if (resultado.functional_goals && resultado.functional_goals.length > 0) {
@@ -148,9 +148,9 @@ function evaluarResultadoParseado(resultado) {
     detalles.push(`✅ Sugerencias: ${resultado.suggestions.length}`);
   }
   
-  if (resultado.model_info && resultado.model_info.parsing_status === 'SUCCESS') {
+  if (resultado.model_info && resultado.model_info.parsing_status === "SUCCESS") {
     puntaje += 15;
-    detalles.push('✅ Parsing exitoso');
+    detalles.push("✅ Parsing exitoso");
   }
   
   return { puntaje, detalles };
@@ -159,10 +159,10 @@ function evaluarResultadoParseado(resultado) {
 // Ejecutar test
 testParsingMejorado().then(resultado => {
   if (resultado) {
-    console.log('\n🎉 TEST PARSING COMPLETADO');
+    console.log("\n🎉 TEST PARSING COMPLETADO");
   } else {
-    console.log('\n💥 TEST PARSING FALLÓ');
+    console.log("\n💥 TEST PARSING FALLÓ");
   }
 }).catch(error => {
-  console.error('💥 ERROR GENERAL:', error.message);
+  console.error("💥 ERROR GENERAL:", error.message);
 }); 

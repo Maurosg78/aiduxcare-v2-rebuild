@@ -4,16 +4,16 @@
  * Este script debe ejecutarse después de createClinicalCase.ts para tener una
  * visita previa con la que realizar el seguimiento longitudinal.
  */
-import 'dotenv/config';
-import { createClient } from '@supabase/supabase-js';
-import { v4 as uuidv4 } from 'uuid';
+import "dotenv/config";
+import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
 
 // Configuración Supabase
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Error: Variables de entorno de Supabase no definidas');
+  console.error("Error: Variables de entorno de Supabase no definidas");
   process.exit(1);
 }
 
@@ -31,7 +31,7 @@ interface Visit {
   patient_id: string;
   professional_id: string;
   date: string;
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  status: "scheduled" | "in_progress" | "completed" | "cancelled";
   notes?: string;
 }
 
@@ -74,17 +74,17 @@ interface MCPContext {
 // Función para crear una nueva visita y registrar evolución del caso
 async function createSecondVisit() {
   try {
-    console.log('🔄 Iniciando creación de segunda visita para Andrea Bultó...');
+    console.log("🔄 Iniciando creación de segunda visita para Andrea Bultó...");
 
     // 1. Buscar el paciente Andrea Bultó
     const { data: patients, error: patientError } = await supabase
-      .from('patients')
-      .select('*')
-      .ilike('full_name', '%Andrea Bultó%')
+      .from("patients")
+      .select("*")
+      .ilike("full_name", "%Andrea Bultó%")
       .limit(1);
 
     if (patientError || !patients || patients.length === 0) {
-      console.error('Error: No se encontró a la paciente Andrea Bultó', patientError);
+      console.error("Error: No se encontró a la paciente Andrea Bultó", patientError);
       return;
     }
 
@@ -93,14 +93,14 @@ async function createSecondVisit() {
 
     // 2. Buscar la primera visita
     const { data: visits, error: visitsError } = await supabase
-      .from('visits')
-      .select('*')
-      .eq('patient_id', patient.id)
-      .order('date', { ascending: false })
+      .from("visits")
+      .select("*")
+      .eq("patient_id", patient.id)
+      .order("date", { ascending: false })
       .limit(1);
 
     if (visitsError || !visits || visits.length === 0) {
-      console.error('Error: No se encontraron visitas previas para la paciente', visitsError);
+      console.error("Error: No se encontraron visitas previas para la paciente", visitsError);
       return;
     }
 
@@ -114,20 +114,20 @@ async function createSecondVisit() {
 
     const secondVisitId = uuidv4();
     const { data: newVisit, error: visitError } = await supabase
-      .from('visits')
+      .from("visits")
       .insert({
         id: secondVisitId,
         patient_id: patient.id,
         professional_id: patient.user_id, // Mismo profesional
         date: secondVisitDate.toISOString(),
-        status: 'completed',
-        notes: 'Seguimiento de dolor lumbo-cervical - Evaluación de evolución y respuesta al tratamiento'
+        status: "completed",
+        notes: "Seguimiento de dolor lumbo-cervical - Evaluación de evolución y respuesta al tratamiento"
       })
       .select()
       .single();
 
     if (visitError || !newVisit) {
-      console.error('Error: No se pudo crear la segunda visita', visitError);
+      console.error("Error: No se pudo crear la segunda visita", visitError);
       return;
     }
 
@@ -135,13 +135,13 @@ async function createSecondVisit() {
 
     // 4. Obtener contexto de la primera visita
     const { data: prevContextData, error: prevContextError } = await supabase
-      .from('mcp_contexts')
-      .select('context')
-      .eq('visit_id', firstVisit.id)
+      .from("mcp_contexts")
+      .select("context")
+      .eq("visit_id", firstVisit.id)
       .single();
 
     if (prevContextError || !prevContextData) {
-      console.error('Error: No se pudo obtener el contexto previo', prevContextError);
+      console.error("Error: No se pudo obtener el contexto previo", prevContextError);
       return;
     }
 
@@ -160,21 +160,21 @@ async function createSecondVisit() {
           {
             id: uuidv4(),
             type: "contextual",
-            content: `Paciente Andrea Bultó acude a consulta de seguimiento por dolor lumbo-cervical. Refiere mejoría parcial tras 2 semanas de tratamiento. El dolor cervical ha disminuido de 8/10 a 4/10 en escala EVA. Persiste molestia lumbar especialmente después de estar sentada por períodos prolongados.`,
+            content: "Paciente Andrea Bultó acude a consulta de seguimiento por dolor lumbo-cervical. Refiere mejoría parcial tras 2 semanas de tratamiento. El dolor cervical ha disminuido de 8/10 a 4/10 en escala EVA. Persiste molestia lumbar especialmente después de estar sentada por períodos prolongados.",
             timestamp: new Date().toISOString(),
             created_at: new Date().toISOString()
           },
           {
             id: uuidv4(),
             type: "contextual",
-            content: `Examen físico: Reducción de contractura en trapecio bilateral. Mejoría en rango de movilidad cervical. Test de Lasègue negativo bilateral. Persistencia de puntos gatillo en región lumbar.`,
+            content: "Examen físico: Reducción de contractura en trapecio bilateral. Mejoría en rango de movilidad cervical. Test de Lasègue negativo bilateral. Persistencia de puntos gatillo en región lumbar.",
             timestamp: new Date().toISOString(),
             created_at: new Date().toISOString()
           },
           {
             id: uuidv4(),
             type: "contextual",
-            content: `Ha cumplido con ejercicios indicados y medicación. Refiere dificultad para mantener postura correcta durante jornada laboral.`,
+            content: "Ha cumplido con ejercicios indicados y medicación. Refiere dificultad para mantener postura correcta durante jornada laboral.",
             timestamp: new Date().toISOString(),
             created_at: new Date().toISOString()
           }
@@ -193,14 +193,14 @@ async function createSecondVisit() {
           {
             id: uuidv4(),
             type: "persistent",
-            content: `Evolución del dolor lumbar: Mejoría parcial tras 2 semanas de tratamiento. Reducción de intensidad de 8/10 a 4-5/10 en escala EVA.`,
+            content: "Evolución del dolor lumbar: Mejoría parcial tras 2 semanas de tratamiento. Reducción de intensidad de 8/10 a 4-5/10 en escala EVA.",
             timestamp: new Date().toISOString(),
             created_at: new Date().toISOString()
           },
           {
             id: uuidv4(),
             type: "persistent",
-            content: `Medicación actual: Completó ciclo de AINE. Actualmente solo paracetamol 1g según necesidad (refiere tomar 1-2 comprimidos por semana).`,
+            content: "Medicación actual: Completó ciclo de AINE. Actualmente solo paracetamol 1g según necesidad (refiere tomar 1-2 comprimidos por semana).",
             timestamp: new Date().toISOString(),
             created_at: new Date().toISOString()
           }
@@ -213,7 +213,7 @@ async function createSecondVisit() {
 
     // 6. Guardar el nuevo contexto
     const { error: contextError } = await supabase
-      .from('mcp_contexts')
+      .from("mcp_contexts")
       .insert({
         visit_id: secondVisitId,
         context: secondContext,
@@ -224,18 +224,18 @@ async function createSecondVisit() {
       });
 
     if (contextError) {
-      console.error('Error: No se pudo guardar el contexto de la segunda visita', contextError);
+      console.error("Error: No se pudo guardar el contexto de la segunda visita", contextError);
       return;
     }
 
-    console.log(`✅ Contexto clínico de segunda visita guardado`);
+    console.log("✅ Contexto clínico de segunda visita guardado");
 
     // 7. Registrar logs de auditoría para la nueva visita
     const auditLogs = [
       {
         timestamp: new Date().toISOString(),
         user_id: patient.user_id,
-        event_type: 'visit.create',
+        event_type: "visit.create",
         details: {
           description: `Creación de visita de seguimiento para ${patient.full_name}`
         },
@@ -244,45 +244,45 @@ async function createSecondVisit() {
       {
         timestamp: new Date(new Date().getTime() + 2 * 60000).toISOString(), // 2 minutos después
         user_id: patient.user_id,
-        event_type: 'emr.form.update',
+        event_type: "emr.form.update",
         details: {
-          description: 'Actualización de formulario SOAP - Sección subjetiva'
+          description: "Actualización de formulario SOAP - Sección subjetiva"
         },
         visit_id: secondVisitId
       },
       {
         timestamp: new Date(new Date().getTime() + 5 * 60000).toISOString(), // 5 minutos después
         user_id: patient.user_id,
-        event_type: 'emr.form.update',
+        event_type: "emr.form.update",
         details: {
-          description: 'Actualización de formulario SOAP - Sección objetiva'
+          description: "Actualización de formulario SOAP - Sección objetiva"
         },
         visit_id: secondVisitId
       },
       {
         timestamp: new Date(new Date().getTime() + 8 * 60000).toISOString(), // 8 minutos después
         user_id: patient.user_id,
-        event_type: 'ai.suggestion',
+        event_type: "ai.suggestion",
         details: {
-          description: 'Sugerencia generada: Actualización de plan terapéutico'
+          description: "Sugerencia generada: Actualización de plan terapéutico"
         },
         visit_id: secondVisitId,
-        source: 'ia'
+        source: "ia"
       },
       {
         timestamp: new Date(new Date().getTime() + 10 * 60000).toISOString(), // 10 minutos después
         user_id: patient.user_id,
-        event_type: 'suggestion.integrated',
+        event_type: "suggestion.integrated",
         details: {
-          description: 'Sugerencia integrada: Actualización de plan terapéutico'
+          description: "Sugerencia integrada: Actualización de plan terapéutico"
         },
         visit_id: secondVisitId,
-        source: 'ia'
+        source: "ia"
       },
       {
         timestamp: new Date(new Date().getTime() + 15 * 60000).toISOString(), // 15 minutos después
         user_id: patient.user_id,
-        event_type: 'visit.completed',
+        event_type: "visit.completed",
         details: {
           description: `Visita de seguimiento completada para ${patient.full_name}`
         },
@@ -292,22 +292,22 @@ async function createSecondVisit() {
 
     // Insertar logs de auditoría
     const { error: auditError } = await supabase
-      .from('audit_logs')
+      .from("audit_logs")
       .insert(auditLogs);
 
     if (auditError) {
-      console.error('Error: No se pudieron registrar los logs de auditoría', auditError);
+      console.error("Error: No se pudieron registrar los logs de auditoría", auditError);
       return;
     }
 
-    console.log(`✅ Logs de auditoría registrados para la segunda visita`);
-    console.log(`\n🎉 Segunda visita creada exitosamente para Andrea Bultó!`);
+    console.log("✅ Logs de auditoría registrados para la segunda visita");
+    console.log("\n🎉 Segunda visita creada exitosamente para Andrea Bultó!");
     console.log(`🔍 ID de la visita: ${secondVisitId}`);
     console.log(`📅 Fecha: ${new Date(secondVisitDate).toLocaleDateString()}`);
-    console.log(`\n✅ Ya puedes ver la traza longitudinal en la UI accediendo a la ficha del paciente.`);
+    console.log("\n✅ Ya puedes ver la traza longitudinal en la UI accediendo a la ficha del paciente.");
 
   } catch (error) {
-    console.error('Error general en el proceso:', error);
+    console.error("Error general en el proceso:", error);
   }
 }
 

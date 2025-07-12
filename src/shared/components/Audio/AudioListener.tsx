@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { audioCaptureService, TranscriptionSegment } from '@/core/audio/AudioCaptureService';
+import React, { useState } from "react";
+import { audioCaptureService, TranscriptionSegment } from "@/core/audio/AudioCaptureService";
 
 interface AudioListenerProps {
   onCaptureComplete: (transcription: TranscriptionSegment[]) => void;
@@ -51,7 +51,7 @@ const AudioListener: React.FC<AudioListenerProps> = ({ onCaptureComplete }) => {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (

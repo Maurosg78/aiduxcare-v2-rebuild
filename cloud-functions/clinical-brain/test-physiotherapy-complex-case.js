@@ -10,12 +10,12 @@
  * @version 1.0 - Caso Complejo Fisioterapia
  */
 
-const winston = require('winston');
-const ClinicalInsightService = require('./src/services/ClinicalInsightService');
+const winston = require("winston");
+const ClinicalInsightService = require("./src/services/ClinicalInsightService");
 
 // Configurar logger
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -78,39 +78,39 @@ TERAPEUTA: María, basándome en su historia y exploración, veo un cuadro compl
  * Ejecutar prueba de caso complejo
  */
 async function ejecutarPruebaCasoComplejo() {
-  logger.info('🩺 INICIANDO PRUEBA CASO COMPLEJO FISIOTERAPIA');
+  logger.info("🩺 INICIANDO PRUEBA CASO COMPLEJO FISIOTERAPIA");
   
   const service = new ClinicalInsightService();
   
   try {
-    logger.info('📋 DATOS DEL CASO:', {
-      paciente: 'Mujer 45 años',
-      duracion_sintomas: '8 meses',
-      problema_principal: 'Dolor cervical con irradiación',
-      complejidad: 'Alta - múltiples comorbilidades',
-      antecedentes: 'Accidente automovilístico, cirugía túnel carpiano',
-      medicacion: 'Ibuprofeno, tramadol, pregabalina, duloxetina',
-      comorbilidades: 'Fibromialgia, hipotiroidismo, ansiedad',
-      limitaciones_funcionales: 'Trabajo, sueño, actividades diarias'
+    logger.info("📋 DATOS DEL CASO:", {
+      paciente: "Mujer 45 años",
+      duracion_sintomas: "8 meses",
+      problema_principal: "Dolor cervical con irradiación",
+      complejidad: "Alta - múltiples comorbilidades",
+      antecedentes: "Accidente automovilístico, cirugía túnel carpiano",
+      medicacion: "Ibuprofeno, tramadol, pregabalina, duloxetina",
+      comorbilidades: "Fibromialgia, hipotiroidismo, ansiedad",
+      limitaciones_funcionales: "Trabajo, sueño, actividades diarias"
     });
     
-    logger.info('🎯 INICIANDO ANÁLISIS CASCADA V2...');
+    logger.info("🎯 INICIANDO ANÁLISIS CASCADA V2...");
     const startTime = Date.now();
     
     // Procesar transcripción con nuestro cerebro clínico
     const resultado = await service.processTranscription(
       TRANSCRIPCION_CASO_COMPLEJO,
-      'physiotherapy',
-      'initial'
+      "physiotherapy",
+      "initial"
     );
     
     const processingTime = Date.now() - startTime;
     
-    logger.info('✅ ANÁLISIS COMPLETADO', {
+    logger.info("✅ ANÁLISIS COMPLETADO", {
       tiempo_procesamiento: `${processingTime}ms`,
       warnings_detectados: resultado.warnings?.length || 0,
       sugerencias_generadas: resultado.suggestions?.length || 0,
-      calidad_soap: resultado.soap_quality?.overall || 'N/A'
+      calidad_soap: resultado.soap_quality?.overall || "N/A"
     });
     
     // Analizar calidad de respuestas para fisioterapeutas
@@ -119,7 +119,7 @@ async function ejecutarPruebaCasoComplejo() {
     return resultado;
     
   } catch (error) {
-    logger.error('❌ ERROR EN PRUEBA CASO COMPLEJO:', {
+    logger.error("❌ ERROR EN PRUEBA CASO COMPLEJO:", {
       error: error.message,
       stack: error.stack
     });
@@ -131,18 +131,18 @@ async function ejecutarPruebaCasoComplejo() {
  * Analizar si las respuestas son específicas y útiles para fisioterapeutas
  */
 async function analizarCalidadRespuesta(resultado) {
-  logger.info('🔍 ANÁLISIS DE CALIDAD PARA FISIOTERAPEUTAS');
+  logger.info("🔍 ANÁLISIS DE CALIDAD PARA FISIOTERAPEUTAS");
   
   // Verificar warnings específicos de fisioterapia
   const warningsEspecificos = resultado.warnings?.filter(w => 
-    w.category === 'red_flag' || 
-    w.category === 'contraindication' ||
-    w.title.toLowerCase().includes('cervical') ||
-    w.title.toLowerCase().includes('radiculopatía') ||
-    w.title.toLowerCase().includes('vascular')
+    w.category === "red_flag" || 
+    w.category === "contraindication" ||
+    w.title.toLowerCase().includes("cervical") ||
+    w.title.toLowerCase().includes("radiculopatía") ||
+    w.title.toLowerCase().includes("vascular")
   );
   
-  logger.info('⚠️ WARNINGS ESPECÍFICOS FISIOTERAPIA:', {
+  logger.info("⚠️ WARNINGS ESPECÍFICOS FISIOTERAPIA:", {
     total: warningsEspecificos?.length || 0,
     warnings: warningsEspecificos?.map(w => ({
       severity: w.severity,
@@ -153,19 +153,19 @@ async function analizarCalidadRespuesta(resultado) {
   
   // Verificar sugerencias específicas de fisioterapia
   const sugerenciasFisioterapia = resultado.suggestions?.filter(s =>
-    s.type === 'assessment' ||
-    s.type === 'treatment' ||
-    s.description.toLowerCase().includes('movilización') ||
-    s.description.toLowerCase().includes('ejercicio') ||
-    s.description.toLowerCase().includes('postura') ||
-    s.description.toLowerCase().includes('ergonomía')
+    s.type === "assessment" ||
+    s.type === "treatment" ||
+    s.description.toLowerCase().includes("movilización") ||
+    s.description.toLowerCase().includes("ejercicio") ||
+    s.description.toLowerCase().includes("postura") ||
+    s.description.toLowerCase().includes("ergonomía")
   );
   
-  logger.info('💡 SUGERENCIAS FISIOTERAPIA:', {
+  logger.info("💡 SUGERENCIAS FISIOTERAPIA:", {
     total: sugerenciasFisioterapia?.length || 0,
-    tratamiento: sugerenciasFisioterapia?.filter(s => s.type === 'treatment').length || 0,
-    evaluacion: sugerenciasFisioterapia?.filter(s => s.type === 'assessment').length || 0,
-    educacion: sugerenciasFisioterapia?.filter(s => s.type === 'education').length || 0,
+    tratamiento: sugerenciasFisioterapia?.filter(s => s.type === "treatment").length || 0,
+    evaluacion: sugerenciasFisioterapia?.filter(s => s.type === "assessment").length || 0,
+    educacion: sugerenciasFisioterapia?.filter(s => s.type === "education").length || 0,
     sugerencias: sugerenciasFisioterapia?.map(s => ({
       type: s.type,
       priority: s.priority,
@@ -175,40 +175,40 @@ async function analizarCalidadRespuesta(resultado) {
   
   // Verificar calidad SOAP
   if (resultado.soap_quality) {
-    logger.info('📊 CALIDAD SOAP EMR:', {
+    logger.info("📊 CALIDAD SOAP EMR:", {
       subjective: `${resultado.soap_quality.subjective}%`,
       objective: `${resultado.soap_quality.objective}%`,
       assessment: `${resultado.soap_quality.assessment}%`,
       plan: `${resultado.soap_quality.plan}%`,
       overall: `${resultado.soap_quality.overall}%`,
-      calidad_emr: resultado.soap_quality.overall >= 80 ? 'EXCELENTE' : 
-                   resultado.soap_quality.overall >= 70 ? 'BUENA' : 
-                   resultado.soap_quality.overall >= 60 ? 'ACEPTABLE' : 'NECESITA MEJORA'
+      calidad_emr: resultado.soap_quality.overall >= 80 ? "EXCELENTE" : 
+        resultado.soap_quality.overall >= 70 ? "BUENA" : 
+          resultado.soap_quality.overall >= 60 ? "ACEPTABLE" : "NECESITA MEJORA"
     });
   }
   
   // Verificar contenido específico de fisioterapia
   const contenidoFisioterapia = {
-    evaluacion_postural: JSON.stringify(resultado).toLowerCase().includes('postura'),
-    pruebas_neurodinamicas: JSON.stringify(resultado).toLowerCase().includes('spurling') || 
-                            JSON.stringify(resultado).toLowerCase().includes('phalen'),
-    limitaciones_funcionales: JSON.stringify(resultado).toLowerCase().includes('funcional'),
-    tratamiento_manual: JSON.stringify(resultado).toLowerCase().includes('manual') ||
-                       JSON.stringify(resultado).toLowerCase().includes('movilización'),
-    ejercicio_terapeutico: JSON.stringify(resultado).toLowerCase().includes('ejercicio'),
-    ergonomia: JSON.stringify(resultado).toLowerCase().includes('ergonomía') ||
-               JSON.stringify(resultado).toLowerCase().includes('trabajo')
+    evaluacion_postural: JSON.stringify(resultado).toLowerCase().includes("postura"),
+    pruebas_neurodinamicas: JSON.stringify(resultado).toLowerCase().includes("spurling") || 
+                            JSON.stringify(resultado).toLowerCase().includes("phalen"),
+    limitaciones_funcionales: JSON.stringify(resultado).toLowerCase().includes("funcional"),
+    tratamiento_manual: JSON.stringify(resultado).toLowerCase().includes("manual") ||
+                       JSON.stringify(resultado).toLowerCase().includes("movilización"),
+    ejercicio_terapeutico: JSON.stringify(resultado).toLowerCase().includes("ejercicio"),
+    ergonomia: JSON.stringify(resultado).toLowerCase().includes("ergonomía") ||
+               JSON.stringify(resultado).toLowerCase().includes("trabajo")
   };
   
-  logger.info('🎯 CONTENIDO ESPECÍFICO FISIOTERAPIA:', contenidoFisioterapia);
+  logger.info("🎯 CONTENIDO ESPECÍFICO FISIOTERAPIA:", contenidoFisioterapia);
   
   const puntuacionEspecializacion = Object.values(contenidoFisioterapia).filter(Boolean).length;
-  logger.info('⭐ PUNTUACIÓN ESPECIALIZACIÓN FISIOTERAPIA:', {
+  logger.info("⭐ PUNTUACIÓN ESPECIALIZACIÓN FISIOTERAPIA:", {
     puntuacion: `${puntuacionEspecializacion}/6`,
     porcentaje: `${Math.round((puntuacionEspecializacion/6) * 100)}%`,
-    nivel: puntuacionEspecializacion >= 5 ? 'EXCELENTE' :
-           puntuacionEspecializacion >= 4 ? 'BUENO' :
-           puntuacionEspecializacion >= 3 ? 'ACEPTABLE' : 'NECESITA OPTIMIZACIÓN'
+    nivel: puntuacionEspecializacion >= 5 ? "EXCELENTE" :
+      puntuacionEspecializacion >= 4 ? "BUENO" :
+        puntuacionEspecializacion >= 3 ? "ACEPTABLE" : "NECESITA OPTIMIZACIÓN"
   });
 }
 
@@ -217,28 +217,28 @@ async function analizarCalidadRespuesta(resultado) {
  */
 async function main() {
   try {
-    logger.info('🚀 INICIANDO PRUEBA CASO COMPLEJO FISIOTERAPIA');
+    logger.info("🚀 INICIANDO PRUEBA CASO COMPLEJO FISIOTERAPIA");
     
     const resultado = await ejecutarPruebaCasoComplejo();
     
-    logger.info('🎉 PRUEBA COMPLETADA EXITOSAMENTE');
-    logger.info('📋 PRÓXIMOS PASOS:', {
-      '1': 'Revisar warnings específicos para fisioterapeutas',
-      '2': 'Verificar sugerencias de tratamiento apropiadas',
-      '3': 'Optimizar prompts si puntuación < 80%',
-      '4': 'Implementar mejoras en PromptFactory si es necesario'
+    logger.info("🎉 PRUEBA COMPLETADA EXITOSAMENTE");
+    logger.info("📋 PRÓXIMOS PASOS:", {
+      "1": "Revisar warnings específicos para fisioterapeutas",
+      "2": "Verificar sugerencias de tratamiento apropiadas",
+      "3": "Optimizar prompts si puntuación < 80%",
+      "4": "Implementar mejoras en PromptFactory si es necesario"
     });
     
     // Mostrar resumen final
-    console.log('\n🎯 RESUMEN EJECUTIVO:');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log("\n🎯 RESUMEN EJECUTIVO:");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     console.log(`⚠️  Warnings detectados: ${resultado.warnings?.length || 0}`);
     console.log(`💡 Sugerencias generadas: ${resultado.suggestions?.length || 0}`);
-    console.log(`📊 Calidad SOAP: ${resultado.soap_quality?.overall || 'N/A'}%`);
-    console.log(`✅ Sistema optimizado para fisioterapeutas: ${resultado.warnings?.length > 0 && resultado.suggestions?.length > 0 ? 'SÍ' : 'NECESITA MEJORA'}`);
+    console.log(`📊 Calidad SOAP: ${resultado.soap_quality?.overall || "N/A"}%`);
+    console.log(`✅ Sistema optimizado para fisioterapeutas: ${resultado.warnings?.length > 0 && resultado.suggestions?.length > 0 ? "SÍ" : "NECESITA MEJORA"}`);
     
   } catch (error) {
-    logger.error('💥 ERROR EN PRUEBA:', error);
+    logger.error("💥 ERROR EN PRUEBA:", error);
     process.exit(1);
   }
 }

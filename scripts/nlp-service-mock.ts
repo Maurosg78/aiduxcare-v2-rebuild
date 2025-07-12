@@ -3,14 +3,14 @@
  * Simula las funciones principales del NLPServiceOllama para scripts
  */
 
-import { ollamaNode } from './ollama-client-node';
-import { RAGMedicalMCP, MedicalSpecialty } from '../src/core/mcp/RAGMedicalMCP';
+import { ollamaNode } from "./ollama-client-node";
+import { RAGMedicalMCP, MedicalSpecialty } from "../src/core/mcp/RAGMedicalMCP";
 
 // === INTERFACES ===
 
 export interface ClinicalEntity {
   text: string;
-  type: 'symptom' | 'diagnosis' | 'treatment' | 'medication' | 'anatomy' | 'measurement' | 'temporal';
+  type: "symptom" | "diagnosis" | "treatment" | "medication" | "anatomy" | "measurement" | "temporal";
   confidence: number;
   start_position?: number;
   end_position?: number;
@@ -51,7 +51,7 @@ export class MockNLPService {
   ): Promise<NLPProcessingResult> {
     const startTime = Date.now();
     
-    console.log(`🧠 Procesando transcripción (RAG: ${options.useRAG ? 'ON' : 'OFF'})...`);
+    console.log(`🧠 Procesando transcripción (RAG: ${options.useRAG ? "ON" : "OFF"})...`);
     
     // 1. Extraer entidades clínicas
     const entitiesStart = Date.now();
@@ -123,7 +123,7 @@ TIPOS VÁLIDOS: symptom, diagnosis, treatment, medication, anatomy, measurement,
       return this.extractEntitiesBasic(transcript);
       
     } catch (error) {
-      console.error('Error extrayendo entidades:', error);
+      console.error("Error extrayendo entidades:", error);
       return this.extractEntitiesBasic(transcript);
     }
   }
@@ -137,18 +137,18 @@ TIPOS VÁLIDOS: symptom, diagnosis, treatment, medication, anatomy, measurement,
     useRAG: boolean = false
   ): Promise<SOAPNotes> {
     
-    let ragContext = '';
+    let ragContext = "";
     
     // Si RAG está habilitado, buscar evidencia científica
     if (useRAG && entities.length > 0) {
-      console.log('🔬 Buscando evidencia científica con RAG...');
+      console.log("🔬 Buscando evidencia científica con RAG...");
       
-      const symptoms = entities.filter(e => e.type === 'symptom' || e.type === 'diagnosis');
+      const symptoms = entities.filter(e => e.type === "symptom" || e.type === "diagnosis");
       if (symptoms.length > 0) {
-        const query = `${symptoms.map(s => s.text).join(' ')} evidence based treatment physiotherapy`;
+        const query = `${symptoms.map(s => s.text).join(" ")} evidence based treatment physiotherapy`;
         
         try {
-          const ragResult = await RAGMedicalMCP.retrieveRelevantKnowledge(query, 'fisioterapia', 3);
+          const ragResult = await RAGMedicalMCP.retrieveRelevantKnowledge(query, "fisioterapia", 3);
           
           if (ragResult.citations.length > 0) {
             ragContext = `\n\nEVIDENCIA CIENTÍFICA DISPONIBLE:
@@ -156,11 +156,11 @@ ${ragResult.medical_context}
 
 REFERENCIAS:
 ${ragResult.citations.slice(0, 2).map(c => 
-  `- ${c.title} (${c.authors}, ${c.journal} ${c.year})`
-).join('\n')}`;
+    `- ${c.title} (${c.authors}, ${c.journal} ${c.year})`
+  ).join("\n")}`;
           }
         } catch (error) {
-          console.warn('Error en búsqueda RAG:', error);
+          console.warn("Error en búsqueda RAG:", error);
         }
       }
     }
@@ -172,7 +172,7 @@ TRANSCRIPCIÓN:
 ${transcript}
 
 ENTIDADES IDENTIFICADAS:
-${entities.map(e => `- ${e.type}: ${e.text}`).join('\n')}${ragContext}
+${entities.map(e => `- ${e.type}: ${e.text}`).join("\n")}${ragContext}
 
 Genera notas SOAP estructuradas y profesionales:
 
@@ -186,7 +186,7 @@ ASSESSMENT:
 [Análisis clínico y diagnóstico]
 
 PLAN:
-[Plan de tratamiento detallado${useRAG ? ' basado en evidencia científica' : ''}]
+[Plan de tratamiento detallado${useRAG ? " basado en evidencia científica" : ""}]
 `;
 
     try {
@@ -198,7 +198,7 @@ PLAN:
       return this.parseSOAPFromResponse(response.response, useRAG);
       
     } catch (error) {
-      console.error('Error generando SOAP:', error);
+      console.error("Error generando SOAP:", error);
       return this.generateBasicSOAP(transcript, useRAG);
     }
   }
@@ -223,7 +223,7 @@ PLAN:
         matches.forEach(match => {
           entities.push({
             text: match.toLowerCase(),
-            type: type as ClinicalEntity['type'],
+            type: type as ClinicalEntity["type"],
             confidence: 0.8
           });
         });
@@ -238,10 +238,10 @@ PLAN:
    */
   private static parseSOAPFromResponse(response: string, hasRAG: boolean): SOAPNotes {
     const sections = {
-      subjective: '',
-      objective: '',
-      assessment: '',
-      plan: ''
+      subjective: "",
+      objective: "",
+      assessment: "",
+      plan: ""
     };
     
     // Extraer secciones SOAP
@@ -270,10 +270,10 @@ PLAN:
    */
   private static generateBasicSOAP(transcript: string, hasRAG: boolean): SOAPNotes {
     return {
-      subjective: 'Paciente reporta síntomas según transcripción.',
-      objective: 'Evaluación física documentada en sesión.',
-      assessment: 'Análisis clínico basado en hallazgos objetivos.',
-      plan: `Plan de tratamiento ${hasRAG ? 'basado en evidencia científica' : 'según evaluación clínica'}.`,
+      subjective: "Paciente reporta síntomas según transcripción.",
+      objective: "Evaluación física documentada en sesión.",
+      assessment: "Análisis clínico basado en hallazgos objetivos.",
+      plan: `Plan de tratamiento ${hasRAG ? "basado en evidencia científica" : "según evaluación clínica"}.`,
       confidence_score: hasRAG ? 0.6 : 0.5
     };
   }

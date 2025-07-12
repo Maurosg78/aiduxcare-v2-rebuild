@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getMetricsSummaryByVisit } from '../../../services/UsageAnalyticsService';
+import React, { useState, useEffect } from "react";
+import { getMetricsSummaryByVisit } from "../../../services/UsageAnalyticsService";
 
 /**
  * Props para el componente AgentUsageDashboard
@@ -52,7 +52,7 @@ const AgentUsageDashboard: React.FC<AgentUsageDashboardProps> = ({ visitId }) =>
           onClick={() => setIsExpanded(!isExpanded)}
           className="px-3 py-1 text-sm font-medium rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100"
         >
-          {isExpanded ? 'Ocultar detalles' : 'Ver detalles'}
+          {isExpanded ? "Ocultar detalles" : "Ver detalles"}
         </button>
       </div>
       
@@ -99,7 +99,7 @@ const AgentUsageDashboard: React.FC<AgentUsageDashboardProps> = ({ visitId }) =>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className={`${acceptRate >= 70 ? 'bg-green-500' : acceptRate >= 30 ? 'bg-yellow-500' : 'bg-red-500'} h-2 rounded-full`}
+                  className={`${acceptRate >= 70 ? "bg-green-500" : acceptRate >= 30 ? "bg-yellow-500" : "bg-red-500"} h-2 rounded-full`}
                   style={{ width: `${acceptRate}%` }}
                 />
               </div>
@@ -113,7 +113,7 @@ const AgentUsageDashboard: React.FC<AgentUsageDashboardProps> = ({ visitId }) =>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className={`${integrationRate >= 70 ? 'bg-green-500' : integrationRate >= 30 ? 'bg-yellow-500' : 'bg-red-500'} h-2 rounded-full`}
+                  className={`${integrationRate >= 70 ? "bg-green-500" : integrationRate >= 30 ? "bg-yellow-500" : "bg-red-500"} h-2 rounded-full`}
                   style={{ width: `${integrationRate}%` }}
                 />
               </div>

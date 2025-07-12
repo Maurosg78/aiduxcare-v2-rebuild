@@ -1,5 +1,5 @@
-const VertexAIClient = require('./src/services/VertexAIClient');
-const PromptFactory = require('./src/services/PromptFactory');
+const VertexAIClient = require("./src/services/VertexAIClient");
+const PromptFactory = require("./src/services/PromptFactory");
 
 /**
  * TEST FINAL DEL SISTEMA OPTIMIZADO
@@ -18,7 +18,7 @@ const testCases = {
       Evaluación: contractura muscular cervical, dolor a la palpación.
       Movilidad cervical limitada por dolor. Paciente refiere mejoría gradual.
     `,
-    expectedModel: 'gemini-2.5-flash',
+    expectedModel: "gemini-2.5-flash",
     expectedRedFlags: 0,
     description: "Caso simple sin banderas rojas - debe usar modelo estándar"
   },
@@ -33,7 +33,7 @@ const testCases = {
       Sin antecedentes relevantes. Dolor empeora al toser o estornudar.
       Evaluación: test de Lasègue positivo, disminución de reflejos.
     `,
-    expectedModel: 'gemini-2.5-flash',
+    expectedModel: "gemini-2.5-flash",
     expectedRedFlags: 1,
     description: "Una bandera roja (déficit neurológico) - modelo estándar suficiente"
   },
@@ -48,15 +48,15 @@ const testCases = {
       Antecedentes: hipertensión, diabetes, fumador. Dolor no mejora con reposo.
       Evaluación: paciente ansioso, diaforético, dolor precordial.
     `,
-    expectedModel: 'gemini-2.5-pro',
+    expectedModel: "gemini-2.5-pro",
     expectedRedFlags: 3,
     description: "Múltiples banderas rojas (dolor torácico + disnea + sudoración) - requiere modelo premium"
   }
 };
 
 async function testOptimizedSystem() {
-  console.log('🧪 TESTING SISTEMA OPTIMIZADO BASADO EN EVIDENCIA EMPÍRICA');
-  console.log('='.repeat(80));
+  console.log("🧪 TESTING SISTEMA OPTIMIZADO BASADO EN EVIDENCIA EMPÍRICA");
+  console.log("=".repeat(80));
   
   // Inicializar servicios
   const vertexClient = new VertexAIClient();
@@ -67,7 +67,7 @@ async function testOptimizedSystem() {
   
   for (const [caseKey, testCase] of Object.entries(testCases)) {
     console.log(`\n📋 TESTING: ${testCase.name}`);
-    console.log('-'.repeat(60));
+    console.log("-".repeat(60));
     console.log(`Descripción: ${testCase.description}`);
     console.log(`Banderas rojas esperadas: ${testCase.expectedRedFlags}`);
     console.log(`Modelo esperado: ${testCase.expectedModel}`);
@@ -88,7 +88,7 @@ async function testOptimizedSystem() {
       const modelUsed = result.costOptimization.modelUsed;
       const redFlagsDetected = result.costOptimization.redFlagsDetected;
       
-      console.log(`\n✅ RESULTADO:`);
+      console.log("\n✅ RESULTADO:");
       console.log(`   🤖 Modelo usado: ${modelUsed}`);
       console.log(`   🚩 Banderas rojas detectadas: ${redFlagsDetected}`);
       console.log(`   ⏱️  Tiempo de procesamiento: ${processingTime.toFixed(1)}s`);
@@ -121,21 +121,21 @@ async function testOptimizedSystem() {
   }
   
   // Resumen final
-  console.log('\n📊 RESUMEN DE TESTING');
-  console.log('='.repeat(80));
+  console.log("\n📊 RESUMEN DE TESTING");
+  console.log("=".repeat(80));
   console.log(`Tests ejecutados: ${totalTests}`);
   console.log(`Tests exitosos: ${passedTests}`);
   console.log(`Tasa de éxito: ${((passedTests / totalTests) * 100).toFixed(1)}%`);
   
   if (passedTests === totalTests) {
-    console.log('\n🎉 ¡SISTEMA OPTIMIZADO FUNCIONANDO PERFECTAMENTE!');
-    console.log('✅ Selección automática de modelos basada en evidencia empírica');
-    console.log('✅ Detección de banderas rojas críticas');
-    console.log('✅ Optimización de costos inteligente');
-    console.log('✅ Preservación de seguridad clínica');
+    console.log("\n🎉 ¡SISTEMA OPTIMIZADO FUNCIONANDO PERFECTAMENTE!");
+    console.log("✅ Selección automática de modelos basada en evidencia empírica");
+    console.log("✅ Detección de banderas rojas críticas");
+    console.log("✅ Optimización de costos inteligente");
+    console.log("✅ Preservación de seguridad clínica");
   } else {
-    console.log('\n⚠️  SISTEMA REQUIERE AJUSTES');
-    console.log('❌ Algunos casos no pasaron la validación');
+    console.log("\n⚠️  SISTEMA REQUIERE AJUSTES");
+    console.log("❌ Algunos casos no pasaron la validación");
   }
   
   return {

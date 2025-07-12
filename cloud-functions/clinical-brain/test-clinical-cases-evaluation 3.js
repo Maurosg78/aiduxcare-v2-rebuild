@@ -1,10 +1,10 @@
-const VertexAIClient = require('./src/services/VertexAIClient');
-const PromptFactory = require('./src/services/PromptFactory');
-const winston = require('winston');
+const VertexAIClient = require("./src/services/VertexAIClient");
+const PromptFactory = require("./src/services/PromptFactory");
+const winston = require("winston");
 
 // Configurar logger
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -123,7 +123,7 @@ const clinicalCases = {
  */
 async function evaluateCase(caseData, modelName, vertexClient, promptFactory) {
   console.log(`\n🔬 EVALUANDO CON MODELO: ${modelName}`);
-  console.log('-'.repeat(50));
+  console.log("-".repeat(50));
   
   const startTime = Date.now();
   
@@ -146,7 +146,7 @@ async function evaluateCase(caseData, modelName, vertexClient, promptFactory) {
       const jsonMatch = result.text.match(/```json\n([\s\S]*?)\n```/);
       analysis = jsonMatch ? JSON.parse(jsonMatch[1]) : JSON.parse(result.text);
     } catch (parseError) {
-      console.log('❌ Error parseando JSON:', parseError.message);
+      console.log("❌ Error parseando JSON:", parseError.message);
       return null;
     }
     
@@ -181,18 +181,18 @@ function evaluateResponse(analysis, caseData) {
     criticalMissed: [],
     appropriateAlerts: [],
     overallScore: 0,
-    clinicalSafety: 'unknown'
+    clinicalSafety: "unknown"
   };
   
   // Verificar detección de banderas rojas
   const warningsText = JSON.stringify(analysis.warnings || []).toLowerCase();
   const suggestionsText = JSON.stringify(analysis.suggestions || []).toLowerCase();
-  const combinedText = warningsText + ' ' + suggestionsText;
+  const combinedText = warningsText + " " + suggestionsText;
   
   // Contar banderas rojas detectadas
   caseData.redFlags.forEach(redFlag => {
-    const flagWords = redFlag.toLowerCase().split(' ');
-    const detected = flagWords.some(word => combinedText.includes(word.replace(/[^a-z]/g, '')));
+    const flagWords = redFlag.toLowerCase().split(" ");
+    const detected = flagWords.some(word => combinedText.includes(word.replace(/[^a-z]/g, "")));
     if (detected) {
       evaluation.redFlagsDetected++;
     } else {
@@ -202,8 +202,8 @@ function evaluateResponse(analysis, caseData) {
   
   // Verificar alertas esperadas
   caseData.expectedAlerts.forEach(expectedAlert => {
-    const alertWords = expectedAlert.toLowerCase().split(' ');
-    const found = alertWords.some(word => combinedText.includes(word.replace(/[^a-z]/g, '')));
+    const alertWords = expectedAlert.toLowerCase().split(" ");
+    const found = alertWords.some(word => combinedText.includes(word.replace(/[^a-z]/g, "")));
     if (found) {
       evaluation.expectedAlertsFound++;
       evaluation.appropriateAlerts.push(expectedAlert);
@@ -220,11 +220,11 @@ function evaluateResponse(analysis, caseData) {
   
   // Determinar seguridad clínica
   if (evaluation.redFlagsDetected === caseData.redFlags.length && evaluation.expectedAlertsFound >= 1) {
-    evaluation.clinicalSafety = 'SAFE';
+    evaluation.clinicalSafety = "SAFE";
   } else if (evaluation.redFlagsDetected >= caseData.redFlags.length * 0.7) {
-    evaluation.clinicalSafety = 'ACCEPTABLE';
+    evaluation.clinicalSafety = "ACCEPTABLE";
   } else {
-    evaluation.clinicalSafety = 'UNSAFE';
+    evaluation.clinicalSafety = "UNSAFE";
   }
   
   return evaluation;
@@ -234,15 +234,15 @@ function evaluateResponse(analysis, caseData) {
  * Función principal de evaluación
  */
 async function runClinicalEvaluation() {
-  console.log('🏥 INICIANDO EVALUACIÓN EMPÍRICA DE MODELOS CLÍNICOS');
-  console.log('='.repeat(80));
+  console.log("🏥 INICIANDO EVALUACIÓN EMPÍRICA DE MODELOS CLÍNICOS");
+  console.log("=".repeat(80));
   
   // Inicializar servicios
   const vertexClient = new VertexAIClient();
   const promptFactory = new PromptFactory();
   
   // Modelos a evaluar
-  const modelsToTest = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'];
+  const modelsToTest = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
   
   // Resultados generales
   const overallResults = {
@@ -254,7 +254,7 @@ async function runClinicalEvaluation() {
   // Evaluar cada caso con cada modelo
   for (const [caseKey, caseData] of Object.entries(clinicalCases)) {
     console.log(`\n📋 EVALUANDO: ${caseData.name}`);
-    console.log('='.repeat(80));
+    console.log("=".repeat(80));
     console.log(`Complejidad: ${caseData.complexity}`);
     console.log(`Banderas rojas esperadas: ${caseData.redFlags.length}`);
     console.log(`Alertas críticas esperadas: ${caseData.expectedAlerts.length}`);
@@ -278,7 +278,7 @@ async function runClinicalEvaluation() {
         console.log(`   ⚠️  Warnings generadas: ${result.analysis.warnings?.length || 0}`);
         
         if (result.evaluation.criticalMissed.length > 0) {
-          console.log(`   ❌ CRÍTICOS PERDIDOS: ${result.evaluation.criticalMissed.join(', ')}`);
+          console.log(`   ❌ CRÍTICOS PERDIDOS: ${result.evaluation.criticalMissed.join(", ")}`);
         }
         
         // Guardar resultado
@@ -305,7 +305,7 @@ async function runClinicalEvaluation() {
         modelStats.redFlagsTotal += caseData.redFlags.length;
         
       } else {
-        console.log(`\n❌ FALLO ${modelName.toUpperCase()}: ${result?.error || 'Error desconocido'}`);
+        console.log(`\n❌ FALLO ${modelName.toUpperCase()}: ${result?.error || "Error desconocido"}`);
       }
       
       // Pausa entre modelos para evitar rate limiting
@@ -314,8 +314,8 @@ async function runClinicalEvaluation() {
   }
   
   // ANÁLISIS FINAL Y RECOMENDACIONES
-  console.log('\n📊 ANÁLISIS FINAL DE RENDIMIENTO');
-  console.log('='.repeat(80));
+  console.log("\n📊 ANÁLISIS FINAL DE RENDIMIENTO");
+  console.log("=".repeat(80));
   
   for (const [modelName, stats] of Object.entries(overallResults.modelPerformance)) {
     const avgScore = (stats.totalScore / stats.totalCases).toFixed(1);
@@ -332,8 +332,8 @@ async function runClinicalEvaluation() {
   }
   
   // GENERAR RECOMENDACIONES
-  console.log('\n💡 RECOMENDACIONES BASADAS EN EVIDENCIA:');
-  console.log('='.repeat(80));
+  console.log("\n💡 RECOMENDACIONES BASADAS EN EVIDENCIA:");
+  console.log("=".repeat(80));
   
   // Encontrar el mejor modelo por seguridad
   let bestSafetyModel = null;
@@ -351,20 +351,20 @@ async function runClinicalEvaluation() {
   console.log(`   Razón: Mayor tasa de seguridad clínica (${(bestSafetyRate * 100).toFixed(1)}%)`);
   
   // Recomendaciones específicas
-  const flash25Stats = overallResults.modelPerformance['gemini-2.5-flash'];
-  const proStats = overallResults.modelPerformance['gemini-2.5-pro'];
+  const flash25Stats = overallResults.modelPerformance["gemini-2.5-flash"];
+  const proStats = overallResults.modelPerformance["gemini-2.5-pro"];
   
   if (flash25Stats && proStats) {
     const timeDiff = ((proStats.totalTime - flash25Stats.totalTime) / flash25Stats.totalTime * 100).toFixed(1);
     const scoreDiff = ((proStats.totalScore - flash25Stats.totalScore) / flash25Stats.totalScore * 100).toFixed(1);
     
-    console.log(`\n📊 COMPARACIÓN FLASH 2.5 vs PRO 2.5:`);
+    console.log("\n📊 COMPARACIÓN FLASH 2.5 vs PRO 2.5:");
     console.log(`   ⏱️  Pro es ${timeDiff}% más lento que Flash`);
     console.log(`   📈 Pro es ${scoreDiff}% mejor en score que Flash`);
     
     if (Math.abs(parseFloat(scoreDiff)) < 10 && parseFloat(timeDiff) > 50) {
-      console.log(`\n✅ RECOMENDACIÓN: Usar GEMINI-2.5-FLASH como estándar`);
-      console.log(`   Razón: Diferencia de calidad mínima con latencia significativamente menor`);
+      console.log("\n✅ RECOMENDACIÓN: Usar GEMINI-2.5-FLASH como estándar");
+      console.log("   Razón: Diferencia de calidad mínima con latencia significativamente menor");
     }
   }
   

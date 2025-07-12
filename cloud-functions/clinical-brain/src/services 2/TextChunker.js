@@ -1,7 +1,7 @@
-const winston = require('winston');
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -19,7 +19,7 @@ class TextChunker {
   shouldChunk(transcription) {
     const shouldChunk = transcription.length > this.maxChunkLength;
     
-    logger.info('🔍 EVALUANDO NECESIDAD DE CHUNKING', {
+    logger.info("🔍 EVALUANDO NECESIDAD DE CHUNKING", {
       transcriptionLength: transcription.length,
       maxChunkLength: this.maxChunkLength,
       shouldChunk,
@@ -31,12 +31,12 @@ class TextChunker {
 
   chunkTranscription(transcription) {
     if (transcription.length <= this.maxChunkLength) {
-      logger.info('✅ No se requiere chunking');
+      logger.info("✅ No se requiere chunking");
       return [transcription];
     }
 
     if (transcription.length > this.maxTotalLength) {
-      logger.warn('⚠️ Transcripción excede límite máximo, truncando', {
+      logger.warn("⚠️ Transcripción excede límite máximo, truncando", {
         originalLength: transcription.length,
         maxLength: this.maxTotalLength
       });
@@ -55,9 +55,9 @@ class TextChunker {
       // Intentar cortar en punto natural (final de oración)
       let cutPosition = chunkEnd;
       if (chunkEnd < transcription.length) {
-        const lastPeriod = transcription.lastIndexOf('.', chunkEnd);
-        const lastExclamation = transcription.lastIndexOf('!', chunkEnd);
-        const lastQuestion = transcription.lastIndexOf('?', chunkEnd);
+        const lastPeriod = transcription.lastIndexOf(".", chunkEnd);
+        const lastExclamation = transcription.lastIndexOf("!", chunkEnd);
+        const lastQuestion = transcription.lastIndexOf("?", chunkEnd);
         
         const bestCut = Math.max(lastPeriod, lastExclamation, lastQuestion);
         
@@ -80,7 +80,7 @@ class TextChunker {
       if (currentPosition >= transcription.length) break;
     }
 
-    logger.info('✅ CHUNKING COMPLETADO', {
+    logger.info("✅ CHUNKING COMPLETADO", {
       originalLength: transcription.length,
       chunksCreated: chunks.length,
       averageChunkLength: Math.round(chunks.reduce((sum, chunk) => sum + chunk.length, 0) / chunks.length),
@@ -91,7 +91,7 @@ class TextChunker {
   }
 
   async processChunks(chunks, promptFactory, vertexClient, specialty, sessionType) {
-    logger.info('🔄 PROCESANDO CHUNKS INDIVIDUALES', {
+    logger.info("🔄 PROCESANDO CHUNKS INDIVIDUALES", {
       totalChunks: chunks.length,
       specialty,
       sessionType
@@ -104,7 +104,7 @@ class TextChunker {
       
       logger.info(`🤖 Procesando chunk ${i + 1}/${chunks.length}`, {
         chunkLength: chunk.length,
-        chunkPreview: chunk.substring(0, 100) + '...'
+        chunkPreview: chunk.substring(0, 100) + "..."
       });
 
       try {
@@ -115,7 +115,7 @@ class TextChunker {
         const rawResponse = await vertexClient.analyze(chunkPrompt);
         
         // Parsear respuesta del chunk
-        const responseParser = new (require('./ResponseParser'))({});
+        const responseParser = new (require("./ResponseParser"))({});
         const chunkResult = responseParser.parse(rawResponse, specialty);
         
         chunkResults.push({
@@ -149,7 +149,7 @@ class TextChunker {
   }
 
   consolidateResults(chunkResults, originalTranscription) {
-    logger.info('🔗 CONSOLIDANDO RESULTADOS DE CHUNKS', {
+    logger.info("🔗 CONSOLIDANDO RESULTADOS DE CHUNKS", {
       totalChunks: chunkResults.length,
       successfulChunks: chunkResults.filter(r => r.result).length,
       failedChunks: chunkResults.filter(r => r.error).length
@@ -174,7 +174,7 @@ class TextChunker {
         areas_for_improvement: []
       },
       specialty_metrics: {
-        specialty: '',
+        specialty: "",
         clinical_accuracy_score: 0,
         safety_compliance_score: 0,
         completeness_score: 0
@@ -184,7 +184,7 @@ class TextChunker {
     const validResults = chunkResults.filter(r => r.result && !r.error);
     
     if (validResults.length === 0) {
-      logger.error('❌ No hay resultados válidos para consolidar');
+      logger.error("❌ No hay resultados válidos para consolidar");
       return this.createEmptyResult();
     }
 
@@ -227,11 +227,11 @@ class TextChunker {
     });
 
     // Promediar métricas SOAP
-    const soapMetrics = ['subjective_completeness', 'objective_completeness', 'assessment_quality', 'plan_appropriateness'];
+    const soapMetrics = ["subjective_completeness", "objective_completeness", "assessment_quality", "plan_appropriateness"];
     soapMetrics.forEach(metric => {
       const values = validResults
         .map(r => r.result.soap_analysis[metric])
-        .filter(v => typeof v === 'number');
+        .filter(v => typeof v === "number");
       
       consolidatedResult.soap_analysis[metric] = values.length > 0 
         ? Math.round(values.reduce((sum, val) => sum + val, 0) / values.length)
@@ -259,11 +259,11 @@ class TextChunker {
     });
 
     // Promediar métricas de calidad de sesión
-    const qualityMetrics = ['communication_score', 'clinical_thoroughness', 'patient_engagement', 'professional_standards'];
+    const qualityMetrics = ["communication_score", "clinical_thoroughness", "patient_engagement", "professional_standards"];
     qualityMetrics.forEach(metric => {
       const values = validResults
         .map(r => r.result.session_quality[metric])
-        .filter(v => typeof v === 'number');
+        .filter(v => typeof v === "number");
       
       consolidatedResult.session_quality[metric] = values.length > 0 
         ? Math.round(values.reduce((sum, val) => sum + val, 0) / values.length)
@@ -293,7 +293,7 @@ class TextChunker {
       consolidatedResult.specialty_metrics.specialty = validResults[0].result.specialty_metrics.specialty;
     }
 
-    logger.info('✅ CONSOLIDACIÓN COMPLETADA', {
+    logger.info("✅ CONSOLIDACIÓN COMPLETADA", {
       finalWarnings: consolidatedResult.warnings.length,
       finalSuggestions: consolidatedResult.suggestions.length,
       overallQuality: consolidatedResult.soap_analysis.overall_quality,
@@ -307,13 +307,13 @@ class TextChunker {
   createEmptyResult() {
     return {
       warnings: [{
-        id: 'chunking_error_001',
-        severity: 'HIGH',
-        category: 'clinical_alert',
-        title: 'Error en Procesamiento de Transcripción',
-        description: 'No se pudo procesar la transcripción debido a su longitud o complejidad',
-        recommendation: 'Revisar transcripción manualmente o dividir en secciones más pequeñas',
-        evidence: 'Error en chunking automático'
+        id: "chunking_error_001",
+        severity: "HIGH",
+        category: "clinical_alert",
+        title: "Error en Procesamiento de Transcripción",
+        description: "No se pudo procesar la transcripción debido a su longitud o complejidad",
+        recommendation: "Revisar transcripción manualmente o dividir en secciones más pequeñas",
+        evidence: "Error en chunking automático"
       }],
       suggestions: [],
       soap_analysis: {
@@ -322,17 +322,17 @@ class TextChunker {
         assessment_quality: 0,
         plan_appropriateness: 0,
         overall_quality: 0,
-        missing_elements: ['Procesamiento automático fallido']
+        missing_elements: ["Procesamiento automático fallido"]
       },
       session_quality: {
         communication_score: 0,
         clinical_thoroughness: 0,
         patient_engagement: 0,
         professional_standards: 0,
-        areas_for_improvement: ['Procesamiento automático fallido']
+        areas_for_improvement: ["Procesamiento automático fallido"]
       },
       specialty_metrics: {
-        specialty: 'unknown',
+        specialty: "unknown",
         clinical_accuracy_score: 0,
         safety_compliance_score: 0,
         completeness_score: 0

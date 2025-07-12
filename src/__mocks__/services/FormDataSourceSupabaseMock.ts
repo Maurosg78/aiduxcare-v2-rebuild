@@ -6,22 +6,22 @@ export default class FormDataSourceSupabaseMock {
   async getFormFields() {
     return [
       {
-        id: 'field-1',
-        key: 'symptoms',
-        label: 'Síntomas',
-        type: 'textarea',
-        value: '',
-        placeholder: 'Describa los síntomas',
+        id: "field-1",
+        key: "symptoms",
+        label: "Síntomas",
+        type: "textarea",
+        value: "",
+        placeholder: "Describa los síntomas",
         required: true,
         order: 1
       },
       {
-        id: 'field-2',
-        key: 'diagnosis',
-        label: 'Diagnóstico',
-        type: 'textarea',
-        value: '',
-        placeholder: 'Diagnóstico presuntivo',
+        id: "field-2",
+        key: "diagnosis",
+        label: "Diagnóstico",
+        type: "textarea",
+        value: "",
+        placeholder: "Diagnóstico presuntivo",
         required: true,
         order: 2
       }
@@ -45,17 +45,17 @@ export default class FormDataSourceSupabaseMock {
   async getFormById(formId: string) {
     return {
       id: formId,
-      visit_id: 'visit-123',
+      visit_id: "visit-123",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       fields: [
         {
-          id: 'field-1',
-          key: 'symptoms',
-          label: 'Síntomas',
-          type: 'textarea',
-          value: '',
-          placeholder: 'Describa los síntomas',
+          id: "field-1",
+          key: "symptoms",
+          label: "Síntomas",
+          type: "textarea",
+          value: "",
+          placeholder: "Describa los síntomas",
           required: true,
           order: 1
         }
@@ -66,7 +66,7 @@ export default class FormDataSourceSupabaseMock {
   // Mock de createForm
   async createForm(visitId: string) {
     return {
-      id: 'new-form-id',
+      id: "new-form-id",
       visit_id: visitId,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -77,18 +77,18 @@ export default class FormDataSourceSupabaseMock {
   // Mock de getFormByVisitId
   async getFormByVisitId(visitId: string) {
     return {
-      id: 'form-for-' + visitId,
+      id: "form-for-" + visitId,
       visit_id: visitId,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       fields: [
         {
-          id: 'field-1',
-          key: 'symptoms',
-          label: 'Síntomas',
-          type: 'textarea',
-          value: '',
-          placeholder: 'Describa los síntomas',
+          id: "field-1",
+          key: "symptoms",
+          label: "Síntomas",
+          type: "textarea",
+          value: "",
+          placeholder: "Describa los síntomas",
           required: true,
           order: 1
         }

@@ -4,16 +4,16 @@
  * Este script compara la primera y segunda visita de Andrea, calculando
  * las métricas de evolución clínica y almacenándolas en Supabase.
  */
-import 'dotenv/config';
-import { createClient } from '@supabase/supabase-js';
-import { calculateClinicalEvolution } from '../src/services/UsageAnalyticsService.js';
+import "dotenv/config";
+import { createClient } from "@supabase/supabase-js";
+import { calculateClinicalEvolution } from "../src/services/UsageAnalyticsService.js";
 
 // Configuración Supabase
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Error: Variables de entorno de Supabase no definidas');
+  console.error("Error: Variables de entorno de Supabase no definidas");
   process.exit(1);
 }
 
@@ -22,17 +22,17 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Función principal
 async function generateLongitudinalMetrics() {
   try {
-    console.log('🔄 Generando métricas longitudinales para Andrea Bultó...');
+    console.log("🔄 Generando métricas longitudinales para Andrea Bultó...");
 
     // 1. Buscar el paciente Andrea Bultó
     const { data: patients, error: patientError } = await supabase
-      .from('patients')
-      .select('*')
-      .ilike('full_name', '%Andrea Bultó%')
+      .from("patients")
+      .select("*")
+      .ilike("full_name", "%Andrea Bultó%")
       .limit(1);
 
     if (patientError || !patients || patients.length === 0) {
-      console.error('Error: No se encontró a la paciente Andrea Bultó', patientError);
+      console.error("Error: No se encontró a la paciente Andrea Bultó", patientError);
       return;
     }
 
@@ -41,13 +41,13 @@ async function generateLongitudinalMetrics() {
 
     // 2. Buscar las visitas de Andrea, ordenadas por fecha
     const { data: visits, error: visitsError } = await supabase
-      .from('visits')
-      .select('*')
-      .eq('patient_id', patient.id)
-      .order('date', { ascending: false });
+      .from("visits")
+      .select("*")
+      .eq("patient_id", patient.id)
+      .order("date", { ascending: false });
 
     if (visitsError || !visits || visits.length < 2) {
-      console.error('Error: No se encontraron suficientes visitas para comparar', visitsError);
+      console.error("Error: No se encontraron suficientes visitas para comparar", visitsError);
       return;
     }
 
@@ -61,19 +61,19 @@ async function generateLongitudinalMetrics() {
 
     // 3. Obtener los contextos MCP de ambas visitas
     const { data: currentContextData, error: currentContextError } = await supabase
-      .from('mcp_contexts')
-      .select('context')
-      .eq('visit_id', currentVisit.id)
+      .from("mcp_contexts")
+      .select("context")
+      .eq("visit_id", currentVisit.id)
       .single();
 
     const { data: previousContextData, error: previousContextError } = await supabase
-      .from('mcp_contexts')
-      .select('context')
-      .eq('visit_id', previousVisit.id)
+      .from("mcp_contexts")
+      .select("context")
+      .eq("visit_id", previousVisit.id)
       .single();
 
     if (currentContextError || !currentContextData || previousContextError || !previousContextData) {
-      console.error('Error: No se pudieron obtener los contextos MCP', currentContextError || previousContextError);
+      console.error("Error: No se pudieron obtener los contextos MCP", currentContextError || previousContextError);
       return;
     }
 
@@ -88,37 +88,37 @@ async function generateLongitudinalMetrics() {
     
     // 5. Obtener métricas de sugerencias IA de las visitas
     const { data: currentSuggestions, error: currentSuggestionsError } = await supabase
-      .from('ai_suggestions')
-      .select('*')
-      .eq('visit_id', currentVisit.id);
+      .from("ai_suggestions")
+      .select("*")
+      .eq("visit_id", currentVisit.id);
       
     const { data: previousSuggestions, error: previousSuggestionsError } = await supabase
-      .from('ai_suggestions')
-      .select('*')
-      .eq('visit_id', previousVisit.id);
+      .from("ai_suggestions")
+      .select("*")
+      .eq("visit_id", previousVisit.id);
       
     if (currentSuggestionsError || previousSuggestionsError) {
-      console.error('Error: No se pudieron obtener las sugerencias IA', currentSuggestionsError || previousSuggestionsError);
+      console.error("Error: No se pudieron obtener las sugerencias IA", currentSuggestionsError || previousSuggestionsError);
     }
     
     // Métricas de sugerencias IA
     const suggestionsGenerated = (currentSuggestions?.length || 0);
-    const suggestionsAccepted = (currentSuggestions?.filter(s => s.status === 'accepted')?.length || 0);
-    const suggestionsIntegrated = (currentSuggestions?.filter(s => s.status === 'integrated')?.length || 0);
+    const suggestionsAccepted = (currentSuggestions?.filter(s => s.status === "accepted")?.length || 0);
+    const suggestionsIntegrated = (currentSuggestions?.filter(s => s.status === "integrated")?.length || 0);
     
     // Métricas previas (para comparación)
     const previousSuggestionsGenerated = (previousSuggestions?.length || 0);
-    const previousSuggestionsAccepted = (previousSuggestions?.filter(s => s.status === 'accepted')?.length || 0);
-    const previousSuggestionsIntegrated = (previousSuggestions?.filter(s => s.status === 'integrated')?.length || 0);
+    const previousSuggestionsAccepted = (previousSuggestions?.filter(s => s.status === "accepted")?.length || 0);
+    const previousSuggestionsIntegrated = (previousSuggestions?.filter(s => s.status === "integrated")?.length || 0);
     
     // 6. Obtener datos de audio transcriptions
     const { data: audioData, error: audioError } = await supabase
-      .from('audio_transcriptions')
-      .select('*')
-      .eq('visit_id', currentVisit.id);
+      .from("audio_transcriptions")
+      .select("*")
+      .eq("visit_id", currentVisit.id);
       
     if (audioError) {
-      console.error('Error: No se pudieron obtener las transcripciones de audio', audioError);
+      console.error("Error: No se pudieron obtener las transcripciones de audio", audioError);
     }
     
     // Calcular ítems de audio validados en total
@@ -129,10 +129,10 @@ async function generateLongitudinalMetrics() {
       audioData.forEach(transcription => {
         try {
           const content = JSON.parse(transcription.content as string);
-          const approvedItems = content.filter((item: any) => item.status === 'approved').length;
+          const approvedItems = content.filter((item: any) => item.status === "approved").length;
           audioItemsValidated += approvedItems;
         } catch (e) {
-          console.error('Error procesando contenido de transcripción:', e);
+          console.error("Error procesando contenido de transcripción:", e);
         }
       });
     }
@@ -147,7 +147,7 @@ async function generateLongitudinalMetrics() {
       
       // Buscar el patrón en todos los bloques de datos contextuales
       for (const block of context.contextual?.data || []) {
-        const content = block.content || '';
+        const content = block.content || "";
         const match = content.match(painPattern);
         if (match) {
           // El valor podría estar en el primer o segundo grupo según el patrón
@@ -168,11 +168,11 @@ async function generateLongitudinalMetrics() {
     const clinicalEvolution = calculateClinicalEvolution(currentPainLevel, previousPainLevel, false);
     
     // 8. Determinación de nivel de riesgo
-    const warningCount = currentSuggestions?.filter(s => s.type === 'warning' && s.status !== 'accepted')?.length || 0;
-    let riskLevel: 'low' | 'medium' | 'high' = 'low';
+    const warningCount = currentSuggestions?.filter(s => s.type === "warning" && s.status !== "accepted")?.length || 0;
+    let riskLevel: "low" | "medium" | "high" = "low";
     
     if (warningCount > 0) {
-      riskLevel = warningCount > 2 ? 'high' : 'medium';
+      riskLevel = warningCount > 2 ? "high" : "medium";
     }
     
     // 9. Estimar tiempo ahorrado (aproximado)
@@ -200,7 +200,7 @@ async function generateLongitudinalMetrics() {
           accepted: previousSuggestionsAccepted,
           integrated: previousSuggestionsIntegrated,
           field_matched: 0,
-          warnings: previousSuggestions?.filter(s => s.type === 'warning')?.length || 0,
+          warnings: previousSuggestions?.filter(s => s.type === "warning")?.length || 0,
           estimated_time_saved_minutes: previousSuggestionsIntegrated * 2
         },
         current_metrics: {
@@ -221,31 +221,31 @@ async function generateLongitudinalMetrics() {
     
     // 11. Guardar en Supabase
     const { data: insertResult, error: insertError } = await supabase
-      .from('metrics_by_visit')
+      .from("metrics_by_visit")
       .insert(metricsData);
       
     if (insertError) {
-      console.error('Error: No se pudieron guardar las métricas longitudinales', insertError);
+      console.error("Error: No se pudieron guardar las métricas longitudinales", insertError);
       return;
     }
     
-    console.log(`✅ Métricas longitudinales generadas y guardadas correctamente`);
+    console.log("✅ Métricas longitudinales generadas y guardadas correctamente");
     console.log(`📊 Resumen: ${getEvolutionEmoji(clinicalEvolution)} Evolución clínica: ${clinicalEvolution}`);
     console.log(`⏱️ Tiempo estimado ahorrado: ${timeSavedMinutes} minutos`);
     console.log(`⚠️ Nivel de riesgo: ${riskLevel.toUpperCase()}`);
     
   } catch (error) {
-    console.error('Error general en el proceso:', error);
+    console.error("Error general en el proceso:", error);
   }
 }
 
 // Función auxiliar para obtener emoji de evolución
 function getEvolutionEmoji(evolution: string): string {
   switch (evolution) {
-    case 'improved': return '🟢';
-    case 'stable': return '🟡';
-    case 'worsened': return '🔴';
-    default: return '⚪';
+  case "improved": return "🟢";
+  case "stable": return "🟡";
+  case "worsened": return "🔴";
+  default: return "⚪";
   }
 }
 

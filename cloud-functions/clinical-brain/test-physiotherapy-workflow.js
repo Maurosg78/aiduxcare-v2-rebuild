@@ -12,10 +12,10 @@
  * @version 1.0 - Test Flujo Fisioterapia
  */
 
-const axios = require('axios');
+const axios = require("axios");
 
 // Configuración
-const ENDPOINT = 'https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/physiotherapyWorkflow';
+const ENDPOINT = "https://us-east1-aiduxcare-stt-20250706.cloudfunctions.net/physiotherapyWorkflow";
 
 /**
  * CASO CLÍNICO COMPLEJO - FISIOTERAPIA
@@ -47,25 +47,25 @@ debido a proyectos con plazos ajustados. Duerme 5-6 horas por noche en promedio.
  * Función principal de prueba
  */
 async function probarFlujoFisioterapia() {
-  console.log('🚀 INICIANDO TEST FLUJO FISIOTERAPIA');
-  console.log('=====================================');
+  console.log("🚀 INICIANDO TEST FLUJO FISIOTERAPIA");
+  console.log("=====================================");
   
   try {
     // ========================================
     // PASO 1: PREGUNTAS DE PUNTOS CIEGOS
     // ========================================
-    console.log('\n📋 PASO 1: GENERANDO PREGUNTAS DE PUNTOS CIEGOS');
-    console.log('------------------------------------------------');
+    console.log("\n📋 PASO 1: GENERANDO PREGUNTAS DE PUNTOS CIEGOS");
+    console.log("------------------------------------------------");
     
     const startTime1 = Date.now();
     const questionsResponse = await axios.post(ENDPOINT, {
       transcription: CASO_CLINICO,
-      step: 'questions',
+      step: "questions",
       clinicalFacts: {
-        region: 'cervical',
-        duration: '3 semanas',
-        pattern: 'dolor con irradiación',
-        occupation: 'desarrollador software'
+        region: "cervical",
+        duration: "3 semanas",
+        pattern: "dolor con irradiación",
+        occupation: "desarrollador software"
       }
     });
     
@@ -83,24 +83,24 @@ async function probarFlujoFisioterapia() {
         console.log(`   Buscando: ${q.expected_insights}`);
       });
     } else {
-      console.error('❌ Error en generación de preguntas');
+      console.error("❌ Error en generación de preguntas");
       return;
     }
 
     // ========================================
     // PASO 2: BATERÍA DE PRUEBAS DIAGNÓSTICAS
     // ========================================
-    console.log('\n🔬 PASO 2: GENERANDO BATERÍA DE PRUEBAS DIAGNÓSTICAS');
-    console.log('---------------------------------------------------');
+    console.log("\n🔬 PASO 2: GENERANDO BATERÍA DE PRUEBAS DIAGNÓSTICAS");
+    console.log("---------------------------------------------------");
     
     const startTime2 = Date.now();
     const testsResponse = await axios.post(ENDPOINT, {
       transcription: CASO_CLINICO,
-      step: 'tests',
+      step: "tests",
       clinicalFacts: {
-        region: 'cervical',
-        symptoms: ['dolor', 'irradiación', 'hormigueos'],
-        suspected_diagnosis: 'Cervicalgia con probable radiculopatía C6-C7'
+        region: "cervical",
+        symptoms: ["dolor", "irradiación", "hormigueos"],
+        suspected_diagnosis: "Cervicalgia con probable radiculopatía C6-C7"
       }
     });
     
@@ -122,37 +122,37 @@ async function probarFlujoFisioterapia() {
         }
       });
     } else {
-      console.error('❌ Error en generación de pruebas');
+      console.error("❌ Error en generación de pruebas");
       return;
     }
 
     // ========================================
     // PASO 3: CHECKLIST DE ACCIONES CLÍNICAS
     // ========================================
-    console.log('\n✅ PASO 3: GENERANDO CHECKLIST DE ACCIONES CLÍNICAS');
-    console.log('---------------------------------------------------');
+    console.log("\n✅ PASO 3: GENERANDO CHECKLIST DE ACCIONES CLÍNICAS");
+    console.log("---------------------------------------------------");
     
     const startTime3 = Date.now();
     const checklistResponse = await axios.post(ENDPOINT, {
       transcription: CASO_CLINICO,
-      step: 'checklist',
+      step: "checklist",
       clinicalFacts: {
-        region: 'cervical',
-        symptoms: ['dolor', 'irradiación', 'hormigueos'],
-        occupation: 'desarrollador software'
+        region: "cervical",
+        symptoms: ["dolor", "irradiación", "hormigueos"],
+        occupation: "desarrollador software"
       },
       warnings: [
         {
-          type: 'neurological',
-          description: 'Hormigueos en distribución C6-C7',
-          severity: 'medium'
+          type: "neurological",
+          description: "Hormigueos en distribución C6-C7",
+          severity: "medium"
         }
       ],
       suggestions: [
         {
-          type: 'ergonomic',
-          description: 'Mejorar ergonomía del puesto de trabajo',
-          priority: 'high'
+          type: "ergonomic",
+          description: "Mejorar ergonomía del puesto de trabajo",
+          priority: "high"
         }
       ]
     });
@@ -181,7 +181,7 @@ async function probarFlujoFisioterapia() {
       Object.keys(groupedActions).forEach(type => {
         const actions = groupedActions[type];
         if (actions.length > 0) {
-          console.log(`\n🔹 ${type.toUpperCase().replace('_', ' ')}`);
+          console.log(`\n🔹 ${type.toUpperCase().replace("_", " ")}`);
           actions.forEach((action, index) => {
             console.log(`   ${index + 1}. [${action.priority.toUpperCase()}] ${action.action}`);
             console.log(`      Fundamento: ${action.rationale}`);
@@ -191,7 +191,7 @@ async function probarFlujoFisioterapia() {
         }
       });
     } else {
-      console.error('❌ Error en generación de checklist');
+      console.error("❌ Error en generación de checklist");
       return;
     }
 
@@ -199,22 +199,22 @@ async function probarFlujoFisioterapia() {
     // RESUMEN FINAL
     // ========================================
     const totalTime = questionsTime + testsTime + checklistTime;
-    console.log('\n🎉 FLUJO FISIOTERAPIA COMPLETADO EXITOSAMENTE');
-    console.log('=============================================');
+    console.log("\n🎉 FLUJO FISIOTERAPIA COMPLETADO EXITOSAMENTE");
+    console.log("=============================================");
     console.log(`⏱️ Tiempo total: ${totalTime}ms`);
     console.log(`📋 Preguntas generadas: ${questionsResponse.data.result.questions?.length || 0}`);
     console.log(`🔬 Pruebas generadas: ${testsResponse.data.result.diagnostic_tests?.length || 0}`);
     console.log(`✅ Acciones generadas: ${checklistResponse.data.result.action_checklist?.length || 0}`);
-    console.log('\n🎯 SISTEMA LISTO PARA FISIOTERAPEUTAS');
-    console.log('   - Preguntas de puntos ciegos para anamnesis completa');
-    console.log('   - Pruebas diagnósticas específicas y relevantes');
-    console.log('   - Checklist de acciones con documentación');
-    console.log('   - Flujo optimizado para toma de decisiones clínicas');
+    console.log("\n🎯 SISTEMA LISTO PARA FISIOTERAPEUTAS");
+    console.log("   - Preguntas de puntos ciegos para anamnesis completa");
+    console.log("   - Pruebas diagnósticas específicas y relevantes");
+    console.log("   - Checklist de acciones con documentación");
+    console.log("   - Flujo optimizado para toma de decisiones clínicas");
     
   } catch (error) {
-    console.error('❌ ERROR EN FLUJO FISIOTERAPIA:', error.message);
+    console.error("❌ ERROR EN FLUJO FISIOTERAPIA:", error.message);
     if (error.response) {
-      console.error('Respuesta del servidor:', error.response.data);
+      console.error("Respuesta del servidor:", error.response.data);
     }
   }
 }

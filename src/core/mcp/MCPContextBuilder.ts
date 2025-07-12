@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import { AgentContext, MemoryBlock } from '@/types/agent';
-import { MCPContext, MCPContextSchema } from './schema';
-import { getContextualMemory, getPersistentMemory, getSemanticMemory } from './MCPDataSourceSupabase';
+import { z } from "zod";
+import { AgentContext, MemoryBlock } from "@/types/agent";
+import { MCPContext, MCPContextSchema } from "./schema";
+import { getContextualMemory, getPersistentMemory, getSemanticMemory } from "./MCPDataSourceSupabase";
 
 /**
  * Tipo para los datos de memoria utilizados internamente
@@ -61,15 +61,15 @@ export async function getContextFromVisit(
 
   return {
     contextual: {
-      source: 'supabase',
+      source: "supabase",
       data: contextual
     },
     persistent: {
-      source: 'supabase',
+      source: "supabase",
       data: persistent
     },
     semantic: {
-      source: 'supabase',
+      source: "supabase",
       data: semantic
     }
   };

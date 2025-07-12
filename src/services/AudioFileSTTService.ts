@@ -4,18 +4,18 @@
  * Tarea 1.1.2 del Roadmap MVP "Escucha Activa Clínica"
  */
 
-import { TranscriptionSegment, TranscriptionConfidence } from '../core/audio/AudioCaptureService';
-import { WebSpeechSTTService } from './WebSpeechSTTService';
+import { TranscriptionSegment, TranscriptionConfidence } from "../core/audio/AudioCaptureService";
+import { WebSpeechSTTService } from "./WebSpeechSTTService";
 
 export interface AudioFileSTTOptions {
-  language?: 'es' | 'en';
+  language?: "es" | "en";
   enableSpeakerDetection?: boolean;
   chunkDurationMs?: number;
   enableSimulation?: boolean;
 }
 
 export interface STTProgress {
-  stage: 'preparing' | 'transcribing' | 'processing' | 'completed' | 'error';
+  stage: "preparing" | "transcribing" | "processing" | "completed" | "error";
   progress: number; // 0-100
   message: string;
   currentSegment?: number;
@@ -45,13 +45,13 @@ export interface AudioFileSTTResult {
  */
 export class AudioFileSTTService {
   private readonly supportedMimeTypes = [
-    'audio/wav',
-    'audio/mp3',
-    'audio/mpeg',
-    'audio/ogg',
-    'audio/webm',
-    'audio/m4a',
-    'audio/aac'
+    "audio/wav",
+    "audio/mp3",
+    "audio/mpeg",
+    "audio/ogg",
+    "audio/webm",
+    "audio/m4a",
+    "audio/aac"
   ];
 
   /**
@@ -66,7 +66,7 @@ export class AudioFileSTTService {
     
     // Configuración por defecto
     const config = {
-      language: 'es' as const,
+      language: "es" as const,
       enableSpeakerDetection: true,
       chunkDurationMs: 30000, // 30 segundos por chunk
       enableSimulation: false,
@@ -74,9 +74,9 @@ export class AudioFileSTTService {
     };
 
     onProgress?.({
-      stage: 'preparing',
+      stage: "preparing",
       progress: 10,
-      message: 'Preparando archivo de audio...'
+      message: "Preparando archivo de audio..."
     });
 
     // Validar archivo
@@ -91,9 +91,9 @@ export class AudioFileSTTService {
     }
 
     onProgress?.({
-      stage: 'transcribing',
+      stage: "transcribing",
       progress: 20,
-      message: 'Iniciando transcripción...'
+      message: "Iniciando transcripción..."
     });
 
     try {
@@ -106,18 +106,18 @@ export class AudioFileSTTService {
       );
 
       onProgress?.({
-        stage: 'processing',
+        stage: "processing",
         progress: 90,
-        message: 'Procesando resultados...'
+        message: "Procesando resultados..."
       });
 
       // Calcular métricas de calidad
       const qualityMetrics = this.calculateQualityMetrics(transcription);
 
       onProgress?.({
-        stage: 'completed',
+        stage: "completed",
         progress: 100,
-        message: 'Transcripción completada'
+        message: "Transcripción completada"
       });
 
       const processingTimeMs = Date.now() - startTime;
@@ -130,12 +130,12 @@ export class AudioFileSTTService {
       };
 
     } catch (error) {
-      console.error('Error en transcripción:', error);
+      console.error("Error en transcripción:", error);
       
       onProgress?.({
-        stage: 'error',
+        stage: "error",
         progress: 0,
-        message: 'Error en la transcripción, usando simulación'
+        message: "Error en la transcripción, usando simulación"
       });
 
       // Fallback a simulación en caso de error
@@ -148,48 +148,48 @@ export class AudioFileSTTService {
    */
   private async validateAudioFile(file: File): Promise<void> {
     if (!file) {
-      throw new Error('No se proporcionó archivo de audio');
+      throw new Error("No se proporcionó archivo de audio");
     }
 
     if (file.size === 0) {
-      throw new Error('El archivo está vacío');
+      throw new Error("El archivo está vacío");
     }
 
     if (file.size > 100 * 1024 * 1024) { // 100MB límite
-      throw new Error('El archivo excede el tamaño máximo de 100MB');
+      throw new Error("El archivo excede el tamaño máximo de 100MB");
     }
 
     // Verificar tipo MIME
     const isValidType = this.supportedMimeTypes.some(type => 
-      file.type === type || file.name.toLowerCase().includes(type.split('/')[1])
+      file.type === type || file.name.toLowerCase().includes(type.split("/")[1])
     );
 
     if (!isValidType) {
-      throw new Error(`Formato de archivo no soportado. Use: ${this.supportedMimeTypes.join(', ')}`);
+      throw new Error(`Formato de archivo no soportado. Use: ${this.supportedMimeTypes.join(", ")}`);
     }
   }
 
   /**
    * Obtiene información del archivo de audio
    */
-  private async getAudioInfo(file: File): Promise<AudioFileSTTResult['audioInfo']> {
+  private async getAudioInfo(file: File): Promise<AudioFileSTTResult["audioInfo"]> {
     return new Promise((resolve, reject) => {
       const audio = new Audio();
       const url = URL.createObjectURL(file);
 
-      audio.addEventListener('loadedmetadata', () => {
+      audio.addEventListener("loadedmetadata", () => {
         URL.revokeObjectURL(url);
         resolve({
           duration: audio.duration,
           size: file.size,
-          format: file.type || 'unknown',
+          format: file.type || "unknown",
           sampleRate: undefined // No disponible desde HTML Audio API
         });
       });
 
-      audio.addEventListener('error', () => {
+      audio.addEventListener("error", () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Error al cargar metadatos del audio'));
+        reject(new Error("Error al cargar metadatos del audio"));
       });
 
       audio.src = url;
@@ -201,7 +201,7 @@ export class AudioFileSTTService {
    */
   private async processAudioInChunks(
     file: File,
-    audioInfo: AudioFileSTTResult['audioInfo'],
+    audioInfo: AudioFileSTTResult["audioInfo"],
     config: AudioFileSTTOptions,
     onProgress?: (progress: STTProgress) => void
   ): Promise<TranscriptionSegment[]> {
@@ -221,7 +221,7 @@ export class AudioFileSTTService {
       const endTime = Math.min((i + 1) * chunkDuration, audioInfo.duration);
 
       onProgress?.({
-        stage: 'transcribing',
+        stage: "transcribing",
         progress: 20 + (i / totalChunks) * 60, // 20% a 80%
         message: `Transcribiendo chunk ${i + 1} de ${totalChunks}...`,
         currentSegment: i + 1,
@@ -264,7 +264,7 @@ export class AudioFileSTTService {
     
     return new Promise((resolve, reject) => {
       const sttService = new WebSpeechSTTService({
-        language: config.language || 'es',
+        language: config.language || "es",
         continuous: true,
         interimResults: false, // Solo resultados finales para archivos
         maxAlternatives: 1
@@ -280,13 +280,13 @@ export class AudioFileSTTService {
           progressCounter++;
           
           onProgress?.({
-            stage: 'transcribing' as const,
+            stage: "transcribing" as const,
             progress: 30 + Math.min(progressCounter * 2, 50), // 30% a 80%
             message: `Procesando segmento ${progressCounter}...`
           });
         },
         onError: (error: string) => {
-          console.error('Error en transcripción:', error);
+          console.error("Error en transcripción:", error);
           reject(new Error(error));
         },
         onEnd: () => {
@@ -315,20 +315,20 @@ export class AudioFileSTTService {
     return this.processAudioComplete(file, config);
   }
 
-     /**
+  /**
     * Reproduce el archivo de audio mientras captura con Web Speech API
     */
-   private async playAudioForTranscription(
-     file: File,
-     sttService: WebSpeechSTTService,
-     options: { onResult: (segment: TranscriptionSegment) => void; onError?: (error: string) => void; onEnd?: () => void }
-   ): Promise<void> {
+  private async playAudioForTranscription(
+    file: File,
+    sttService: WebSpeechSTTService,
+    options: { onResult: (segment: TranscriptionSegment) => void; onError?: (error: string) => void; onEnd?: () => void }
+  ): Promise<void> {
     
     return new Promise((resolve, reject) => {
       const audio = new Audio();
       const url = URL.createObjectURL(file);
 
-      audio.addEventListener('canplaythrough', async () => {
+      audio.addEventListener("canplaythrough", async () => {
         try {
           // Iniciar transcripción
           await sttService.startRealtimeTranscription(options);
@@ -342,7 +342,7 @@ export class AudioFileSTTService {
         }
       });
 
-      audio.addEventListener('ended', async () => {
+      audio.addEventListener("ended", async () => {
         try {
           await sttService.stopTranscription();
           URL.revokeObjectURL(url);
@@ -352,9 +352,9 @@ export class AudioFileSTTService {
         }
       });
 
-      audio.addEventListener('error', () => {
+      audio.addEventListener("error", () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Error reproduciendo audio'));
+        reject(new Error("Error reproduciendo audio"));
       });
 
       audio.src = url;
@@ -366,15 +366,15 @@ export class AudioFileSTTService {
    */
   private async simulateTranscription(
     file: File,
-    audioInfo: AudioFileSTTResult['audioInfo'],
+    audioInfo: AudioFileSTTResult["audioInfo"],
     config: AudioFileSTTOptions,
     onProgress?: (progress: STTProgress) => void
   ): Promise<AudioFileSTTResult> {
     
     onProgress?.({
-      stage: 'transcribing',
+      stage: "transcribing",
       progress: 30,
-      message: 'Simulando transcripción...'
+      message: "Simulando transcripción..."
     });
 
     // Simular tiempo de procesamiento
@@ -383,13 +383,13 @@ export class AudioFileSTTService {
     // Generar transcripción simulada realista
     const simulatedSegments = this.generateSimulatedTranscription(
       audioInfo.duration,
-      config.language || 'es'
+      config.language || "es"
     );
 
     onProgress?.({
-      stage: 'processing',
+      stage: "processing",
       progress: 90,
-      message: 'Procesando resultados simulados...'
+      message: "Procesando resultados simulados..."
     });
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -397,9 +397,9 @@ export class AudioFileSTTService {
     const qualityMetrics = this.calculateQualityMetrics(simulatedSegments);
 
     onProgress?.({
-      stage: 'completed',
+      stage: "completed",
       progress: 100,
-      message: 'Simulación completada'
+      message: "Simulación completada"
     });
 
     return {
@@ -415,10 +415,10 @@ export class AudioFileSTTService {
    */
   private generateSimulatedTranscription(
     duration: number,
-    language: 'es' | 'en'
+    language: "es" | "en"
   ): TranscriptionSegment[] {
     
-    const templates = language === 'es' ? [
+    const templates = language === "es" ? [
       "Fisioterapeuta: Buenos días, ¿cómo se encuentra hoy?",
       "Paciente: Hola doctor, siento una molestia en la zona lumbar desde hace tres días.",
       "Fisioterapeuta: Entiendo. ¿Puede describir el tipo de dolor? ¿Es punzante, sordo, o más bien como una tensión?",
@@ -457,8 +457,8 @@ export class AudioFileSTTService {
         timestamp,
         content,
         confidence: this.randomConfidence(),
-                 actor: content.toLowerCase().includes('fisio') || content.toLowerCase().includes('physio') 
-           ? 'profesional' : 'paciente',
+        actor: content.toLowerCase().includes("fisio") || content.toLowerCase().includes("physio") 
+          ? "profesional" : "paciente",
         approved: false,
         edited: false
       });
@@ -470,12 +470,12 @@ export class AudioFileSTTService {
   /**
    * Calcula métricas de calidad de la transcripción
    */
-  private calculateQualityMetrics(segments: TranscriptionSegment[]): AudioFileSTTResult['qualityMetrics'] {
+  private calculateQualityMetrics(segments: TranscriptionSegment[]): AudioFileSTTResult["qualityMetrics"] {
     const confidenceValues = segments.map(s => this.confidenceToNumber(s.confidence));
     const averageConfidence = confidenceValues.reduce((a, b) => a + b, 0) / confidenceValues.length || 0;
     
     const totalWords = segments.reduce((total, segment) => 
-      total + segment.content.split(' ').length, 0
+      total + segment.content.split(" ").length, 0
     );
     
     const totalDuration = segments.length * 8; // estimación básica
@@ -496,10 +496,10 @@ export class AudioFileSTTService {
    */
   private confidenceToNumber(confidence: TranscriptionConfidence): number {
     switch (confidence) {
-      case 'entendido': return 0.9;
-      case 'poco_claro': return 0.6;
-      case 'no_reconocido': return 0.3;
-      default: return 0.7;
+    case "entendido": return 0.9;
+    case "poco_claro": return 0.6;
+    case "no_reconocido": return 0.3;
+    default: return 0.7;
     }
   }
 
@@ -508,9 +508,9 @@ export class AudioFileSTTService {
    */
   private randomConfidence(): TranscriptionConfidence {
     const rand = Math.random();
-    if (rand > 0.7) return 'entendido';
-    if (rand > 0.3) return 'poco_claro';
-    return 'no_reconocido';
+    if (rand > 0.7) return "entendido";
+    if (rand > 0.3) return "poco_claro";
+    return "no_reconocido";
   }
 
   /**

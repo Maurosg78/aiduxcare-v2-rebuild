@@ -1,4 +1,4 @@
-import { Form, ClinicalFormData } from '@/types/forms';
+import { Form, ClinicalFormData } from "@/types/forms";
 
 export type { Form, ClinicalFormData };
 

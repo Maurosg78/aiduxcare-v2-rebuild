@@ -1,7 +1,7 @@
-import React, { lazy, Suspense } from 'react';
-import { RouteObject } from 'react-router-dom';
-import Layout from '../components/Layout';
-import ProtectedRoute from '../../features/auth/ProtectedRoute';
+import React, { lazy, Suspense } from "react";
+import { RouteObject } from "react-router-dom";
+import Layout from "../components/Layout";
+import ProtectedRoute from "../../features/auth/ProtectedRoute";
 
 // Componente de loading para las rutas lazy
 const PageLoader = () => (
@@ -12,21 +12,21 @@ const PageLoader = () => (
 );
 
 // Lazy loading de páginas principales
-const LoginPage = lazy(() => import('../../pages/LoginPage'));
-const RegisterPage = lazy(() => import('../../pages/RegisterPage'));
-const VisitDetailPage = lazy(() => import('../../features/visits/id/VisitDetailPage'));
-const DemoVisitPage = lazy(() => import('../../features/demo/DemoVisitPage'));
-const AccessDeniedPage = lazy(() => import('../../features/auth/AccessDeniedPage'));
-const DashboardPage = lazy(() => import('../../features/admin/DashboardPage'));
-const PatientPortalPage = lazy(() => import('../../features/patient/PatientPortalPage'));
-const PatientDetailPage = lazy(() => import('../../features/patient/PatientDetailPage'));
-const AdvancedAIDemoPage = lazy(() => import('@/pages/AdvancedAIDemoPage'));
-const AudioTestPage = lazy(() => import('@/pages/AudioTestPage'));
-const AudioProcessingPage = lazy(() => import('@/pages/AudioProcessingPage'));
+const LoginPage = lazy(() => import("../../pages/LoginPage"));
+const RegisterPage = lazy(() => import("../../pages/RegisterPage"));
+const VisitDetailPage = lazy(() => import("../../features/visits/id/VisitDetailPage"));
+const DemoVisitPage = lazy(() => import("../../features/demo/DemoVisitPage"));
+const AccessDeniedPage = lazy(() => import("../../features/auth/AccessDeniedPage"));
+const DashboardPage = lazy(() => import("../../features/admin/DashboardPage"));
+const PatientPortalPage = lazy(() => import("../../features/patient/PatientPortalPage"));
+const PatientDetailPage = lazy(() => import("../../features/patient/PatientDetailPage"));
+const AdvancedAIDemoPage = lazy(() => import("@/pages/AdvancedAIDemoPage"));
+const AudioTestPage = lazy(() => import("@/pages/AudioTestPage"));
+const AudioProcessingPage = lazy(() => import("@/pages/AudioProcessingPage"));
 
 export const appRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <Layout />,
     children: [
       {
@@ -40,9 +40,9 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: 'visits/:id',
+        path: "visits/:id",
         element: (
-          <ProtectedRoute requiredRoles={['professional', 'admin']}>
+          <ProtectedRoute requiredRoles={["professional", "admin"]}>
             <Suspense fallback={<PageLoader />}>
               <VisitDetailPage />
             </Suspense>
@@ -50,9 +50,9 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: 'patients/:id',
+        path: "patients/:id",
         element: (
-          <ProtectedRoute requiredRoles={['professional', 'admin']}>
+          <ProtectedRoute requiredRoles={["professional", "admin"]}>
             <Suspense fallback={<PageLoader />}>
               <PatientDetailPage />
             </Suspense>
@@ -60,9 +60,9 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: 'demo',
+        path: "demo",
         element: (
-          <ProtectedRoute requiredRoles={['professional', 'admin']}>
+          <ProtectedRoute requiredRoles={["professional", "admin"]}>
             <Suspense fallback={<PageLoader />}>
               <DemoVisitPage />
             </Suspense>
@@ -70,7 +70,7 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: 'admin',
+        path: "admin",
         element: (
           <ProtectedRoute requiredRoles="admin">
             <Suspense fallback={<PageLoader />}>
@@ -80,7 +80,7 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: 'patient-portal',
+        path: "patient-portal",
         element: (
           <ProtectedRoute requiredRoles="patient">
             <Suspense fallback={<PageLoader />}>
@@ -90,7 +90,7 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: 'advanced-ai-demo',
+        path: "advanced-ai-demo",
         element: (
           <Suspense fallback={<PageLoader />}>
             <AdvancedAIDemoPage />
@@ -98,7 +98,7 @@ export const appRoutes: RouteObject[] = [
         )
       },
       {
-        path: 'audio-test',
+        path: "audio-test",
         element: (
           <Suspense fallback={<PageLoader />}>
             <AudioTestPage />
@@ -106,9 +106,9 @@ export const appRoutes: RouteObject[] = [
         )
       },
       {
-        path: 'audio-processing',
+        path: "audio-processing",
         element: (
-          <ProtectedRoute requiredRoles={['professional', 'admin']}>
+          <ProtectedRoute requiredRoles={["professional", "admin"]}>
             <Suspense fallback={<PageLoader />}>
               <AudioProcessingPage />
             </Suspense>
@@ -118,7 +118,7 @@ export const appRoutes: RouteObject[] = [
     ],
   },
   {
-    path: '/login',
+    path: "/login",
     element: (
       <Suspense fallback={<PageLoader />}>
         <LoginPage />
@@ -126,7 +126,7 @@ export const appRoutes: RouteObject[] = [
     ),
   },
   {
-    path: '/register',
+    path: "/register",
     element: (
       <Suspense fallback={<PageLoader />}>
         <RegisterPage />
@@ -134,7 +134,7 @@ export const appRoutes: RouteObject[] = [
     ),
   },
   {
-    path: '/access-denied',
+    path: "/access-denied",
     element: (
       <Suspense fallback={<PageLoader />}>
         <AccessDeniedPage />

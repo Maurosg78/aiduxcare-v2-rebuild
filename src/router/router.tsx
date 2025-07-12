@@ -1,19 +1,19 @@
-import { createBrowserRouter } from 'react-router-dom';
-import ConsultationPage from '../pages/ConsultationPage';
-import { DebugAudioPage } from '../pages/DebugAudioPage';
-import DebugCloudFunctionPage from '../pages/DebugCloudFunctionPage';
+import { createBrowserRouter } from "react-router-dom";
+import ConsultationPage from "../pages/ConsultationPage";
+import { DebugAudioPage } from "../pages/DebugAudioPage";
+import DebugCloudFunctionPage from "../pages/DebugCloudFunctionPage";
 
 export const router = createBrowserRouter([
   {
-    path: '/consultation',
+    path: "/consultation",
     element: <ConsultationPage />
   },
   {
-    path: '/debug-audio',
+    path: "/debug-audio",
     element: <DebugAudioPage />
   },
   {
-    path: '/debug-cloud',
+    path: "/debug-cloud",
     element: <DebugCloudFunctionPage />
   }
 ]);

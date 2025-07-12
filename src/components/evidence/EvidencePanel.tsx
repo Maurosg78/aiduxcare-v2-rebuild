@@ -3,8 +3,8 @@
  * Componente para visualizar artículos científicos y evidencia
  */
 
-import React, { useState } from 'react';
-import { RAGQueryResult, CitationReference } from '@/core/mcp/RAGMedicalMCP';
+import React, { useState } from "react";
+import { RAGQueryResult, CitationReference } from "@/core/mcp/RAGMedicalMCP";
 
 interface EvidencePanelProps {
   ragResult?: RAGQueryResult;
@@ -23,11 +23,11 @@ interface EvidenceBadgeProps {
 const EvidenceBadge: React.FC<EvidenceBadgeProps> = ({ level, articles, confidence }) => {
   const getBadgeColor = (level: string) => {
     switch (level) {
-      case 'Level-1': return 'bg-green-100 text-green-800 border-green-300';
-      case 'Level-2': return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'Guidelines': return 'bg-purple-100 text-purple-800 border-purple-300';
-      case 'Consensus': return 'bg-orange-100 text-orange-800 border-orange-300';
-      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+    case "Level-1": return "bg-green-100 text-green-800 border-green-300";
+    case "Level-2": return "bg-blue-100 text-blue-800 border-blue-300";
+    case "Guidelines": return "bg-purple-100 text-purple-800 border-purple-300";
+    case "Consensus": return "bg-orange-100 text-orange-800 border-orange-300";
+    default: return "bg-gray-100 text-gray-800 border-gray-300";
     }
   };
 
@@ -43,7 +43,7 @@ const ArticlePreview: React.FC<{
   onClick?: () => void;
 }> = ({ citation, onClick }) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onClick?.();
     }
@@ -93,9 +93,9 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
   isLoading = false,
   onArticleClick,
   onRefresh,
-  className = ''
+  className = ""
 }) => {
-  const [expandedSection, setExpandedSection] = useState<'summary' | 'articles' | 'context'>('summary');
+  const [expandedSection, setExpandedSection] = useState<"summary" | "articles" | "context">("summary");
 
   if (isLoading) {
     return (
@@ -168,17 +168,17 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
       {/* Navigation Tabs */}
       <div className="flex border-b border-gray-200">
         {[
-          { key: 'summary', label: '📊 Resumen', count: ragResult.citations.length },
-          { key: 'articles', label: '📚 Artículos', count: ragResult.citations.length },
-          { key: 'context', label: '🧠 Contexto', count: 1 }
+          { key: "summary", label: "📊 Resumen", count: ragResult.citations.length },
+          { key: "articles", label: "📚 Artículos", count: ragResult.citations.length },
+          { key: "context", label: "🧠 Contexto", count: 1 }
         ].map(tab => (
           <button
             key={tab.key}
-            onClick={() => setExpandedSection(tab.key as 'summary' | 'articles' | 'context')}
+            onClick={() => setExpandedSection(tab.key as "summary" | "articles" | "context")}
             className={`flex-1 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               expandedSection === tab.key
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? "border-blue-500 text-blue-600 bg-blue-50"
+                : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
             {tab.label} ({tab.count})
@@ -190,7 +190,7 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
       <div className="p-4 max-h-96 overflow-y-auto">
         
         {/* Summary Tab */}
-        {expandedSection === 'summary' && (
+        {expandedSection === "summary" && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div className="bg-green-50 p-3 rounded-lg">
@@ -221,7 +221,7 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
         )}
 
         {/* Articles Tab */}
-        {expandedSection === 'articles' && (
+        {expandedSection === "articles" && (
           <div className="space-y-3">
             {ragResult.citations.map((citation, index) => (
               <ArticlePreview
@@ -234,11 +234,11 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
         )}
 
         {/* Context Tab */}
-        {expandedSection === 'context' && (
+        {expandedSection === "context" && (
           <div>
             <h4 className="text-sm font-medium text-gray-800 mb-2">🧠 Contexto médico generado:</h4>
             <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700 leading-relaxed">
-              {ragResult.medical_context || 'No hay contexto médico disponible.'}
+              {ragResult.medical_context || "No hay contexto médico disponible."}
             </div>
           </div>
         )}
