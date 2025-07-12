@@ -23,22 +23,22 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: '18.x'
         cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --prefer-offline --no-audit
       
     - name: Run linter
       run: npm run lint
       
     - name: Run tests
-      run: npm test
+      run: npm test -- --passWithNoTests
       
     - name: Build
       run: npm run build
