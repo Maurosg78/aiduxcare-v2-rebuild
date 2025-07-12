@@ -49,8 +49,8 @@ Responde SOLO en formato JSON:
         max_tokens: 500
       });
 
-      // Parse JSON response
-      const jsonMatch = result.response.match(/\[[\s\S]*\]/);
+      // Parse JSON response - optimizar regex para evitar backtracking
+      const jsonMatch = result.response.match(/\[[^\]]{0,1000}\]/);
       let entities: ClinicalEntity[] = [];
       
       if (jsonMatch) {
@@ -107,11 +107,7 @@ Responde SOLO en formato JSON:
    * Genera notas SOAP con A/B testing automático
    */
   static async generateSOAPNotes(transcript: string, entities: ClinicalEntity[], useRAG: boolean = true): Promise<SOAPNotes> {
-    const startTime = Date.now();
-    const promptVersion = "current";
-    
     const result = await this.generateSOAPNotesOriginal(transcript, entities, useRAG);
-    
     return result;
   }
 
@@ -186,8 +182,8 @@ Genera SOAP en formato JSON:
       
       const processingTime = Date.now() - startTime;
       
-      // Extraer JSON de la respuesta
-      const jsonMatch = result.response.match(/\{[\s\S]*\}/);
+      // Extraer JSON de la respuesta - optimizar regex para evitar backtracking
+      const jsonMatch = result.response.match(/\{[^}]{0,2000}\}/);
       if (jsonMatch) {
         try {
           const soapData = JSON.parse(jsonMatch[0]);
@@ -247,7 +243,7 @@ JSON:
         max_tokens: 400
       });
       
-      const jsonMatch = result.response.match(/\{[\s\S]*\}/);
+      const jsonMatch = result.response.match(/\{[^}]{0,1000}\}/);
       if (jsonMatch) {
         const soapData = JSON.parse(jsonMatch[0]);
         return {
@@ -472,7 +468,7 @@ JSON:
   /**
    * Genera SOAP de fallback cuando falla el LLM
    */
-  private static generateFallbackSOAP(transcript: string, useRAG: boolean): SOAPNotes {
+  private static generateFallbackSOAP(transcript: string, _useRAG: boolean): SOAPNotes {
     const wordCount = transcript.split(" ").length;
     const hasSymptoms = /dolor|molestia|duele/i.test(transcript);
     const hasMovement = /movimiento|ejercicio|estirar/i.test(transcript);

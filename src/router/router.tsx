@@ -1,19 +1,19 @@
 import { createBrowserRouter } from "react-router-dom";
-import ConsultationPage from "../pages/ConsultationPage";
-import { DebugAudioPage } from "../pages/DebugAudioPage";
-import DebugCloudFunctionPage from "../pages/DebugCloudFunctionPage";
+import PhysiotherapyWorkflowPage from "../pages/PhysiotherapyWorkflowPage";
+import LoginPage from "../features/auth/LoginPage";
+import ProtectedRoute from "../features/auth/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
-    path: "/consultation",
-    element: <ConsultationPage />
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <PhysiotherapyWorkflowPage />
+      </ProtectedRoute>
+    )
   },
   {
-    path: "/debug-audio",
-    element: <DebugAudioPage />
-  },
-  {
-    path: "/debug-cloud",
-    element: <DebugCloudFunctionPage />
+    path: "/login",
+    element: <LoginPage />
   }
 ]);

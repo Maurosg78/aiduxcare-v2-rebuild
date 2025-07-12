@@ -1,5 +1,8 @@
 import { AuditLogger } from "@/core/audit/AuditLogger";
 
+// Constantes para evitar strings duplicados
+const TEST_ADMIN_ID = "admin-test-001";
+
 // Función para crear logs de prueba
 export function createTestAuditLogs(): void {
   // Primero limpiar logs existentes
@@ -22,7 +25,7 @@ export function createTestAuditLogs(): void {
       content: "Contenido modificado contextual para pruebas de auditoría",
       visit_id: visitId
     }],
-    "admin-test-001",
+    TEST_ADMIN_ID,
     visitId
   );
   
@@ -42,7 +45,7 @@ export function createTestAuditLogs(): void {
       visit_id: visitId,
       patient_id: "patient-456"
     }],
-    "admin-test-001",
+    TEST_ADMIN_ID,
     visitId
   );
   
@@ -60,7 +63,7 @@ export function createTestAuditLogs(): void {
       content: "Contenido modificado semántico para pruebas de auditoría",
       visit_id: visitId
     }],
-    "admin-test-001",
+    TEST_ADMIN_ID,
     visitId
   );
   
@@ -78,13 +81,13 @@ export function createTestAuditLogs(): void {
       content: "Contenido modificado de otra visita",
       visit_id: "visit-different-001"
     }],
-    "admin-test-001",
+    TEST_ADMIN_ID,
     "visit-different-001"
   );
   
   // Simular integración de sugerencias
   AuditLogger.logSuggestionIntegration(
-    "admin-test-001",
+    TEST_ADMIN_ID,
     visitId,
     "suggestion-001",
     "recommendation",
@@ -93,7 +96,7 @@ export function createTestAuditLogs(): void {
   );
   
   AuditLogger.logSuggestionIntegration(
-    "admin-test-001",
+    TEST_ADMIN_ID,
     visitId,
     "suggestion-002",
     "warning",
@@ -102,7 +105,7 @@ export function createTestAuditLogs(): void {
   );
   
   AuditLogger.logSuggestionIntegration(
-    "admin-test-001",
+    TEST_ADMIN_ID,
     "visit-different-001",
     "suggestion-003",
     "info",

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 /**
  * Configuración rápida de mock para Supabase en archivos de prueba

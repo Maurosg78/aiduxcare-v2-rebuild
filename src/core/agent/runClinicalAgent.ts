@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { AgentContext, AgentSuggestion } from "@/types/agent"; // Asegúrate que las rutas de importación con @ sean correctas para tu proyecto
+import { AgentSuggestion } from "@/types/agent"; // Asegúrate que las rutas de importación con @ sean correctas para tu proyecto
 import { buildAgentContext } from "./AgentContextBuilder";
 import { AgentExecutor } from "./AgentExecutor";
 import { logMetric, UsageMetricType } from "@/services/UsageAnalyticsService"; // Asegúrate que UsageMetricType se exporte y se importe

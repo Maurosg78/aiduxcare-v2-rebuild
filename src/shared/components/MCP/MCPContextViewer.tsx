@@ -54,22 +54,22 @@ const MemoryBlockItem: React.FC<{
 
   // Función para obtener la fecha formateada
   const getFormattedDate = () => {
-    // Usar timestamp si está disponible, o created_at como fallback
-    const dateString = block.timestamp || block.created_at;
+    const dateString = block.timestamp || block.created_at || "";
     if (!dateString) return "Fecha no disponible";
     
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    } catch (e) {
-      return dateString;
+    // Validar que la fecha sea válida antes de formatearla
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return dateString; // Devolver la fecha original si es inválida
     }
+    
+    return date.toLocaleString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   };
 
   // Manejar el guardado del contenido editado
@@ -282,7 +282,11 @@ const MCPContextViewer: React.FC<MCPContextViewerProps> = ({ context, editable =
 
   // Actualizar el estado local cuando cambia el contexto externo
   useEffect(() => {
-    setWorkingContext(context);
+    try {
+      setWorkingContext(context);
+    } catch (_e) {
+      console.error("Error al cargar contexto MCP:", _e);
+    }
   }, [context]);
 
   // Verificar si todos los bloques están validados
@@ -299,56 +303,35 @@ const MCPContextViewer: React.FC<MCPContextViewerProps> = ({ context, editable =
     setAllValidated(allBlocksValidated);
   }, [workingContext]);
 
+  // Funciones auxiliares para actualizar bloques
+  function updateBlockInSection(section: { data: Array<{ id: string; validated?: boolean; content?: string }> }, id: string, updates: { validated?: boolean; content?: string }) {
+    const blockIndex = section.data.findIndex(block => block.id === id);
+    if (blockIndex !== -1) {
+      section.data[blockIndex] = {
+        ...section.data[blockIndex],
+        ...updates
+      };
+    }
+  }
+
+  function createUpdatedContext(prevContext: MCPContext, id: string, updates: { validated?: boolean; content?: string }): MCPContext {
+    const newContext = JSON.parse(JSON.stringify(prevContext)) as MCPContext;
+    
+    updateBlockInSection(newContext.contextual, id, updates);
+    updateBlockInSection(newContext.persistent, id, updates);
+    updateBlockInSection(newContext.semantic, id, updates);
+    
+    return newContext;
+  }
+
   // Función para validar un bloque
   const handleValidateBlock = useCallback((id: string, validated: boolean) => {
-    setWorkingContext(prevContext => {
-      // Crear una copia profunda del contexto
-      const newContext = JSON.parse(JSON.stringify(prevContext)) as MCPContext;
-      
-      // Buscar y actualizar el bloque en todas las secciones
-      const updateBlockInSection = (section: typeof newContext.contextual) => {
-        const blockIndex = section.data.findIndex(block => block.id === id);
-        if (blockIndex !== -1) {
-          section.data[blockIndex] = {
-            ...section.data[blockIndex],
-            validated
-          };
-        }
-      };
-      
-      updateBlockInSection(newContext.contextual);
-      updateBlockInSection(newContext.persistent);
-      updateBlockInSection(newContext.semantic);
-      
-      return newContext;
-    });
+    setWorkingContext(prevContext => createUpdatedContext(prevContext, id, { validated }));
   }, []);
 
   // Función para editar el contenido de un bloque
   const handleEditBlock = useCallback((id: string, content: string) => {
-    setWorkingContext(prevContext => {
-      // Crear una copia profunda del contexto
-      const newContext = JSON.parse(JSON.stringify(prevContext)) as MCPContext;
-      
-      // Buscar y actualizar el bloque en todas las secciones
-      const updateBlockInSection = (section: typeof newContext.contextual) => {
-        const blockIndex = section.data.findIndex(block => block.id === id);
-        if (blockIndex !== -1) {
-          section.data[blockIndex] = {
-            ...section.data[blockIndex],
-            content,
-            // Al editar, se marca como no validado
-            validated: false
-          };
-        }
-      };
-      
-      updateBlockInSection(newContext.contextual);
-      updateBlockInSection(newContext.persistent);
-      updateBlockInSection(newContext.semantic);
-      
-      return newContext;
-    });
+    setWorkingContext(prevContext => createUpdatedContext(prevContext, id, { content, validated: false }));
   }, []);
 
   // Guardar cambios en el contexto (solo enviar para validación, sin persistencia real)

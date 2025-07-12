@@ -6,7 +6,7 @@
 import { SOAPData } from "./AudioToSOAPBridge";
 import { EncryptedData, CryptoService } from "./CryptoService";
 import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { auth, db } from "../config/firebase";
 
 export interface SavedNote {
   id: string;

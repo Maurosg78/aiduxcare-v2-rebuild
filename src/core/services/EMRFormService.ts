@@ -1,11 +1,6 @@
-import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
 import { formDataSourceSupabase } from "../dataSources/formDataSourceSupabase";
 import { AuditLogger } from "../audit/AuditLogger";
-import { trackMetric } from "../services/UsageAnalyticsService";
-import { FormDataSource } from "../dataSources/FormDataSource";
-import { ClinicalFormData, EMRContent, EMRForm } from "@/types/forms";
-import { SuggestionType } from "@/types/agent";
 
 /**
  * Tipos de secciones del EMR donde se pueden integrar sugerencias

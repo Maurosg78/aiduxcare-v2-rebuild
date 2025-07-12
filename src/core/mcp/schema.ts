@@ -19,7 +19,8 @@ export const MCPMemoryBlockSchema = z.object({
         try {
           // Verificar si es un formato ISO válido
           return !isNaN(new Date(val).getTime());
-        } catch (e) {
+        } catch (error) {
+          console.error("Error validando esquema MCP:", error);
           return false;
         }
       },
@@ -52,7 +53,8 @@ const MemoryItemSchema = z.object({
       (val) => {
         try {
           return !isNaN(new Date(val).getTime());
-        } catch (e) {
+        } catch (error) {
+          console.error("Error validando esquema MCP:", error);
           return false;
         }
       },
@@ -65,7 +67,8 @@ const MemoryItemSchema = z.object({
       (val) => {
         try {
           return !isNaN(new Date(val).getTime());
-        } catch (e) {
+        } catch (error) {
+          console.error("Error validando esquema MCP:", error);
           return false;
         }
       },

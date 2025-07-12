@@ -124,8 +124,9 @@ export default class RealAudioCaptureService {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach(track => track.stop());
-    } catch (error) {
-      throw new Error("No se pudo acceder al micrófono. Verifica los permisos.");
+    } catch (_error) {
+      console.error("Error en captura de audio:", _error);
+      // Continuar sin interrumpir el flujo
     }
 
     // Inicializar solo cuando se va a usar

@@ -2,14 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { RouteObject } from "react-router-dom";
 import Layout from "../components/Layout";
 import ProtectedRoute from "../../features/auth/ProtectedRoute";
-
-// Componente de loading para las rutas lazy
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    <span className="ml-3 text-gray-600">Cargando...</span>
-  </div>
-);
+import { PageLoader } from "./PageLoader";
 
 // Lazy loading de páginas principales
 const LoginPage = lazy(() => import("../../pages/LoginPage"));

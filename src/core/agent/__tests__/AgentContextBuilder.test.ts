@@ -12,8 +12,6 @@ vi.mock("../../../core/auth/supabaseClient", () => ({
 
 // Aplicamos un tipo más genérico para evitar problemas de linter
  
-type PostgrestMock = any;
-
 describe("AgentContextBuilder", () => {
   // Datos de prueba
   const mockDate = new Date("2023-06-15T10:00:00Z");
@@ -56,7 +54,7 @@ describe("AgentContextBuilder", () => {
       })
     };
     
-    vi.mocked(supabase.from).mockReturnValue(mockSupabaseQuery as PostgrestMock);
+    vi.mocked(supabase.from).mockReturnValue(mockSupabaseQuery as any);
   });
 
   afterEach(() => {
@@ -90,7 +88,7 @@ describe("AgentContextBuilder", () => {
       })
     };
     
-    vi.mocked(supabase.from).mockReturnValueOnce(mockErrorQuery as PostgrestMock);
+    vi.mocked(supabase.from).mockReturnValueOnce(mockErrorQuery as any);
     
     await expect(buildAgentContext(visitId)).rejects.toThrow(mockError);
   });
@@ -105,7 +103,7 @@ describe("AgentContextBuilder", () => {
       })
     };
     
-    vi.mocked(supabase.from).mockReturnValueOnce(mockEmptyQuery as PostgrestMock);
+    vi.mocked(supabase.from).mockReturnValueOnce(mockEmptyQuery as any);
     
     const result = await buildAgentContext(visitId);
     
@@ -170,7 +168,7 @@ describe("AgentContextBuilder", () => {
       })
     };
 
-    vi.mocked(supabase.from).mockReturnValueOnce(mockQueryWithInvalidBlocks as PostgrestMock);
+    vi.mocked(supabase.from).mockReturnValueOnce(mockQueryWithInvalidBlocks as any);
 
     const result = await buildAgentContext(visitId);
     
@@ -210,7 +208,7 @@ describe("AgentContextBuilder", () => {
       })
     };
 
-    vi.mocked(supabase.from).mockReturnValueOnce(mockQueryWithDifferentDates as PostgrestMock);
+    vi.mocked(supabase.from).mockReturnValueOnce(mockQueryWithDifferentDates as any);
 
     const result = await buildAgentContext(visitId);
     
@@ -246,7 +244,7 @@ describe("AgentContextBuilder", () => {
       })
     };
 
-    vi.mocked(supabase.from).mockReturnValueOnce(mockQueryWithEmptyContent as PostgrestMock);
+    vi.mocked(supabase.from).mockReturnValueOnce(mockQueryWithEmptyContent as any);
 
     const result = await buildAgentContext(visitId);
     

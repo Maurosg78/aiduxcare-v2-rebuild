@@ -3,14 +3,14 @@ export const userDataSourceSupabase = {
     return { id: userId, name: "Mock User", role: "clinician" };
   },
 
-  async signInWithPassword(email: string, password: string) {
+  async signInWithPassword(): Promise<{ session: { user: { id: string } }; user: { id: string } }> {
     return {
       session: { user: { id: "mock-user-id" } },
       user: { id: "mock-user-id" }
     };
   },
 
-  async signUp(email: string, password: string, options: { full_name: string; role: RoleType }) {
+  async signUp(): Promise<{ user: { id: string } }> {
     return { user: { id: "mock-user-id" } };
   }
 };

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import supabase from "@/core/auth/supabaseClient";
-// import { testDirectConnection } from '@/core/auth/directClient';
 import { SupabaseClient } from "@supabase/supabase-js";
 
 interface ErrorWithMessage {
@@ -50,7 +49,7 @@ export const ConnectionStatus = () => {
         for (const table of tablesToTry) {
           try {
             console.log(`Probando tabla ${table} con cliente oficial...`);
-            const { data, error } = await client
+            const { error } = await client
               .from(table)
               .select("*")
               .limit(1);
@@ -82,7 +81,8 @@ export const ConnectionStatus = () => {
             const singletonError = singletonTest.error as ErrorWithMessage;
             const message = singletonError.message || "Error desconocido";
             const hint = singletonError.hint || "";
-            setErrorInfo(`${message}${hint ? ` (${hint})` : ""}`);
+            const errorMessage = hint ? `${message} (${hint})` : message;
+            setErrorInfo(errorMessage);
           } else if (lastError) {
             const message = lastError.message || "Error desconocido";
             setErrorInfo(message);

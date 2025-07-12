@@ -23,23 +23,27 @@ vi.mock("./config/env", () => ({
   }
 }));
 
-// Definir un mock global de cliente Supabase para evitar duplicación
-const mockSupabaseClient = {
-  from: vi.fn((table) => ({
-    select: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        single: vi.fn(() => Promise.resolve({ 
-          data: { professional_id: "prof-mock-123" }, 
-          error: null 
-        })),
-        order: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve({ data: [], error: null }))
-        }))
+// Funciones auxiliares para crear mocks de Supabase
+function createSelectMock() {
+  return {
+    eq: vi.fn(() => ({
+      single: vi.fn(() => Promise.resolve({ 
+        data: { professional_id: "prof-mock-123" }, 
+        error: null 
       })),
       order: vi.fn(() => ({
         limit: vi.fn(() => Promise.resolve({ data: [], error: null }))
       }))
     })),
+    order: vi.fn(() => ({
+      limit: vi.fn(() => Promise.resolve({ data: [], error: null }))
+    }))
+  };
+}
+
+function createTableMock() {
+  return {
+    select: vi.fn(createSelectMock),
     update: vi.fn(() => ({
       eq: vi.fn(() => Promise.resolve({ data: {}, error: null }))
     })),
@@ -47,7 +51,12 @@ const mockSupabaseClient = {
     delete: vi.fn(() => ({
       eq: vi.fn(() => Promise.resolve({ data: {}, error: null }))
     }))
-  })),
+  };
+}
+
+// Definir un mock global de cliente Supabase para evitar duplicación
+const mockSupabaseClient = {
+  from: vi.fn((_table) => createTableMock()),
   auth: {
     getSession: vi.fn(() => Promise.resolve({ data: { session: { user: { id: "user-mock-123" } } }, error: null })),
     getUser: vi.fn(() => Promise.resolve({ data: { user: { id: "user-mock-123" } }, error: null })),
@@ -117,6 +126,25 @@ vi.mock("./core/dataSources/formDataSourceSupabase", () => ({
   }
 }));
 
+// Funciones auxiliares para filtrar mensajes de consola
+function shouldFilterError(message: string): boolean {
+  return message.includes("Warning: ReactDOM.render") || 
+         message.includes("React.createFactory") ||
+         message.includes("Warning: An update to") ||
+         message.includes("Warning: Failed prop type") ||
+         message.includes("Invalid prop") ||
+         message.includes("supabaseUrl is required") ||
+         message.includes("Cannot read properties of null") ||
+         message.includes("createClient requires a valid supabase URL");
+}
+
+function shouldFilterWarn(message: string): boolean {
+  return message.includes("Warning: useLayoutEffect") || 
+         message.includes("Warning: React does not recognize") ||
+         message.includes("Missing Supabase client") ||
+         message.includes("Invalid Supabase configuration");
+}
+
 // Suprimir advertencias de consola durante las pruebas
 beforeAll(() => {
   // Almacenar los métodos originales de console
@@ -126,17 +154,7 @@ beforeAll(() => {
   // Sobrescribir console.error y console.warn para filtrar mensajes específicos
   console.error = (...args) => {
     // Filtrar mensajes específicos de React relacionados con testing
-    if (
-      typeof args[0] === "string" && 
-      (args[0].includes("Warning: ReactDOM.render") || 
-       args[0].includes("React.createFactory") ||
-       args[0].includes("Warning: An update to") ||
-       args[0].includes("Warning: Failed prop type") ||
-       args[0].includes("Invalid prop") ||
-       args[0].includes("supabaseUrl is required") ||
-       args[0].includes("Cannot read properties of null") ||
-       args[0].includes("createClient requires a valid supabase URL"))
-    ) {
+    if (typeof args[0] === "string" && shouldFilterError(args[0])) {
       return;
     }
     originalConsoleError(...args);
@@ -144,13 +162,7 @@ beforeAll(() => {
   
   console.warn = (...args) => {
     // Filtrar advertencias específicas que no son relevantes para las pruebas
-    if (
-      typeof args[0] === "string" && 
-      (args[0].includes("Warning: useLayoutEffect") || 
-       args[0].includes("Warning: React does not recognize") ||
-       args[0].includes("Missing Supabase client") ||
-       args[0].includes("Invalid Supabase configuration"))
-    ) {
+    if (typeof args[0] === "string" && shouldFilterWarn(args[0])) {
       return;
     }
     originalConsoleWarn(...args);
@@ -161,3 +173,42 @@ beforeAll(() => {
 afterEach(() => {
   vi.clearAllMocks();
 }); 
+
+// Funciones auxiliares para crear mocks de Supabase alternativos
+function createAlternativeSelectMock() {
+  return {
+    eq: vi.fn(() => ({
+      order: vi.fn(() => Promise.resolve({ data: [], error: null }))
+    }))
+  };
+}
+
+function createAlternativeTableMock() {
+  return {
+    select: vi.fn(createAlternativeSelectMock),
+    insert: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    update: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    delete: vi.fn(() => Promise.resolve({ data: null, error: null }))
+  };
+}
+
+function createAlternativeAuthMock() {
+  return {
+    getSession: vi.fn(() => Promise.resolve({ data: { session: null }, error: null })),
+    signInWithPassword: vi.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+    signOut: vi.fn(() => Promise.resolve({ error: null }))
+  };
+}
+
+// Función auxiliar para configurar mock de Supabase (no usada pero disponible para tests futuros)
+const _setupSupabaseMock = (): void => {
+  // Configuración básica del mock
+  const mockSupabase = {
+    from: vi.fn(createAlternativeTableMock),
+    auth: createAlternativeAuthMock()
+  };
+
+  vi.doMock("@/core/auth/supabaseClient", () => ({
+    default: mockSupabase
+  }));
+}; 

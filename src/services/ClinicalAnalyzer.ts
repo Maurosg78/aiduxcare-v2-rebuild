@@ -3,9 +3,12 @@
  * Reemplaza Cloud Function inestable con análisis 100% local
  */
 
+// Type aliases para evitar repetición de uniones de tipos
+type SeverityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+
 export interface ClinicalWarning {
   id: string;
-  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  severity: SeverityLevel;
   title: string;
   description: string;
   confidence: number;
@@ -35,7 +38,7 @@ export interface ClinicalAnalysis {
   warnings: ClinicalWarning[];
   suggestions: ClinicalSuggestion[];
   soapAnalysis: SOAPAnalysis;
-  riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  riskLevel: SeverityLevel;
   processingTimeMs: number;
   success: boolean;
   modelUsed: string;
@@ -121,12 +124,18 @@ export class ClinicalAnalyzer {
    */
   private detectCriticalPatterns(transcription: string, specialty: string): ClinicalWarning[] {
     const warnings: ClinicalWarning[] = [];
-    const text = transcription.toLowerCase();
 
     // PATRONES CRÍTICOS UNIVERSALES
     const criticalPatterns = [
       {
-        pattern: /dolor.*pecho.*brazo|dolor.*torácico.*irrad|opresión.*pecho|dolor.*opresivo.*pecho|sudoración.*profusa|dolor.*brazo.*mandíbula/i,
+        patterns: [
+          /dolor.*pecho.*brazo/i,
+          /dolor.*torácico.*irrad/i,
+          /opresión.*pecho/i,
+          /dolor.*opresivo.*pecho/i,
+          /sudoración.*profusa/i,
+          /dolor.*brazo.*mandíbula/i
+        ],
         severity: "CRITICAL" as const,
         title: "Sospecha de Síndrome Coronario Agudo",
         description: "Combinación de dolor torácico con irradiación sugiere posible evento coronario agudo",
@@ -135,7 +144,11 @@ export class ClinicalAnalyzer {
         confidence: 92
       },
       {
-        pattern: /dolor.*cabeza.*súbito|cefalea.*intensa.*repentina|peor.*dolor.*vida/i,
+        patterns: [
+          /dolor.*cabeza.*súbito/i,
+          /cefalea.*intensa.*repentina/i,
+          /peor.*dolor.*vida/i
+        ],
         severity: "CRITICAL" as const,
         title: "Cefalea de Inicio Súbito",
         description: "Cefalea súbita intensa puede indicar hemorragia subaracnoidea",
@@ -144,7 +157,11 @@ export class ClinicalAnalyzer {
         confidence: 88
       },
       {
-        pattern: /dificultad.*respirar|disnea.*severa|no.*puedo.*respirar/i,
+        patterns: [
+          /dificultad.*respirar/i,
+          /disnea.*severa/i,
+          /no.*puedo.*respirar/i
+        ],
         severity: "HIGH" as const,
         title: "Dificultad Respiratoria Significativa",
         description: "Disnea severa requiere evaluación inmediata de vía aérea y función pulmonar",
@@ -153,7 +170,11 @@ export class ClinicalAnalyzer {
         confidence: 85
       },
       {
-        pattern: /dolor.*abdominal.*intenso|abdomen.*rígido|defensa.*abdominal/i,
+        patterns: [
+          /dolor.*abdominal.*intenso/i,
+          /abdomen.*rígido/i,
+          /defensa.*abdominal/i
+        ],
         severity: "HIGH" as const,
         title: "Dolor Abdominal Agudo",
         description: "Dolor abdominal severo con signos de irritación peritoneal",
@@ -166,7 +187,11 @@ export class ClinicalAnalyzer {
     // PATRONES ESPECÍFICOS POR ESPECIALIDAD
     if (specialty === "cardiology") {
       criticalPatterns.push({
-        pattern: /palpitaciones.*mareos|taquicardia.*síncope|arritmia/i,
+        patterns: [
+          /palpitaciones.*mareos/i,
+          /taquicardia.*síncope/i,
+          /arritmia/i
+        ],
         severity: "HIGH" as const,
         title: "Síntomas Cardiovasculares Complejos",
         description: "Combinación de síntomas sugiere posible arritmia significativa",
@@ -177,8 +202,15 @@ export class ClinicalAnalyzer {
     }
 
     if (specialty === "physiotherapy") {
-      criticalPatterns.push(       {
-        pattern: /pérdida.*fuerza|perdido.*fuerza|entumecimiento|hormigueo|debilidad.*súbita|parestesia/i,
+      criticalPatterns.push({
+        patterns: [
+          /pérdida.*fuerza/i,
+          /perdido.*fuerza/i,
+          /entumecimiento/i,
+          /hormigueo/i,
+          /debilidad.*súbita/i,
+          /parestesia/i
+        ],
         severity: "HIGH" as const,
         title: "Signos Neurológicos de Alarma",
         description: "Pérdida de fuerza o sensibilidad puede indicar compromiso neurológico",
@@ -190,7 +222,8 @@ export class ClinicalAnalyzer {
 
     // Análisis de patrones
     criticalPatterns.forEach((pattern, index) => {
-      if (pattern.pattern.test(transcription)) {
+      const isMatch = pattern.patterns.some(p => p.test(transcription));
+      if (isMatch) {
         warnings.push({
           id: `warning_${index}_${Date.now()}`,
           severity: pattern.severity,
@@ -215,7 +248,6 @@ export class ClinicalAnalyzer {
     specialty: string
   ): ClinicalSuggestion[] {
     const suggestions: ClinicalSuggestion[] = [];
-    const text = transcription.toLowerCase();
 
     // SUGERENCIAS BASADAS EN ADVERTENCIAS
     warnings.forEach((warning, index) => {
@@ -365,7 +397,7 @@ export class ClinicalAnalyzer {
   /**
    * Cálculo de nivel de riesgo general
    */
-  private calculateRiskLevel(warnings: ClinicalWarning[]): "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" {
+  private calculateRiskLevel(warnings: ClinicalWarning[]): SeverityLevel {
     if (warnings.some(w => w.severity === "CRITICAL")) {
       return "CRITICAL";
     }

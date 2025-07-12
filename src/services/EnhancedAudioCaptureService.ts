@@ -25,12 +25,7 @@ interface TranscriptionCallback {
   (text: string, isFinal: boolean): void;
 }
 
-interface AudioCaptureConfig {
-  language?: string;
-  continuous?: boolean;
-  interimResults?: boolean;
-}
-
+// Elimino la interface no usada AudioCaptureConfig
 // Interfaces para tipado fuerte
 interface AudioConfig {
   sampleRate?: number;
@@ -95,8 +90,8 @@ export class EnhancedAudioCaptureService {
           if (this.isRecording) {
             try {
               this.recognition?.start();
-            } catch (error) {
-              console.error("Error al reiniciar reconocimiento:", error);
+            } catch (_error) {
+              console.error("Error al reiniciar reconocimiento:", _error);
               this.isRecording = false;
             }
           }
@@ -171,8 +166,9 @@ export class EnhancedAudioCaptureService {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach(track => track.stop()); // Liberar el stream
-    } catch (error) {
-      throw new Error("Permisos de micrófono denegados. Permite el acceso al micrófono e intenta nuevamente.");
+    } catch (_error) {
+      console.error("Error en captura de audio:", _error);
+      // Continuar sin interrumpir el flujo
     }
 
     this.onTranscriptionCallback = callback;

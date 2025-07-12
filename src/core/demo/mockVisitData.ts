@@ -1,15 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
 import { MCPContext, MCPMemoryBlock } from "@/core/mcp/schema";
-import type { AgentSuggestion, SuggestionField } from "@/types/agent";
+import type { AgentSuggestion } from "@/types/agent";
 import { TranscriptionSegment } from "@/core/audio/AudioCaptureService";
 import { AuditLogEntry } from "@/core/audit/AuditLogger";
-import type { MemoryBlock } from "@/types/agent";
+
+// Constantes para evitar strings duplicados
+const DEMO_VISIT_ID = "visit-demo-20230615";
+const DEMO_PATIENT_ID = "patient-demo-001";
 
 /**
  * Información simulada del paciente para la demo
  */
 export const mockPatient = {
-  id: "patient-demo-001",
+  id: DEMO_PATIENT_ID,
   name: "Alejandro Sánchez",
   age: 68,
   gender: "Masculino",
@@ -21,7 +24,7 @@ export const mockPatient = {
  * Información simulada de la visita para la demo
  */
 export const mockVisit = {
-  id: "visit-demo-20230615",
+  id: DEMO_VISIT_ID,
   date: "2023-06-15T09:30:00Z",
   type: "Consulta de seguimiento",
   provider: "Dra. Carmen Ruiz",
@@ -52,8 +55,8 @@ export const mockMCPContext: MCPContext = {
         type: "contextual",
         content: "Paciente masculino de 68 años acude a consulta de seguimiento por hipertensión y diabetes tipo 2. Refiere episodios de mareo ocasional al levantarse y dolor intermitente en extremidades inferiores.",
         timestamp: new Date("2023-06-15T09:35:00Z").toISOString(),
-        visit_id: "visit-demo-20230615",
-        patient_id: "patient-demo-001",
+        visit_id: DEMO_VISIT_ID,
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock,
       {
@@ -61,8 +64,8 @@ export const mockMCPContext: MCPContext = {
         type: "contextual",
         content: "Signos vitales: TA 152/88 mmHg, FC 76 lpm, FR 16 rpm, T 36.5°C, SatO2 97%, Glucemia capilar 156 mg/dL.",
         timestamp: new Date("2023-06-15T09:40:00Z").toISOString(), 
-        visit_id: "visit-demo-20230615",
-        patient_id: "patient-demo-001",
+        visit_id: DEMO_VISIT_ID,
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock,
       {
@@ -70,8 +73,8 @@ export const mockMCPContext: MCPContext = {
         type: "contextual",
         content: "Medicación actual: Metformina 850mg c/12h, Enalapril 10mg c/24h, Amlodipino 5mg c/24h, AAS 100mg c/24h.",
         timestamp: new Date("2023-06-15T09:42:00Z").toISOString(),
-        visit_id: "visit-demo-20230615",
-        patient_id: "patient-demo-001",
+        visit_id: DEMO_VISIT_ID,
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock
     ]
@@ -84,7 +87,7 @@ export const mockMCPContext: MCPContext = {
         type: "persistent",
         content: "Diagnósticos: Hipertensión arterial esencial (I10) desde 2015, Diabetes mellitus tipo 2 (E11) desde 2018, Dislipemia mixta (E78.2) desde 2019.",
         timestamp: new Date("2021-03-10T11:20:00Z").toISOString(),
-        patient_id: "patient-demo-001",
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock,
       {
@@ -92,7 +95,7 @@ export const mockMCPContext: MCPContext = {
         type: "persistent",
         content: "Antecedentes quirúrgicos: Apendicectomía (1985), Colecistectomía laparoscópica (2010).",
         timestamp: new Date("2020-05-22T14:15:00Z").toISOString(),
-        patient_id: "patient-demo-001",
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock,
       {
@@ -100,7 +103,7 @@ export const mockMCPContext: MCPContext = {
         type: "persistent",
         content: "Alergias: Penicilina (reacción cutánea severa), Sulfamidas (reacción moderada).",
         timestamp: new Date("2019-09-03T10:45:00Z").toISOString(),
-        patient_id: "patient-demo-001",
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock
     ]
@@ -113,7 +116,7 @@ export const mockMCPContext: MCPContext = {
         type: "semantic",
         content: "Últimos resultados de laboratorio (2023-05-20): Glucemia 142 mg/dL, HbA1c 7.2%, Creatinina 1.1 mg/dL, Colesterol total 195 mg/dL, HDL 45 mg/dL, LDL 120 mg/dL, Triglicéridos 156 mg/dL.",
         timestamp: new Date("2023-05-25T08:30:00Z").toISOString(),
-        patient_id: "patient-demo-001",
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock,
       {
@@ -121,7 +124,7 @@ export const mockMCPContext: MCPContext = {
         type: "semantic",
         content: "Último fondo de ojo (2023-01-15): Retinopatía diabética no proliferativa leve en ojo derecho. Sin alteraciones en ojo izquierdo.",
         timestamp: new Date("2023-01-20T15:10:00Z").toISOString(),
-        patient_id: "patient-demo-001",
+        patient_id: DEMO_PATIENT_ID,
         validated: true
       } as ExtendedMCPMemoryBlock
     ]
@@ -251,12 +254,12 @@ export const mockAuditLogs: AuditLogEntry[] = [
     user_id: "user-demo-001",
     action: "visit.created",
     event_type: "visit.created",
-    visit_id: "visit-demo-20230615",
-    patient_id: "patient-demo-001",
+    visit_id: DEMO_VISIT_ID,
+    patient_id: DEMO_PATIENT_ID,
     metadata: {},
     details: {
-      visit_id: "visit-demo-20230615",
-      patient_id: "patient-demo-001"
+      visit_id: DEMO_VISIT_ID,
+      patient_id: DEMO_PATIENT_ID
     }
   },
   {
@@ -265,11 +268,11 @@ export const mockAuditLogs: AuditLogEntry[] = [
     user_id: "user-demo-001",
     action: "mcp.context.generated",
     event_type: "mcp.context.generated",
-    visit_id: "visit-demo-20230615",
-    patient_id: "patient-demo-001",
+    visit_id: DEMO_VISIT_ID,
+    patient_id: DEMO_PATIENT_ID,
     metadata: {},
     details: {
-      visit_id: "visit-demo-20230615",
+      visit_id: DEMO_VISIT_ID,
       blocks_count: 7
     }
   },
@@ -279,11 +282,11 @@ export const mockAuditLogs: AuditLogEntry[] = [
     user_id: "user-demo-001",
     action: "agent.suggestions.generated",
     event_type: "agent.suggestions.generated",
-    visit_id: "visit-demo-20230615",
-    patient_id: "patient-demo-001",
+    visit_id: DEMO_VISIT_ID,
+    patient_id: DEMO_PATIENT_ID,
     metadata: {},
     details: {
-      visit_id: "visit-demo-20230615",
+      visit_id: DEMO_VISIT_ID,
       suggestions_count: 5
     }
   }

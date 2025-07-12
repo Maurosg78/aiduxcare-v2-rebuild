@@ -259,7 +259,7 @@ export default function PhysiotherapyWorkflowPage() {
       const questions = await physiotherapyService.generateBlindSpotQuestions(transcription, clinicalFacts);
       setSession(prev => ({
         ...prev,
-        suggestedQuestions: questions.map((q: any) => ({
+        suggestedQuestions: questions.map((q: { id: string; question?: string; rationale?: string; expected_insights?: string; priority: string }) => ({
           id: q.id,
           type: "question",
           title: q.question ?? "",
@@ -278,7 +278,7 @@ export default function PhysiotherapyWorkflowPage() {
       const tests = await physiotherapyService.generateDiagnosticTests(transcription, clinicalFacts);
       setSession(prev => ({
         ...prev,
-        suggestedTests: tests.map((t: any) => ({
+        suggestedTests: tests.map((t: { id: string; name?: string; procedure?: string; clinical_relevance?: string; priority: string }) => ({
           id: t.id,
           type: "test",
           title: t.name ?? "",
@@ -297,14 +297,14 @@ export default function PhysiotherapyWorkflowPage() {
       const checklist = await physiotherapyService.generateActionChecklist(transcription, clinicalFacts, warnings, suggestions);
       setSession(prev => ({
         ...prev,
-        checklist: checklist.map((item: any) => ({
+        checklist: checklist.map((item: { id: string; type: string; action: string; rationale: string; documentation: string; priority: string }) => ({
           id: item.id,
-          type: item.type,
+          type: item.type as "question" | "test" | "contraindication" | "red_flag" | "suggestion" | "warning",
           title: item.action,
           description: item.rationale,
           rationale: item.documentation,
-          priority: item.priority
-        }))
+          priority: item.priority as "high" | "medium" | "low"
+        })) as PhysiotherapyInsight[]
       }));
     } catch (error) {
       console.error("❌ Error generando checklist:", error);

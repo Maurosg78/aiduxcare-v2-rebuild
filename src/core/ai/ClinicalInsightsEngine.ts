@@ -5,7 +5,7 @@
  */
 
 import { ClinicalEntity, SOAPNotes } from "@/types/nlp";
-import { RAGMedicalMCP, RAGQueryResult } from "@/core/mcp/RAGMedicalMCP";
+import { RAGMedicalMCP } from "@/core/mcp/RAGMedicalMCP";
 import { AuditLogger } from "@/core/audit/AuditLogger";
 
 // === INTERFACES AVANZADAS ===

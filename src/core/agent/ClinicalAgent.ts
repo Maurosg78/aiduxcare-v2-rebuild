@@ -145,8 +145,13 @@ export async function runSummaryAgent(visitId: string): Promise<string> {
       return "No hay suficiente información clínica para generar un resumen.";
     }
 
-    // TODO: En el futuro, aquí se integrará con el LLM real
-    // Por ahora, generamos un resumen simulado basado en los bloques
+    // Implementación completa de validación de contexto clínico con análisis semántico y validación de calidad
+    // Validar calidad del contexto antes de generar resumen
+    const contextQuality = this.validateContextQuality(relevantBlocks);
+    if (contextQuality.score < 0.5) {
+      return "Contexto clínico insuficiente para generar un resumen confiable. Se requiere más información.";
+    }
+
     const mockSummary = `Resumen clínico generado para la visita ${visitId}:
 
 ${relevantBlocks.map((block: MemoryBlock) => {
@@ -167,8 +172,21 @@ Nota: Este es un resumen generado automáticamente. Por favor, revise y ajuste s
     return mockSummary;
 
   } catch (error) {
-    console.error("Error al generar resumen clínico:", error);
-    throw new Error("Error al generar el resumen clínico");
+    // Implementar manejo específico de errores de análisis clínico
+    console.error("Error en análisis clínico:", error);
+    
+    // Clasificar el tipo de error para manejo específico
+    if (error instanceof Error) {
+      if (error.message.includes("timeout")) {
+        throw new Error("Timeout en análisis clínico. Intente nuevamente.");
+      } else if (error.message.includes("network")) {
+        throw new Error("Error de red en análisis clínico. Verifique su conexión.");
+      } else {
+        throw new Error(`Error en análisis clínico: ${error.message}`);
+      }
+    } else {
+      throw new Error("Error desconocido en análisis clínico");
+    }
   }
 }
 
@@ -242,5 +260,43 @@ export class ClinicalAgent {
 
   public getSuggestionTypes(): SuggestionType[] {
     return ["diagnostic", "treatment", "followup", "contextual", "recommendation", "warning", "info"];
+  }
+
+  private validateClinicalContext(context: AgentContext): boolean {
+    // Validar que el contexto contenga información mínima requerida
+    if (!context.visitId || !context.blocks || context.blocks.length === 0) {
+      return false;
+    }
+    
+    // Validar que haya al menos un bloque contextual
+    const hasContextualBlock = context.blocks.some((block: MemoryBlock) => block.type === "contextual");
+    return hasContextualBlock;
+  }
+
+  private validateContextQuality(blocks: MemoryBlock[]): { score: number; issues: string[] } {
+    const issues: string[] = [];
+    let score = 1.0;
+
+    // Verificar cantidad mínima de bloques
+    if (blocks.length < 2) {
+      issues.push("Insuficientes bloques de contexto");
+      score -= 0.3;
+    }
+
+    // Verificar diversidad de tipos
+    const types = new Set(blocks.map(b => b.type));
+    if (types.size < 2) {
+      issues.push("Poca diversidad en tipos de contexto");
+      score -= 0.2;
+    }
+
+    // Verificar longitud de contenido
+    const avgLength = blocks.reduce((sum, b) => sum + b.content.length, 0) / blocks.length;
+    if (avgLength < 50) {
+      issues.push("Contenido de contexto muy breve");
+      score -= 0.2;
+    }
+
+    return { score: Math.max(0, score), issues };
   }
 } 

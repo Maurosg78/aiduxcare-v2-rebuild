@@ -3,13 +3,16 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import supabase from "../../../core/auth/supabaseClient";
 
+// Type aliases para mejorar legibilidad
+type SuggestionType = "recommendation" | "warning" | "info";
+
 interface IntegratedSuggestion {
   id: string;
   content: string;
   field: string;
   accepted_by: string;
   accepted_at: string;
-  type: "recommendation" | "warning" | "info";
+  type: SuggestionType;
 }
 
 interface IntegratedSuggestionViewerProps {
@@ -52,7 +55,7 @@ const IntegratedSuggestionViewer: React.FC<IntegratedSuggestionViewerProps> = ({
           field: log.field_name,
           accepted_by: log.accepted_by,
           accepted_at: log.accepted_at,
-          type: log.suggestion_type as "recommendation" | "warning" | "info"
+          type: log.suggestion_type as SuggestionType
         }));
 
         setSuggestions(formattedSuggestions);
@@ -68,7 +71,7 @@ const IntegratedSuggestionViewer: React.FC<IntegratedSuggestionViewerProps> = ({
   }, [visitId]);
 
   // Función para obtener el color del badge según el tipo de sugerencia
-  const getTypeColorClass = (type: "recommendation" | "warning" | "info"): string => {
+  const getTypeColorClass = (type: SuggestionType): string => {
     switch (type) {
     case "recommendation":
       return "bg-blue-100 text-blue-800";
@@ -80,7 +83,7 @@ const IntegratedSuggestionViewer: React.FC<IntegratedSuggestionViewerProps> = ({
   };
 
   // Función para obtener el ícono según el tipo de sugerencia
-  const getTypeIcon = (type: "recommendation" | "warning" | "info"): string => {
+  const getTypeIcon = (type: SuggestionType): string => {
     switch (type) {
     case "recommendation":
       return "💡";

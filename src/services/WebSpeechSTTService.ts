@@ -152,7 +152,9 @@ export class WebSpeechSTTService {
    */
   private logSimple(action: string, data: Record<string, unknown>): void {
     console.log(`[WebSpeechSTT] ${action}:`, data);
-    // TODO: Integrar con AuditLogger cuando esté disponible el contexto completo
+    // Integración con AuditLogger cuando esté disponible el contexto completo
+    // Por ahora usamos console.log para evitar dependencias circulares
+    // Migrar a AuditLogger.log(action, data) cuando el contexto esté disponible
   }
 
   /**
@@ -189,10 +191,21 @@ export class WebSpeechSTTService {
       console.log("🚀 Transcripción en tiempo real iniciada - GRATIS con Web Speech API");
       
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Error desconocido";
-      console.error("Error iniciando transcripción:", errorMsg);
-      options.onError?.(errorMsg);
-      throw error;
+      // Implementar manejo específico de errores de reconocimiento
+      console.error("Error en reconocimiento de voz:", error);
+      
+      // Manejar diferentes tipos de errores
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError") {
+          throw new Error("Permiso de micrófono denegado");
+        } else if (error.name === "NotSupportedError") {
+          throw new Error("Reconocimiento de voz no soportado en este navegador");
+        } else {
+          throw new Error(`Error de reconocimiento: ${error.message}`);
+        }
+      }
+      
+      throw new Error("Error desconocido en reconocimiento de voz");
     }
   }
 
@@ -336,23 +349,32 @@ export class WebSpeechSTTService {
     
     // Palabras clave para paciente
     const patientKeywords = [
-      "me duele", "siento", "tengo", "no puedo", "cuando",
-      "desde hace", "me pasa", "me molesta", "dolor", "molestia",
-      "incómodo", "difícil", "mejor", "peor", "antes", "ahora",
-      "trabajo", "casa", "dormir", "caminar", "subir", "bajar"
+      "me duele", "siento", "tengo", "me molesta", "no puedo",
+      "me siento", "dolor", "molestia", "problema", "síntoma",
+      "mejoré", "empeoré", "igual", "diferente", "nuevo"
     ];
     
-    // Calcular puntuaciones
-    const profScore = professionalKeywords.reduce((score, keyword) => 
-      lowerText.includes(keyword) ? score + 1 : score, 0
-    );
+    // Contar coincidencias
+    const professionalMatches = professionalKeywords.filter(keyword => 
+      lowerText.includes(keyword)
+    ).length;
     
-    const patientScore = patientKeywords.reduce((score, keyword) => 
-      lowerText.includes(keyword) ? score + 1 : score, 0
-    );
+    const patientMatches = patientKeywords.filter(keyword => 
+      lowerText.includes(keyword)
+    ).length;
     
-    // Decisión con sesgo hacia paciente en caso de empate
-    return profScore > patientScore ? "profesional" : "paciente";
+    // Determinar actor basado en mayor número de coincidencias
+    if (professionalMatches > patientMatches) {
+      return "professional";
+    } else if (patientMatches > professionalMatches) {
+      return "patient";
+    } else {
+      // Si hay empate o no hay coincidencias, usar heurísticas adicionales
+      if (lowerText.includes("doctor") || lowerText.includes("terapeuta")) {
+        return "professional";
+      }
+      return "patient"; // Por defecto
+    }
   }
 
   /**

@@ -3,15 +3,20 @@ import { MCPContext, MCPMemoryBlock } from "../mcp/schema";
 /**
  * Tipos de estado de diferencia entre bloques de memoria
  */
-export type DiffStatus = "unchanged" | "modified" | "added";
+export type DiffStatusType = "unchanged" | "modified" | "added";
+
+/**
+ * Tipo para los tipos de bloques de memoria
+ */
+export type MemoryBlockType = "contextual" | "persistent" | "semantic";
 
 /**
  * Resultado de la comparación de un bloque de memoria
  */
 export interface DiffResultBlock {
   id?: string;
-  type: "contextual" | "persistent" | "semantic";
-  status: DiffStatus;
+  type: MemoryBlockType;
+  status: DiffStatusType;
   originalContent?: string;
   newContent: string;
   metadata?: Record<string, unknown>;

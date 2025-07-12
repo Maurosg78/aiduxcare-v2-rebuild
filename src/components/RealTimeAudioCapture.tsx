@@ -34,22 +34,29 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
   const audioCaptureRef = useRef<AudioCaptureServiceReal | null>(null);
   const statsIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Función fuera del useEffect para evitar anidación profunda
+  function updateTranscriptionSegment(
+    segment: TranscriptionSegment,
+    setTranscriptionSegments: React.Dispatch<React.SetStateAction<TranscriptionSegment[]>>,
+    onTranscriptionUpdate?: (segment: TranscriptionSegment) => void
+  ) {
+    setTranscriptionSegments(prev => {
+      const existingIndex = prev.findIndex(s => s.id === segment.id);
+      if (existingIndex !== -1) {
+        const updated = [...prev];
+        updated[existingIndex] = segment;
+        return updated;
+      }
+      return [...prev, segment];
+    });
+    onTranscriptionUpdate?.(segment);
+  }
+
   // Inicializar servicio de captura
   useEffect(() => {
     audioCaptureRef.current = new AudioCaptureServiceReal({
       language,
-      onTranscriptionUpdate: (segment) => {
-        setTranscriptionSegments(prev => {
-          const existingIndex = prev.findIndex(s => s.id === segment.id);
-          if (existingIndex !== -1) {
-            const updated = [...prev];
-            updated[existingIndex] = segment;
-            return updated;
-          }
-          return [...prev, segment];
-        });
-        onTranscriptionUpdate?.(segment);
-      },
+      onTranscriptionUpdate: (segment) => updateTranscriptionSegment(segment, setTranscriptionSegments, onTranscriptionUpdate),
       onError: (error) => {
         setErrorMessage(error);
         setCaptureStatus("error");
@@ -190,6 +197,11 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
     }
   };
 
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLang = e.target.value as "es" | "en";
+    audioCaptureRef.current?.setLanguage(newLang);
+  };
+
   if (!isSupported) {
     const compatibility = WebSpeechSTTService.getBrowserCompatibility();
     return (
@@ -225,11 +237,34 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
     );
   }
 
-  // Definir constantes para evitar strings duplicados
-  const STATUS_MESSAGES = {
-    RECORDING: "Recording audio...",
-    PROCESSING: "Processing audio...",
-    READY: "Ready to record"
+  interface SegmentItemProps {
+    segment: TranscriptionSegment;
+  }
+
+  const SegmentItem: React.FC<SegmentItemProps> = ({ segment }) => {
+    return (
+      <div 
+        key={segment.id}
+        className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2">
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getActorBadgeColor(segment.actor)}`}>
+              {segment.actor}
+            </span>
+            <span className={`text-xs font-medium ${getConfidenceColor(segment.confidence)}`}>
+              {segment.confidence}
+            </span>
+          </div>
+          <span className="text-xs text-gray-500">
+            {new Date(segment.timestamp).toLocaleTimeString()}
+          </span>
+        </div>
+        <p className="text-sm text-gray-800 leading-relaxed">
+          {segment.content}
+        </p>
+      </div>
+    );
   };
 
   return (
@@ -282,10 +317,7 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
 
           <select
             value={language}
-            onChange={(e) => {
-              const newLang = e.target.value as "es" | "en";
-              audioCaptureRef.current?.setLanguage(newLang);
-            }}
+            onChange={handleLanguageChange}
             disabled={captureStatus === "recording"}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm disabled:opacity-50"
             aria-label="Seleccionar idioma de transcripción"
@@ -359,28 +391,8 @@ const RealTimeAudioCapture: React.FC<RealTimeAudioCaptureProps> = ({
               )}
             </div>
           ) : (
-            transcriptionSegments.map((segment, _index) => (
-              <div 
-                key={segment.id}
-                className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getActorBadgeColor(segment.actor)}`}>
-                      {segment.actor}
-                    </span>
-                    <span className={`text-xs font-medium ${getConfidenceColor(segment.confidence)}`}>
-                      {segment.confidence}
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {new Date(segment.timestamp).toLocaleTimeString()}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-800 leading-relaxed">
-                  {segment.content}
-                </p>
-              </div>
+            transcriptionSegments.map((segment) => (
+              <SegmentItem key={segment.id} segment={segment} />
             ))
           )}
         </div>

@@ -44,28 +44,15 @@ export interface LongitudinalMetric {
   suggestions_integrated: number;
   audio_items_validated: number;
   time_saved_minutes: number;
-  risk_level_summary: "low" | "medium" | "high";
-  clinical_evolution: "improved" | "stable" | "worsened";
+  risk_level_summary: RiskLevel;
+  clinical_evolution: ClinicalEvolution;
   notes?: string;
   details?: Record<string, unknown>;
 }
 
-// Para el uso con metric.map
-export interface MetricData {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  user_id: string;
-  date: string;
-  suggestions_generated: number;
-  suggestions_accepted: number;
-  suggestions_integrated: number;
-  time_saved_minutes: number;
-  risk_level_summary: string;
-  clinical_evolution: string;
-  details?: string;
-  [key: string]: unknown;
-}
+// Type aliases para mejorar legibilidad
+type RiskLevel = "low" | "medium" | "high";
+type ClinicalEvolution = "improved" | "stable" | "worsened";
 
 // Almacén en memoria para métricas (simulando Supabase)
 const metricsStore: UsageMetric[] = [];
@@ -139,14 +126,7 @@ export const getMetricsByVisit = (visitId: string): UsageMetric[] => {
  * @param visitId ID de la visita para filtrar las métricas
  * @returns Objeto con totales por tipo de métrica
  */
-export const getMetricsSummaryByVisit = (visitId: string): { 
-  generated: number;
-  accepted: number;
-  integrated: number;
-  field_matched: number;
-  warnings: number;
-  estimated_time_saved_minutes: number;
-} => {
+export const getMetricsSummaryByVisit = (visitId: string): MetricSummary => {
   const metrics = getMetricsByVisit(visitId);
   
   // Calcular el tiempo estimado ahorrado sumando todos los campos estimated_time_saved_minutes
@@ -200,14 +180,14 @@ export const calculateLongitudinalMetrics = async (
   userId: string,
   fieldsChanged: number = 0,
   audioItemsValidated: number = 0,
-  clinicalEvolution: "improved" | "stable" | "worsened" = "stable"
+  clinicalEvolution: ClinicalEvolution = "stable"
 ): Promise<LongitudinalMetric> => {
   // Obtener métricas de ambas visitas
   const currentMetrics = getMetricsSummaryByVisit(currentVisitId);
   const previousMetrics = getMetricsSummaryByVisit(previousVisitId);
   
   // Determinar el nivel de riesgo basado en advertencias y adherencia a sugerencias
-  let riskLevel: "low" | "medium" | "high" = "low";
+  let riskLevel: RiskLevel = "low";
   
   // Si hay más advertencias en la visita actual y/o baja adherencia a sugerencias,
   // aumentar el nivel de riesgo
@@ -330,8 +310,8 @@ export const getLongitudinalMetricsByPatient = async (patientId: string): Promis
       suggestions_integrated: metric.suggestions_integrated,
       audio_items_validated: metric.audio_items_validated as number,
       time_saved_minutes: metric.time_saved_minutes,
-      risk_level_summary: metric.risk_level_summary as "low" | "medium" | "high",
-      clinical_evolution: metric.clinical_evolution as "improved" | "stable" | "worsened",
+      risk_level_summary: metric.risk_level_summary as RiskLevel,
+      clinical_evolution: metric.clinical_evolution as ClinicalEvolution,
       notes: metric.notes as string | undefined,
       details: metric.details 
         ? JSON.parse(metric.details as string) 
@@ -415,11 +395,11 @@ const generateFallbackMetric = (visitId: string): LongitudinalMetric => {
   const timeSaved = suggestionsIntegrated * 2 + audioValidated;
   
   // Determinar evolución clínica aleatoria
-  const evolutions: Array<"improved" | "stable" | "worsened"> = ["improved", "stable", "worsened"];
+  const evolutions: ClinicalEvolution[] = ["improved", "stable", "worsened"];
   const randomEvolution = evolutions[Math.floor(Math.random() * evolutions.length)];
   
   // Determinar nivel de riesgo
-  const riskLevels: Array<"low" | "medium" | "high"> = ["low", "medium", "high"];
+  const riskLevels: RiskLevel[] = ["low", "medium", "high"];
   const randomRisk = riskLevels[Math.floor(Math.random() * riskLevels.length)];
   
   // Crear métrica de respaldo
@@ -523,20 +503,35 @@ const getSupabaseClient = (): SupabaseClient => {
 
 export class UsageAnalyticsService {
   public static async logMetric(
-    type: string,
-    userId: string,
-    metadata: Record<string, unknown>,
-    visitId?: string
+    metricName: string,
+    value: MetricValue,
+    tags: MetricTags = {}
   ): Promise<void> {
     try {
       // Registrar el evento de uso
-      track(type, {
-        user_id: userId,
-        visit_id: visitId,
-        ...metadata
+      track(metricName, {
+        value: value,
+        ...tags
       });
     } catch (error) {
       console.error("Error al registrar métrica de uso:", error);
+      throw error;
+    }
+  }
+
+  public static async logEvent(
+    eventName: string,
+    properties: MetricProperties = {},
+    tags: MetricTags = {}
+  ): Promise<void> {
+    try {
+      // Registrar el evento de uso
+      track(eventName, {
+        ...properties,
+        ...tags
+      });
+    } catch (error) {
+      console.error("Error al registrar evento de uso:", error);
       throw error;
     }
   }

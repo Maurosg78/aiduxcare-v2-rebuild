@@ -132,9 +132,13 @@ export class GoogleCloudAudioService {
             fullErrorResponse = JSON.parse(rawResponse);
             errorDetails = fullErrorResponse.message || fullErrorResponse.error || "Error desconocido del servidor";
           } catch (jsonParseError) {
+            // Si no se puede parsear JSON, usar la respuesta raw
+            console.warn("No se pudo parsear respuesta JSON:", jsonParseError);
             errorDetails = rawResponse || `Error HTTP ${response.status}: ${response.statusText}`;
           }
         } catch (textError) {
+          // Si no se puede obtener el texto de la respuesta
+          console.warn("No se pudo obtener texto de respuesta:", textError);
           errorDetails = `Error HTTP ${response.status}: ${response.statusText}`;
         }
 
@@ -229,7 +233,8 @@ export class GoogleCloudAudioService {
         confidence: 0.95
       };
     } catch (error) {
-      throw new Error("Error al procesar audio con Google Cloud");
+      console.error("Error en configuración de audio:", error);
+      throw new Error("Error configurando audio para transcripción");
     }
   }
 
@@ -327,10 +332,10 @@ export class GoogleCloudAudioService {
           message: `⚠️ Cerebro Clínico no disponible (${response.status})`
         };
       }
-    } catch (error) {
+    } catch (_error) {
       return {
         available: false,
-        message: `❌ Error verificando estado del Cerebro Clínico: ${error instanceof Error ? error.message : "Error desconocido"}`
+        message: `❌ Error verificando estado del Cerebro Clínico: ${_error instanceof Error ? _error.message : "Error desconocido"}`
       };
     }
   }
